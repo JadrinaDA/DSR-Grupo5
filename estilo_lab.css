@@ -36,11 +36,12 @@ body{
 	flex-direction: column;
 	border-radius: 20px;
 	margin: 8px;
+	background-image: url(sim.png);
+	background-size: cover;
+	background-position: center;
+	width: 20vw;
+	height: 12vw;
 
-}
-
-.block:hover {
-	background-color: lightgrey;
 }
 
 .foto {
@@ -52,8 +53,21 @@ body{
 
 .desc {
 	font-size: 10px;
+	text-align: center;
 	padding-left: 5px;
 	padding-right: 5px;
+	background-color: transparent;
+	width: 14.98vw;
+	height: 12vw;
+	color: transparent;
+	border-radius: 20px;
+	font-weight: bolder;
+}
+
+.desc:hover
+{
+	background-color: rgba(211, 211, 211, 0.7);
+	color: black;
 }
 
 h3 {
