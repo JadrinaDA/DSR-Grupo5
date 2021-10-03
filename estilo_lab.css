@@ -39,7 +39,7 @@ body{
 	background-image: url(sim.png);
 	background-size: cover;
 	background-position: center;
-	width: 20vw;
+	width: 15vw;
 	height: 12vw;
 
 }
@@ -57,7 +57,7 @@ body{
 	padding-left: 5px;
 	padding-right: 5px;
 	background-color: transparent;
-	width: 14.98vw;
+	width: 14.4vw;
 	height: 12vw;
 	color: transparent;
 	border-radius: 20px;
@@ -74,4 +74,24 @@ h3 {
 	background-color: grey;
 	color: white;
 	padding-left: 5px;
+}
+
+.container_horas {
+	background-color: white;
+	border-radius: 20px;
+	padding-left: 10px;
+}
+
+.nombre {
+	font-weight: bolder;
+	font-size: 20px;
+	text-align: center;
+	margin: 0px;
+}
+
+.container_exp {
+	display: flex;
+	flex-direction: column;
+	width: 15vw;
+	margin-right: 1.7vw;
 }
