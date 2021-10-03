@@ -95,3 +95,51 @@ h3 {
 	width: 15vw;
 	margin-right: 1.7vw;
 }
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+
+nav {
+	background-color: grey;
+	color: white;
+	height: 40px;
+	padding: 10px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-family:  'Montserrat', sans-serif;
+	font-style: extra-bold;
+	font-variant: normal;
+	font-weight: bolder;
+	border: none;
+	margin: none;
+  }
+
+  .link {
+	height: 50px;
+    padding: 25px 20px;
+	letter-spacing: 120%;}
+
+ /* LINKS NAVBAR */
+.link:hover {
+    background-color: hsla(197, 62%, 70%, 90%);
+}
+
+.link:focus {
+    background-color:#420E5B;
+}
+
+.link:active {
+    background-color: hsla(287, 51%, 34%, 1);
+}
+
+.nav-links a {
+	text-decoration: none;
+	color: white;
+}
