@@ -3,9 +3,16 @@ import numpy as np
 from scipy.integrate import solve_ivp
 from functools import partial  # https://docs.python.org/3.6/library/functools.html
                                # required to pass additional parameters to solve_ivp
-import pygame
+from flask import Flask 
+from flask_socketio import SocketIO, send
 
 from modelo import *
+
+# Se crea la aplicación
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'mysecret'
+socketio = SocketIO(app, cors_allowed_origins='*')
+
 
 # --- Graphics Variables ---
 XMAX = 640
@@ -73,14 +80,28 @@ kp = 0.0
 ki = 0.0
 kd = 0.0
 
-botin = BaseMovil()
-botin.SetState(state)
+#botin.SetState(state)
 
-init_display()
-botin.SetActuator([1, 0.0])
+#init_display()
+#botin.SetActuator([1, 0.0])
 
-while(1):
-    handle_keyboard()
-    botin.UpdateState()
-    state = botin.GetSensor()
-    draw_base_movil(state)
+@socketio.on('message')
+def handleMessage(msg):
+    botin = BaseMovil()
+    botin.SetActuator([1, 0.0])
+    while(1):
+        #handle_keyboard()
+        botin.UpdateState()
+        state = botin.GetSensor()
+        state_dict = {
+            'x': state[0], 
+            'y': state[1],
+            'theta': state[2]
+        }
+        send(state_dict, broadcast=True)
+        #draw_base_movil(state)
+
+
+
+if __name__ == '__main__':
+	socketio.run(app)

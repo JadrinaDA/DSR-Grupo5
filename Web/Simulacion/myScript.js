@@ -1,3 +1,23 @@
+
+
+  
+    
+    var socket = io.connect('http://127.0.0.1:5000');
+    socket.on('connect', function() {
+		socket.send('User has connected!');
+	});
+    socket.on('message', function(msg) {
+        let x,y, theta;
+        x 	  = msg['x'];
+        y 	  = msg['y'];
+        theta = msg['theta'];
+        console.log('wena cabros')
+        updateStateNico(x, y, theta);
+      // Dibujar
+    });
+
+
+
 document.addEventListener('keydown', recordKey);
 let x,y, theta;
 x = 0;
@@ -64,6 +84,20 @@ function updateState()
     return;
 }
 
+function updateStateNico(x, y, theta)
+{
+    var elem = document.getElementById("botin");
+    console.log("Robot a " + x + ", " + y );
+
+    elem.style.left = x + 'px';
+    elem.style.top = y + 'px';
+    elem.style.transform = "rotate(" + theta + "deg)";
+    console.log("x: "+x);
+    console.log("theta: "+theta);
+    console.log("rotate(" + theta + "deg)");
+    return;
+}
+
 
 var id = null;
 function color() {
@@ -80,4 +114,10 @@ function color() {
         elem.style.background = 'red'; 
         break;
   }
+
+
+  
+  /* socket.on('connect', function() {
+      socket.send('User has connected!');
+  }); */
 }
