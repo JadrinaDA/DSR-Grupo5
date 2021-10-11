@@ -46,6 +46,25 @@ console.log("theta: "+theta);
 console.log("rotate(" + theta + "deg)");
 }
 
+function updateState()
+{
+    var elem = document.getElementById("myAnimation");
+    x = document.getElementById("x_pos").value;
+    y = document.getElementById("y_pos").value;
+    theta = document.getElementById("theta_ang").value;
+
+    console.log("Robot a " + x + ", " + y );
+
+    elem.style.left = x + 'px';
+    elem.style.top = y + 'px';
+    elem.style.transform = "rotate(" + theta + "deg)";
+    console.log("x: "+x);
+    console.log("theta: "+theta);
+    console.log("rotate(" + theta + "deg)");
+    return;
+}
+
+
 var id = null;
 function color() {
   var elem = document.getElementById("myAnimation");   
