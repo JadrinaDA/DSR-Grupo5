@@ -1,6 +1,6 @@
 ul {list-style-type: none;}
 body{
-  background-color: #191919;
+  background-color: #ffffff;
   font-family:  'Montserrat', sans-serif;
   font-style: normal;
   font-variant: normal;
@@ -15,8 +15,9 @@ body{
 .month {
   padding: 70px 25px;
   width: auto;
-  background: #fed802;
+  background: rgb(255, 210, 0, 0.2);
   text-align: center;
+  margin-top: 2%;
 }
 
 /* Month list */
@@ -97,9 +98,9 @@ li a {
 
 
 nav {
-  background-color: grey;
-  color: white;
-  height: 40px;
+  background-color: rgb(255, 210, 0, 0.9);
+  color: black;
+  height: 60px;
   padding: 10px;
   display: flex;
   justify-content: space-between;
@@ -119,7 +120,8 @@ nav {
 
  /* LINKS NAVBAR */
 .link:hover {
-    background-color: hsla(197, 62%, 70%, 90%);
+    background-color: rgb(255, 210, 0);
+    border-radius: 20px;
 }
 
 .link:focus {
@@ -132,7 +134,7 @@ nav {
 
 .nav-links a {
   text-decoration: none;
-  color: white;
+  color: black;
 }
 
 h3 {
@@ -140,7 +142,7 @@ h3 {
 }
 
 .square {
-  background-color: #fed802;
+  background-color: rgb(255, 210, 0, 0.2);
   width: 50%;
   padding: 2%;
   margin: 2%;
@@ -176,5 +178,14 @@ h3 {
 
 .inlink{
   text-decoration: none;
-  color: white;
+  color: black;
+}
+
+.header{
+  position: fixed;
+  width: 100%;
+  background-color: white;
+  top:0;
+  z-index: 1;
+  box-shadow: 0px 0 10px rgba(0, 0, 0, 0.8);
 }

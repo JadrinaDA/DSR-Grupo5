@@ -1,5 +1,5 @@
 body{
-	background-color: #191919;
+	background-color: #ffffff;
 	font-family:  'Montserrat', sans-serif;
 	font-style: normal;
 	font-variant: normal;
@@ -19,7 +19,7 @@ body{
 }
 
 .square {
-	background-color: #fed802;
+	background-color: rgb(255, 210, 0, 0.2);
 	width: 50%;
 	padding: 2%;
 	margin: 2%;
@@ -126,8 +126,8 @@ li a {
 
 
 nav {
-	background-color: grey;
-	color: white;
+	background-color: rgb(255, 210, 0, 0.9);
+	color: black;
 	height: 40px;
 	padding: 10px;
 	display: flex;
@@ -148,7 +148,8 @@ nav {
 
  /* LINKS NAVBAR */
 .link:hover {
-    background-color: hsla(197, 62%, 70%, 90%);
+	background-color: rgb(255, 210, 0);
+    border-radius: 20px;
 }
 
 .link:focus {
@@ -161,10 +162,19 @@ nav {
 
 .nav-links a {
 	text-decoration: none;
-	color: white;
+	color: black;
 }
 
 .inlink{
   text-decoration: none;
-  color: white;
+  color: black;
+}
+
+.header{
+  position: fixed;
+  width: 100%;
+  background-color: white;
+  top:0;
+  z-index: 1;
+  box-shadow: 0px 0 10px rgba(0, 0, 0, 0.8);
 }
