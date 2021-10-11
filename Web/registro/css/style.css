@@ -21,6 +21,7 @@ body {
     display: inline-block;
     border: none;
     background: #f1f1f1;
+    border-radius: 20px;
   }
 
   .full_horizontal{
@@ -33,6 +34,7 @@ body {
     display: inline-block;
     border: none;
     background: #f1f1f1;
+    border-radius: 10px;
   }
 
   select, input[type=text]:focus, input[type=password]:focus {
@@ -48,14 +50,16 @@ body {
   
   /* Set a style for the submit button */
   .registerbtn {
-    background-color: #dfdc0f;
-    color: white;
+    background-color: rgb(255,210,0);
+    color: black;
     padding: 16px 20px;
     margin: 8px 0;
     border: none;
     cursor: pointer;
     width: 100%;
     opacity: 0.9;
+    border-radius: 20px;
+    font-weight: bold;
   }
   
   .registerbtn:hover {

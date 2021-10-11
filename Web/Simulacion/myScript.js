@@ -4,7 +4,7 @@ x = 0;
 y = 0;
 theta = 0;
 function recordKey(e) {
-    var elem = document.getElementById("myAnimation"); 
+    var elem = document.getElementById("botin"); 
     console.log("You pressed" + e.key);
     
     switch (e.key) {
@@ -48,7 +48,7 @@ console.log("rotate(" + theta + "deg)");
 
 function updateState()
 {
-    var elem = document.getElementById("myAnimation");
+    var elem = document.getElementById("botin");
     x = document.getElementById("x_pos").value;
     y = document.getElementById("y_pos").value;
     theta = document.getElementById("theta_ang").value;
@@ -67,6 +67,17 @@ function updateState()
 
 var id = null;
 function color() {
-  var elem = document.getElementById("myAnimation");   
-  elem.style.background = 'blue'; 
+  var elem = document.getElementById("botin");  
+  console.log(getComputedStyle(elem).backgroundColor);
+  switch(getComputedStyle(elem).backgroundColor){
+      case 'rgb(255, 0, 0)':
+        elem.style.background = 'green'; 
+        break;
+    case 'rgb(0, 128, 0)':
+        elem.style.background = 'blue'; 
+        break;
+    case 'rgb(0, 0, 255)':
+        elem.style.background = 'red'; 
+        break;
+  }
 }

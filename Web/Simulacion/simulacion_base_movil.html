@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<title>Simluación</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/estilo_simulacion.css">
+
+<body>
+
+  <div class="header">
+
+    <nav>
+      <a class="inlink" href= "../pagina_principal/info_lab.html"><h1> ERobotLab UC</h1></a>
+      <div class="nav-links">
+          <a class='link' href="../perfil/datos_personales.html">Mi Cuenta</a>		
+          <a class='link' href="../reserva_horas/reserva.html">Reservar Hora</a>
+      </div>
+      
+    </nav>
+   
+  
+  </div>
+
+<div id="wrapper">
+  
+  <div class="sidenav">
+    <p>
+      <button onclick="color()">Color</button> 
+</p>
+
+<p>Seleccion la posición deseada</p>
+
+<label for="x_pos">X:</label>
+<input type="number" id="x_pos" name="x_pos"><br><br>
+
+<label for="y_pos">Y:</label>
+<input type="number" id="y_pos" name="y_pos"><br><br>
+
+<label for="theta_ang">Angulo:</label>
+<input type="number" id="theta_ang" name="theta_angle"><br><br>
+
+<p>
+  <button onclick="updateState()">Actualizar</button> 
+</p>
+
+</div>
+
+<div class="content">
+  <h1 style="margin-bottom: 60px;">Simulación Robot PID</h1>
+  
+  <div id ="field">
+    <div id ="botin"></div>
+  </div>
+  
+  <script
+  src="myScript.js">
+</script>
+
+</div>
+</div>
+
+</body>
+</html>
+

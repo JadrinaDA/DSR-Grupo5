@@ -42,9 +42,10 @@
   width: 100%;
   background-color: white;
   top:0;
-  padding: 0 10px;
+  padding: 10px 0px;
   z-index: 1;
   box-shadow: 0px 0 10px rgba(0, 0, 0, 0.8);
+  
 }
 
   table, td, th {  
@@ -144,9 +145,9 @@ label{
   text-align: center;
   padding: 10px;
   border-radius: 10px;
-  background-color: lightgrey;
+  background-color: black;
   text-decoration: none;
-	color: black;
+	color: white;
   border-style: solid;
   border-color: black;
   display: inline-block;
@@ -155,7 +156,9 @@ label{
 }
 
 .boton:hover{
-  background-color: white;
+  background-color: rgb(255, 210, 0);
+  color: black;
+  font-weight: bold;
 }
 
 .full_horizontal{
@@ -179,12 +182,13 @@ label{
 .nav-links a {
 	text-decoration: none;
 	color: black;
-}
+} 
 
 .link {
 	height: 40px;
     padding: 21.5px 20px;
-	letter-spacing: 120%;}
+	letter-spacing: 120%;
+font-weight: bold;}
 
   .inlink{
     text-decoration: none;
@@ -194,10 +198,14 @@ label{
   #logo{height: 100px; width:150px;}
 
   .imagen_principal{
-    max-width:2000px;
-    max-width: 100%;
-    height: auto;
-    vertical-align: middle;
+    /* max-width:2000px;
+    max-width: 100%; */
+    background-image: url("../img/bg.jpeg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+    height: 700px;
   }
 
   #div_main_title{
@@ -208,13 +216,15 @@ label{
     left: 50%;
     transform: translate(-50%,-50%);
     background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 10px;
   }
 
   #main_title{
-    color: white;
+    color: rgb(255, 210, 0);
     font-size: 40px;
     font-weight: 400;
     margin: 15;
+    line-height: 1;
   }
 
   .content_inicio{
@@ -246,9 +256,6 @@ label{
     float: left;
   }
 
-  .img_container{
-
-  }
 
   .img_title{
     color: rgb(255, 210, 0);
@@ -259,4 +266,5 @@ label{
     top:42px;
     width: 30%;
     box-sizing: inherit;
+    border-radius: 10px;
   }
