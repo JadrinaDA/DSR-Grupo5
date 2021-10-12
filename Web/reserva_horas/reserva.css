@@ -119,9 +119,9 @@ nav {
   letter-spacing: 120%;}
 
  /* LINKS NAVBAR */
-.link:hover {
-    background-color: rgb(255, 210, 0);
-    border-radius: 20px;
+ .link:hover {
+  background-color: rgb(255, 243, 189);
+  border-radius: 20px;
 }
 
 .link:focus {

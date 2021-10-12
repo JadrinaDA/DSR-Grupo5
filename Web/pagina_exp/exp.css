@@ -110,20 +110,23 @@ li a {
 
 
 nav {
-	background-color: rgb(255, 210, 0, 0.9);
-	color: black;
-	height: 40px;
-	padding: 10px;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	font-family:  'Montserrat', sans-serif;
-	font-style: extra-bold;
-	font-variant: normal;
-	font-weight: bolder;
-	border: none;
-	margin: none;
-  }
+	width:99%;
+	  background-color: rgb(255, 210, 0, 0.9);
+	  color: black;
+	  height: 60px;
+	  padding: 10px;
+	  display: flex;
+	  justify-content: space-between;
+	  align-items: center;
+	  font-family:  'Montserrat', sans-serif;
+	  font-style: extra-bold;
+	  font-variant: normal;
+	  font-weight: bolder;
+	  border: none;
+	  margin: none;
+	margin-top: 0px;
+	/* position: fixed; */
+	}
 
   .link {
 	height: 40px;
@@ -131,8 +134,8 @@ nav {
 	letter-spacing: 120%;}
 
  /* LINKS NAVBAR */
-.link:hover {
-    background-color: rgb(255, 210, 0);
+ .link:hover {
+    background-color: rgb(255, 243, 189);
     border-radius: 20px;
 }
 

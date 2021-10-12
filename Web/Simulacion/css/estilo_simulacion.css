@@ -212,6 +212,15 @@ label{
     border-radius: 40%;
   }
 
+  #frente_botin {
+    width: 40%;
+    height: 5px;
+    margin-top:22.5px;
+    margin-left: 60%;
+    background-color: black;
+    border-radius: 10px;
+  }
+
   p{
       text-align: left;
   }

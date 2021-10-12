@@ -91,10 +91,10 @@ function updateStateNico(x, y, theta)
 
     elem.style.left = x + 'px';
     elem.style.top = y + 'px';
-    elem.style.transform = "rotate(" + theta + "deg)";
+    elem.style.transform = "rotate(" + theta* 180 / Math.PI + "deg)";
     console.log("x: "+x);
-    console.log("theta: "+theta);
-    console.log("rotate(" + theta + "deg)");
+    console.log("theta: "+y);
+    console.log("rotate(" + theta* 180 / Math.PI + "deg)");
     return;
 }
 

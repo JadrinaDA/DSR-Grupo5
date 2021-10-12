@@ -88,7 +88,7 @@ kd = 0.0
 @socketio.on('message')
 def handleMessage(msg):
     botin = BaseMovil()
-    botin.SetActuator([1, 0.0])
+    botin.SetActuator([0.5, 0.2])
     while(1):
         #handle_keyboard()
         botin.UpdateState()
