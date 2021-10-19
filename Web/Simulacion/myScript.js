@@ -98,6 +98,29 @@ function updateStateNico(x, y, theta)
     return;
 }
 
+function load(){
+    console.log("Ejecutando Load");
+    let elem = document.getElementById("field");
+    elem.onclick = function clickEvent(e){
+        setGoal(e);
+    }
+    // elem.addEventListener("click",function(){setGoal(e)});
+}
+
+function setGoal(e){
+    console.log("Set Goal ejecutado");
+    console.log(e);
+    var rect = e.target.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    var y = e.clientY - rect.top;
+    console.log("(" + x + "," + y + ")");
+    goal = document.getElementById("goal")
+    goal.style.left = x + 'px';
+    goal.style.top = y + 'px';
+    goal.style.visibility = 'visible';
+}
+
+load();
 
 var id = null;
 function color() {
