@@ -30,8 +30,7 @@ def run_simulation():
     while(1):
         botin.UpdateState()
 
-def run():
-    socketio.run(app)
+        
 
 
 XMAX = 640

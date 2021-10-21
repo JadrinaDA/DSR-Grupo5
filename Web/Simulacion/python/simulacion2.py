@@ -9,6 +9,21 @@ from pygame.locals import *
 
 from modelo import *
 
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'mysecret'
+socketio = SocketIO(app, cors_allowed_origins='*')
+
+@socketio.on('update')
+def handleMessage(msg):
+    # print("Enviando Mensaje")
+    state = botin.GetSensor()
+    state_dict = {
+        'x': state[0], 
+        'y': state[1],
+        'theta': state[2]
+    }
+    send(state_dict, broadcast=True)
+
 # --- Graphics Variables ---
 XMAX = 640
 YMAX = 480
