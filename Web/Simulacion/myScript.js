@@ -1,22 +1,30 @@
 
-
-  
     
-    var socket = io.connect('http://127.0.0.1:5000');
-    socket.on('connect', function() {
-		socket.send('User has connected!');
-	});
-    socket.on('message', function(msg) {
-        let x,y, theta;
-        x 	  = msg['x'];
-        y 	  = msg['y'];
-        theta = msg['theta'];
-        console.log('wena cabros')
-        updateStateNico(x, y, theta);
-      // Dibujar
-    });
+var socket = io.connect('http://127.0.0.1:5000');
 
+socket.on('connect', function() {
+    socket.send('User has connected!');
+    console.log("User has connected");
+});
 
+socket.on('message', function(msg) {
+    let x,y, theta;
+    x 	  = msg['x'];
+    y 	  = msg['y'];
+    theta = msg['theta'];
+    updateStateNico(x, y, theta);
+    // Dibujar
+});
+
+function send(){
+
+    socket.emit('update',
+    {
+        'value':0
+    })
+}
+
+sending = setInterval(send, 1)
 
 document.addEventListener('keydown', recordKey);
 let x,y, theta;
@@ -87,14 +95,14 @@ function updateState()
 function updateStateNico(x, y, theta)
 {
     var elem = document.getElementById("botin");
-    console.log("Robot a " + x + ", " + y );
+    // console.log("Robot a " + x + ", " + y );
 
     elem.style.left = x + 'px';
     elem.style.top = y + 'px';
     elem.style.transform = "rotate(" + theta* 180 / Math.PI + "deg)";
-    console.log("x: "+x);
-    console.log("theta: "+y);
-    console.log("rotate(" + theta* 180 / Math.PI + "deg)");
+    // console.log("x: "+x);
+    // console.log("theta: "+y);
+    // console.log("rotate(" + theta* 180 / Math.PI + "deg)");
     return;
 }
 
