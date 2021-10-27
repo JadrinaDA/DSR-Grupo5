@@ -1,10 +1,19 @@
-from flask import Flask, render_template
+import sqlite3
+from flask import Flask, render_template, url_for, flash, redirect
+
+def get_db_connection():
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
 app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return render_template("inicio/pagina_inicio.html")
+    conn = get_db_connection()
+    users = conn.execute('SELECT * FROM usuarios').fetchall()
+    conn.close()
+    return render_template("inicio/pagina_inicio.html", users = users)
 
 @app.route("/main")
 def main():
@@ -33,3 +42,7 @@ def sim():
 @app.route("/cuenta")
 def perfil():
     return render_template("perfil/datos_personales.html")
+
+@app.route("/cuenta/exp")
+def exps():
+    return render_template("perfil/historial_experiencias.html")

@@ -8,9 +8,9 @@
 	<body>
 		<div class="header">
 			<nav>
-			<a class="inlink" href= "../pagina_principal/info_lab.html"><h1> ERobotLab UC</h1></a>
+			<a class="inlink" href= "{{ url_for('main') }}"><h1> ERobotLab UC</h1></a>
 			<div class="nav-links">
-				<a class='link' href="../perfil/datos_personales.html">Mi Cuenta</a>		
+				<a class='link' href="{{ url_for('perfil') }}">Mi Cuenta</a>		
 				<a class='link' href="">Reservar Hora</a>
 			</div>
 			</nav>

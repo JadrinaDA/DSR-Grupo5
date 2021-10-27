@@ -12,7 +12,7 @@
 	<link rel="stylesheet" href="{{ url_for('static', filename = 'css/style.css') }}">
 
 	</head>
-	<body class="img js-fullheight" style="background-image: url(images/bg.jpeg);">
+	<body class="img js-fullheight">
 	<section class="ftco-section">
 		<div class="container">
 			<div class="row justify-content-center">
@@ -24,7 +24,7 @@
 				<div class="col-md-6 col-lg-4">
 					<div class="login-wrap p-0">
 		      	<h3 class="mb-4 text-center">Ingresa tus datos</h3>
-		      	<form action="../pagina_principal/info_lab.html" class="signin-form">
+		      	<form action="{{ url_for('main') }}" class="signin-form">
 		      		<div class="form-group">
 		      			<input type="text" class="form-control" placeholder="Email" required>
 		      		</div>
@@ -49,7 +49,7 @@
 	          </form>
 	          <!-- <p class="w-100 text-center">&mdash; Or Sign In With &mdash;</p> -->
 	          <div class="social d-flex text-center">
-	          	<a href="../registro/main.html" class="px-2 py-2 mr-md-1 rounded"><span class="mr-2"></span> Crear Cuenta</a>
+	          	<a href="{{ url_for('reg') }}" class="px-2 py-2 mr-md-1 rounded"><span class="mr-2"></span> Crear Cuenta</a>
 	          </div>
 		      </div>
 				</div>
