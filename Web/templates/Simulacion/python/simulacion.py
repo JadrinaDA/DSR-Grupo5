@@ -31,8 +31,6 @@ def run_simulation():
         botin.UpdateState()
 
         
-
-
 XMAX = 640
 YMAX = 480
 ppm = 50                                                    # conversion entre pixeles y metros del sistema
