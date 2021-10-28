@@ -12,8 +12,8 @@
 			<nav>
 			<h1> ERobotLab UC</h1>
 			<div class="nav-links">
-				<a class='link' href="../perfil/datos_personales.html">Mi Cuenta</a>	
-				<a class='link' href="../reserva_horas/reserva.html">Reservar Hora</a>
+				<a class='link' href="{{ url_for('perfil') }}">Mi Cuenta</a>	
+				<a class='link' href="{{ url_for('res') }}">Reservar Hora</a>
 			</div>
 			</nav>
 		</div>
@@ -26,7 +26,7 @@
 					<div class="container_sim">
 						<div class="container_exp">
 							<p class="nombre"> Robot PID </p>
-							<a class="inlink" href= "../pagina_exp/exp.html">
+							<a class="inlink" href= "{{ url_for('exper') }}">
 								<div class="block" id="img_pid">
 									<div class ="desc">
 										Esta experiencia te ayudará a enteder y practicar el control PID para la conducción de un sistema robótico de dos ruedas. Usando tres constantes podrás hacer que el robot llegue a un punto indicado de forma consistente. 

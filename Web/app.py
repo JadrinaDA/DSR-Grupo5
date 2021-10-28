@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from flask import Flask, render_template, request, jsonify
 
 import numpy as np
@@ -9,6 +10,15 @@ from simulacion2 import *
 
 import threading
 
+=======
+import sqlite3
+from flask import Flask, render_template, url_for, flash, redirect
+
+def get_db_connection():
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+>>>>>>> d8c5ec7c8c7b3f296fe23f472ff6a0d921f8200a
 
 app = Flask(__name__)
 Payload.max_decode_packets = 500
@@ -28,7 +38,10 @@ cont = MobileBasePID(botin, ref, kp_l, kd_l, ki_l, kp_a, kd_a, ki_a)
 
 @app.route("/")
 def index():
-    return render_template("inicio/pagina_inicio.html")
+    conn = get_db_connection()
+    users = conn.execute('SELECT * FROM usuarios').fetchall()
+    conn.close()
+    return render_template("inicio/pagina_inicio.html", users = users)
 
 @app.route("/main")
 def main():
@@ -58,6 +71,7 @@ def sim():
 def perfil():
     return render_template("perfil/datos_personales.html")
 
+<<<<<<< HEAD
 @app.route("/sim/run")
 def sim_run():
     def run_simulation():
@@ -100,3 +114,8 @@ def handleMessage(msg):
 
 if __name__ == '__main__':
     app.run(debug=True)
+=======
+@app.route("/cuenta/exp")
+def exps():
+    return render_template("perfil/historial_experiencias.html")
+>>>>>>> d8c5ec7c8c7b3f296fe23f472ff6a0d921f8200a
