@@ -23,8 +23,8 @@ function send(){
     })
 }
 
-// sending = setInterval(send, 1000)
-sending = setInterval(send, 20)
+sending = setInterval(send, 1000)
+// sending = setInterval(send, 20)
 
 document.addEventListener('keydown', recordKey);
 let x,y, theta;
@@ -126,6 +126,8 @@ function setGoal(e){
     goal.style.left = x + 'px';
     goal.style.top = y + 'px';
     goal.style.visibility = 'visible';
+
+    fetch('/setGoal/' + x + "/" + y);
 }
 
 load();

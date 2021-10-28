@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, jsonify
 
 import numpy as np
 from flask_socketio import SocketIO, send
@@ -14,8 +14,17 @@ app = Flask(__name__)
 Payload.max_decode_packets = 500
 socketio = SocketIO(app, cors_allowed_origins='*')
 
-botin = BaseMovil()
+ref = np.array([100.0, 100.0])
 
+kp_l = 0.01
+ki_l = 0.0
+kd_l = 0.0
+kp_a = 1.0
+ki_a = 0.0
+kd_a = 0.0
+
+botin = BaseMovil()
+cont = MobileBasePID(botin, ref, kp_l, kd_l, ki_l, kp_a, kd_a, ki_a)
 
 @app.route("/")
 def index():
@@ -55,31 +64,28 @@ def sim_run():
         print("Corriendo Sim")
         botin.SetState([0,0,0,0,0])
         while(1):
-            state = botin.GetSensor()
-            error_previo[:] = error_actual[:]
-            error_actual[:] = error(ref, state)
-            error_acumulado[:] = error_acumulado[:] + error_actual[:]
-            PID(botin, error_actual, error_previo, kp_lineal, kd_lineal, ki_lineal, kp_angular, kd_angular, ki_angular)
+            cont.update()
             botin.UpdateState()
 
-    ref = np.array([100.0, 100.0])
-
-    kp_lineal = 0.01
-    ki_lineal = 0.0
-    kd_lineal = 0.0
-    kp_angular = 1.0
-    ki_angular = 0.0
-    kd_angular = 0.0
-
-    # Errores
-    error_actual = np.array([0.0, 0.0])
-    error_previo = np.array([0.0, 0.0])
-    error_acumulado =  np.array([0.0, 0.0])
-
-    botin.SetActuator([1.0, 0.5])
+    # botin.SetActuator([1.0, 0.5])
+    
     simulation = threading.Thread(target=run_simulation)
     simulation.start()
     return render_template("Simulacion/simulacion_base_movil.html")
+
+@app.route("/setGoal/<x>/<y>")
+def set_goal(x,y):
+    if request.method == 'GET':
+        x = float(x)
+        y = float(y)
+        cont.set_reference(x,y)
+        message = f'Goal set in ({x},{y})'
+        return jsonify(message)  # serialize and use JSON headers
+    # POST request
+    if request.method == 'POST':
+        print(request.get_json())  # parse as JSON
+        return 'Sucesss', 200
+    
 
 @socketio.on('update')
 def handleMessage(msg):
