@@ -1,1 +1,4 @@
+Web/env
+Web/pyvenv.cfg
+Web/requirements.txt
 *.DS_Store
