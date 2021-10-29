@@ -4,8 +4,8 @@ import numpy as np
 from flask_socketio import SocketIO, send
 from engineio.payload import Payload
 
-from modelo import *
-from simulacion2 import *
+from modelo import BaseMovil
+from simulacion2 import MobileBasePID
 
 import threading
 
@@ -19,6 +19,7 @@ def get_db_connection():
 
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secretkey'
 Payload.max_decode_packets = 500
 socketio = SocketIO(app, cors_allowed_origins='*')
 
@@ -53,8 +54,19 @@ def login():
 def exper():
     return render_template("pagina_exp/exp.html")
 
-@app.route("/reg")
+@app.route("/reg", methods=('GET', 'POST'))
 def reg():
+    if request.method == 'POST':
+        is_robot = 0 #int((request.form['major'] == 'rob'))
+        name = request.form['name'] + " " + request.form['last_name'] 
+        conn = get_db_connection()
+        conn.execute("INSERT INTO usuarios (name, mail, password, tipo, robotica) VALUES (?, ?, ?, ?, ?)",
+            (name, request.form['email'],
+             request.form['psw'], 'alumno', is_robot))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('main'))
+
     return render_template("registro/main.html")
 
 @app.route("/res")
