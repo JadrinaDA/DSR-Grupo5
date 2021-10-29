@@ -17,6 +17,14 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+def get_user(mail):
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM usuarios WHERE mail = ?',
+                        (mail,)).fetchone()
+    conn.close()
+    if user is None:
+        abort(404)
+    return user
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secretkey'
@@ -57,12 +65,16 @@ def exper():
 @app.route("/reg", methods=('GET', 'POST'))
 def reg():
     if request.method == 'POST':
-        is_robot = 0 #int((request.form['major'] == 'rob'))
+        uni = request.form['inst']
+        if (uni == "UC" and request.form['carrera'] == "ing"):
+            is_robot = int((request.form['major'] == 'robotica'))
+        else:
+            is_robot = 0
         name = request.form['name'] + " " + request.form['last_name'] 
         conn = get_db_connection()
-        conn.execute("INSERT INTO usuarios (name, mail, password, tipo, robotica) VALUES (?, ?, ?, ?, ?)",
+        conn.execute("INSERT INTO usuarios (name, mail, password, tipo, inst, robotica) VALUES (?, ?, ?, ?, ?, ?)",
             (name, request.form['email'],
-             request.form['psw'], 'alumno', is_robot))
+             request.form['psw'], request.form['cargo'], uni, is_robot))
         conn.commit()
         conn.close()
         return redirect(url_for('main'))
@@ -77,9 +89,19 @@ def res():
 def sim():
     return render_template("Simulacion/simulacion_base_movil.html")
 
-@app.route("/cuenta")
+@app.route("/cuenta", methods=('GET', 'POST'))
 def perfil():
-    return render_template("perfil/datos_personales.html")
+    user = get_user("jadrinadeandrade@uc.cl")
+
+    if request.method == 'POST':
+        name = request.form['name'] + " " + request.form['last_name'] 
+        conn = get_db_connection()
+        conn.execute('UPDATE usuarios SET name = ? WHERE mail = ?',(name, user['mail']))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('main'))
+
+    return render_template("perfil/datos_personales.html", user = user)
 
 @app.route("/sim/run")
 def sim_run():

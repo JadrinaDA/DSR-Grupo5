@@ -39,41 +39,44 @@
     <table>
       <col style="width:5%">
 	    <col style="width:95%">
+      <form method="post" id = "editf">
 
         <th><label for="name"><b>Nombre</b></label></td>
-        <td><input type="text" placeholder="Alumno" name="name" id="name" readonly></td>
+        <td><input type="text" placeholder="{{user['name'].split(' ')[0]}}" name="name" id="name"></td>
       </tr>
       <tr>
         <th> <label for="last_name"><b>Apellido</b></label></td>
-        <td><input type="text" placeholder="de Prueba" name="last_name" id="last_name" readonly></td>
+        <td><input type="text" placeholder="{{user['name'].split(' ')[1]}}" name="last_name" id="last_name"></td>
       </tr>
       <tr>
         <th> <label for="email"><b>Mail</b></label></td>
-        <td> <input type="text" placeholder="alumnodeprueba@uc.cl" name="email" id="email" readonly></td>
+        <td> <input type="text" placeholder="{{user['mail']}}" name="email" id="email"></td>
       </tr>
 
       <tr>
         <th><label for="cargo"><b>Cargo</b></label></td>
-        <td> <input type="text" placeholder="Alumno" name="cargo" id="cargo" readonly></td>
+        <td> <input type="text" placeholder="{{user['tipo']}}" name="cargo" id="cargo"></td>
       </tr>
       
       <tr>
         <th> <label for="institucion"><b>Institución</b></label></td>
-        <td> <input type="text" placeholder="Pontificia Universidad Católica de Chile" name="institucion" id="institucion" readonly></td>
+        <td> <input type="text" placeholder="{{user['inst']}}" name="institucion" id="institucion"></td>
       </tr>
 
       <tr>
         <th> <label for="carrera"><b>Carrera</b></label></td>
-        <td> <input type="text" placeholder="Ingeniería" name="carrera" id="carrera" readonly></td>
+        <td> <input type="text" placeholder="Ingeniería" name="carrera" id="carrera" ></td>
       </tr>
 
       <tr>
         <th> <label for="major"><b>Major</b></label></td>
-        <td> <input type="text" placeholder="Ingeniería Robótica" name="major" id="major" readonly></td>
+        <td> <input type="text" placeholder="Ingeniería Robótica" name="major" id="major"></td>
       </tr>
+      </form>
     </table>
 
-    <a class="boton"> Actualizar Datos</a>
+    <button class="boton" type="submit" form = "editf"> Actualizar Datos</button>
+    <a class="boton"> Borrar Cuenta</a>
 
 
     </div>

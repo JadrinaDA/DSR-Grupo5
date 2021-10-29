@@ -7,5 +7,6 @@ CREATE TABLE usuarios (
     mail TEXT NOT NULL,
     password TEXT NOT NULL,
     tipo TEXT NOT NULL,
+    inst TEXT NOT NULL,
     robotica BIT NOT NULL
 );

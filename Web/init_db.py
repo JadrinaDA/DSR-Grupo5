@@ -8,8 +8,8 @@ with open('schema.sql') as f:
 
 cur = connection.cursor()
 
-cur.execute("INSERT INTO usuarios (name, mail, password, tipo, robotica) VALUES (?, ?, ?, ?, ?)",
-            ('Admin', 'admin@gmail.com', 'admin1', 'admin', 1)
+cur.execute("INSERT INTO usuarios (name, mail, password, tipo, inst, robotica) VALUES (?, ?, ?, ?, ?, ?)",
+            ('Admin', 'admin@gmail.com', 'admin1', 'admin', 'PUC', 1)
             )
 
 connection.commit()
