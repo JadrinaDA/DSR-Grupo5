@@ -6,6 +6,7 @@ from engineio.payload import Payload
 
 from modelo import BaseMovil
 from simulacion2 import MobileBasePID
+from werkzeug.exceptions import abort
 
 import threading
 
@@ -25,6 +26,22 @@ def get_user(mail):
     if user is None:
         abort(404)
     return user
+
+def get_changes(user, form):
+    new = {}
+    for x in form.keys():
+        print(x)
+        if x == "major":
+            if form[x] == "robotica":
+                new['robotica'] = 1
+            else:
+                new['robotica'] = 0
+        elif form[x]:
+            new[x] = form[x]
+        else:
+            new[x] = user[x]
+    return new
+       
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secretkey'
@@ -70,11 +87,10 @@ def reg():
             is_robot = int((request.form['major'] == 'robotica'))
         else:
             is_robot = 0
-        name = request.form['name'] + " " + request.form['last_name'] 
         conn = get_db_connection()
-        conn.execute("INSERT INTO usuarios (name, mail, password, tipo, inst, robotica) VALUES (?, ?, ?, ?, ?, ?)",
-            (name, request.form['email'],
-             request.form['psw'], request.form['cargo'], uni, is_robot))
+        conn.execute("INSERT INTO usuarios (name, lastname, mail, password, tipo, inst, carrera, robotica) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (request.form['name'], request.form['lastname'], request.form['email'],
+             request.form['psw'], request.form['cargo'], uni, request.form["carrera"], is_robot))
         conn.commit()
         conn.close()
         return redirect(url_for('main'))
@@ -94,9 +110,11 @@ def perfil():
     user = get_user("jadrinadeandrade@uc.cl")
 
     if request.method == 'POST':
-        name = request.form['name'] + " " + request.form['last_name'] 
+        new = get_changes(user, request.form)
         conn = get_db_connection()
-        conn.execute('UPDATE usuarios SET name = ? WHERE mail = ?',(name, user['mail']))
+        conn.execute('UPDATE usuarios SET name = ?, lastname = ?, mail = ?,'
+         ' tipo = ?, inst = ?, carrera = ?, robotica = ? WHERE mail = ?',
+         (new['name'], new['lastname'], new['mail'], new['tipo'], new['inst'], new['carrera'], new['robotica'], user['mail']))
         conn.commit()
         conn.close()
         return redirect(url_for('main'))
