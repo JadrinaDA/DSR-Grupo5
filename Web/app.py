@@ -18,10 +18,10 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-def get_user(mail):
+def get_user(id_user):
     conn = get_db_connection()
-    user = conn.execute('SELECT * FROM usuarios WHERE mail = ?',
-                        (mail,)).fetchone()
+    user = conn.execute('SELECT * FROM usuarios WHERE id = ?',
+                        (id_user,)).fetchone()
     conn.close()
     if user is None:
         abort(404)
@@ -107,7 +107,7 @@ def sim():
 
 @app.route("/cuenta", methods=('GET', 'POST'))
 def perfil():
-    user = get_user("jadrinadeandrade@uc.cl")
+    user = get_user(1)
 
     if request.method == 'POST':
         new = get_changes(user, request.form)
@@ -164,6 +164,16 @@ def handleMessage(msg):
 @app.route("/cuenta/exp")
 def exps():
     return render_template("perfil/historial_experiencias.html")
+
+@app.route("/cuenta/del/<int:id_user>", methods =('POST', ))
+def delete(id_user):
+    usuario = get_user(id_user)
+    conn = get_db_connection()
+    conn.execute('DELETE FROM usuarios WHERE id = ?', (id_user,))
+    conn.commit()
+    conn.close()
+    flash('"{}" was successfully deleted!'.format(usuario['name']))
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
