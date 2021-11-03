@@ -1,6 +1,72 @@
 char msgEnd = '\r\n';
 String instruccion;
 bool newMsg = false;
+#include "DualVNH5019MotorShield.h"
+DualVNH5019MotorShield md;
+// Definición de PINs
+#define encoder0PinA  19
+#define encoder0PinB  18
+#define encoder1PinA  20
+#define encoder1PinB  21
+
+// Variables Tiempo
+unsigned long time_ant = 0;
+const int Period = 10000;   // 10 ms = 100Hz
+float escalon = 0;
+const float dt = Period *0.000001f;
+float motorout    = 0.0;
+
+// Variables de los Encoders y posicion
+volatile long encoder0Pos = 0;
+volatile long encoder1Pos = 0;
+long newposition0;
+long oldposition0 = 0;
+long newposition1;
+long oldposition1 = 0;
+unsigned long newtime;
+float vel0;
+float vel1;
+
+
+
+
+//-----------------------------------
+// CONFIGURANDO INTERRUPCIONES
+void doEncoder0A()
+{
+  if (digitalRead(encoder0PinA) == digitalRead(encoder0PinB)) {
+    encoder0Pos++;
+  } else {
+    encoder0Pos--;
+  }
+}
+
+void doEncoder0B()
+{
+  if (digitalRead(encoder0PinA) == digitalRead(encoder0PinB)) {
+    encoder0Pos--;
+  } else {
+    encoder0Pos++;
+  }
+}
+
+void doEncoder1A()
+{
+  if (digitalRead(encoder1PinA) == digitalRead(encoder1PinB)) {
+    encoder1Pos++;
+  } else {
+    encoder1Pos--;
+  }
+}
+
+void doEncoder1B()
+{
+  if (digitalRead(encoder1PinA) == digitalRead(encoder1PinB)) {
+    encoder1Pos--;
+  } else {
+    encoder1Pos++;
+  }
+}
 
 String readBuff() {
   String buffArray;
@@ -21,8 +87,28 @@ String readBuff() {
 
 void setup()
 {
-  Serial.begin(9600);   // Inicializamos  el puerto serie
+  Serial.begin(115200);   // Inicializamos  el puerto serie
   Serial3.begin(38400);
+
+
+
+    // Configurar MotorShield
+    md.init();
+
+  // Configurar Encoders
+  pinMode(encoder0PinA, INPUT);
+  digitalWrite(encoder0PinA, HIGH);       // Incluir una resistencia de pullup en le entrada
+  pinMode(encoder0PinB, INPUT);
+  digitalWrite(encoder0PinB, HIGH);       // Incluir una resistencia de pullup en le entrada
+  pinMode(encoder1PinA, INPUT);
+  digitalWrite(encoder1PinA, HIGH);       // Incluir una resistencia de pullup en le entrada
+  pinMode(encoder1PinB, INPUT);
+  digitalWrite(encoder1PinB, HIGH);       // Incluir una resistencia de pullup en le entrada
+  attachInterrupt(digitalPinToInterrupt(encoder0PinA), doEncoder0A, CHANGE);  // encoder 0 PIN A
+  attachInterrupt(digitalPinToInterrupt(encoder0PinB), doEncoder0B, CHANGE);  // encoder 0 PIN B
+  attachInterrupt(digitalPinToInterrupt(encoder1PinA), doEncoder1A, CHANGE);  // encoder 1 PIN A
+  attachInterrupt(digitalPinToInterrupt(encoder1PinB), doEncoder1B, CHANGE);  // encoder 1 PIN B
+  
 }
 
 void loop()
@@ -30,8 +116,45 @@ void loop()
   
   if (Serial3.available() > 0) {
     instruccion = readBuff(); //Leer el mensaje entrante
-    Serial.print("Mensaje recibido: ");
-    Serial.println(instruccion);
+    float Kp;
+   // float Ki;
+   // float Kd;
+    Kp = instruccion.substring(0, 3).toFloat();
+   // Ki = instruccion.substring(3, 6).toFloat();
+   // Kd = instruccion.substring(6, 9).toFloat();
+    md.setM1Speed(Kp);
+    Serial.println();
   }
 
+  //-----------------------------------
+    // Actualizando Informacion de los encoders
+    newposition0 = encoder0Pos;
+    newposition1 = encoder1Pos;
+
+    //-----------------------------------
+    // Calculando Velocidad del motor
+    float rpm = 31250;
+    vel0 = (float)(newposition0 - oldposition0) * rpm / (newtime - time_ant); //RPM
+    vel1 = (float)(newposition1 - oldposition1) * rpm / (newtime - time_ant); //RPM
+    oldposition0 = newposition0;
+    oldposition1 = newposition1;
+
+    Serial.print("Encoder position 0:");
+    Serial.print(newposition0);
+    Serial.print(" Encoder position 1:");
+    Serial.println(newposition1);
+    //Serial.print(escalon);
+    //Serial.print(",");
+    //Serial.print(vel0);
+    //Serial.print(",");
+    //Serial.print(vel1);
+    //Serial.print(",");
+    //Serial.print(motorout);
+    //Serial.print(",");
+    //Serial.print(md.getM1CurrentMilliamps());
+    //Serial.print(",");
+    Serial.print(md.getM2CurrentMilliamps());
+    //Serial.println(",");
+    //md.setM1Speed(100);
+  
 }
