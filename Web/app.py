@@ -12,16 +12,22 @@ import threading
 import sqlite3
 from flask import Flask, render_template, url_for, flash, redirect
 
+import paho.mqtt.client as mqtt
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
     return conn
 
+def send_message(message):
+    client.publish('DSR5/1', message)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secretkey'
 Payload.max_decode_packets = 500
 socketio = SocketIO(app, cors_allowed_origins='*')
+
+client = mqtt.Client()
+client.connect('broker.mqttdashboard.com', 1883, 60)
 
 ref = np.array([100.0, 100.0])
 
@@ -108,7 +114,18 @@ def set_goal(x,y):
     if request.method == 'POST':
         print(request.get_json())  # parse as JSON
         return 'Sucesss', 200
-    
+
+
+@app.route('/speed-index')
+def speed_index():
+    return render_template('speed/index.html')
+
+@app.route('/speed', methods=['post', 'get'])
+def speed():
+    m1_speed = request.args.get('m1')
+    m2_speed = request.args.get('m2')
+    send_message(f"{m1_speed}{m2_speed}000")
+    return render_template('speed/speed.html')
 
 @socketio.on('update')
 def handleMessage(msg):
