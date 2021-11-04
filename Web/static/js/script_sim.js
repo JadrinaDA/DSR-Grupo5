@@ -1,6 +1,8 @@
 console.log("Hola!")
 var socket = io.connect('http://127.0.0.1:5000');
 
+const ppm = 400; // Pixeles por metro
+
 socket.on('connect', function() {
     socket.send('User has connected!');
     console.log("User has connected");
@@ -11,8 +13,7 @@ socket.on('message', function(msg) {
     x 	  = msg['x'];
     y 	  = msg['y'];
     theta = msg['theta'];
-    updateStateNico(x, y, theta);
-    // Dibujar
+    updateState(x, y, theta);
 });
 
 function send(){
@@ -23,86 +24,30 @@ function send(){
     })
 }
 
-sending = setInterval(send, 1000)
-// sending = setInterval(send, 20)
+//sending = setInterval(send, 1000)
+sending = setInterval(send, 20)
 
-document.addEventListener('keydown', recordKey);
-let x,y, theta;
-x = 0;
-y = 0;
-theta = 0;
-function recordKey(e) {
-    var elem = document.getElementById("botin"); 
-    console.log("You pressed" + e.key);
-    
-    switch (e.key) {
-        case "Right":
-        case "ArrowRight":
-    x = x + 10; 
-        break
 
-        case "ArrowLeft":
-        case "Left":
-    x = x - 10;
-        break
-
-        case "Up":
-        case "ArrowUp":
-    y = y - 10; 
-        break
-
-        case "ArrowDown":
-        case "Down":
-    y = y + 10;
-        break
-
-        case "d":
-    theta = theta + 10;
-        break
-
-        case "a":
-    theta = theta - 10;
-        break
-        default:
-        return
-    }
-elem.style.left = x + 'px';
-elem.style.top = y + 'px';
-elem.style.transform = "rotate(" + theta + "deg)";
-console.log("x: "+x);
-console.log("theta: "+theta);
-console.log("rotate(" + theta + "deg)");
-}
-
-function updateState()
+function setConstants()
 {
-    var elem = document.getElementById("botin");
-    x = document.getElementById("x_pos").value;
-    y = document.getElementById("y_pos").value;
-    theta = document.getElementById("theta_ang").value;
-
-    console.log("Robot a " + x + ", " + y );
-
-    elem.style.left = x + 'px';
-    elem.style.top = y + 'px';
-    elem.style.transform = "rotate(" + theta + "deg)";
-    console.log("x: "+x);
-    console.log("theta: "+theta);
-    console.log("rotate(" + theta + "deg)");
-    return;
+    kp_l = document.getElementById('kp_l').value;
+    kd_l = document.getElementById('kd_l').value;
+    ki_l = document.getElementById('ki_l').value;
+    kp_a = document.getElementById('kp_a').value;
+    kd_a = document.getElementById('kd_a').value;
+    ki_a = document.getElementById('ki_a').value;
+    fetch('/set_constants/'+kp_l+'/'+kd_l+'/'+ki_l+'/'+kp_a+'/'+kd_a+'/'+ki_a);
 }
 
-function updateStateNico(x, y, theta)
+function updateState(x, y, theta)
 {
     var elem = document.getElementById("botin");
     // console.log("Robot a " + x + ", " + y );
 
-    elem.style.left = x + 'px';
-    elem.style.top = y + 'px';
+    elem.style.left = ppm*x + 'px';
+    elem.style.top = ppm*y + 'px';
     elem.style.transform = "rotate(" + theta* 180 / Math.PI + "deg)";
-    // console.log("x: "+x);
-    // console.log("theta: "+y);
-    // console.log("rotate(" + theta* 180 / Math.PI + "deg)");
+
     return;
 }
 
@@ -112,22 +57,22 @@ function load(){
     elem.onclick = function clickEvent(e){
         setGoal(e);
     }
-    // elem.addEventListener("click",function(){setGoal(e)});
 }
 
 function setGoal(e){
     console.log("Set Goal ejecutado");
     console.log(e);
     var rect = e.target.getBoundingClientRect();
-    var x = e.clientX - rect.left;
-    var y = e.clientY - rect.top;
+    var x = (e.clientX - rect.left)/ppm;
+    var y = (e.clientY - rect.top)/ppm;
     console.log("(" + x + "," + y + ")");
     goal = document.getElementById("goal")
-    goal.style.left = x + 'px';
-    goal.style.top = y + 'px';
+    goal.style.left = x*ppm + 'px';
+    goal.style.top = y*ppm + 'px';
     goal.style.visibility = 'visible';
 
     fetch('/setGoal/' + x + "/" + y);
+    setConstants()
 }
 
 load();
@@ -148,9 +93,4 @@ function color() {
         break;
   }
 
-
-  
-  /* socket.on('connect', function() {
-      socket.send('User has connected!');
-  }); */
 }

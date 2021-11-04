@@ -5,6 +5,8 @@ from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 from functools import partial  # https://docs.python.org/3.6/library/functools.html
                                # required to pass additional parameters to solve_ivp
+import threading
+import ctypes # For Thread exception
 
 from modelo import *
 
@@ -63,3 +65,20 @@ class MobileBasePID():
     def set_reference(self, x, y):
         self.reference = np.array([x, y])
         print(f"Nueva referencia: ({x},{y})")
+
+class Simulacion(threading.Thread):
+    def __init__(self,robot, controler):
+        super().__init__()
+        self.robot = robot
+        self.controler = controler
+        self.loop = True
+
+    def run(self):
+        print("Corriendo Sim")
+        self.robot.SetState([0,0,0,0,0])
+        while(self.loop):
+            self.controler.update()
+            self.robot.UpdateState()
+
+    def stop(self):
+        self.loop = False
