@@ -26,22 +26,41 @@
   
   <div class="sidenav">
     <p>
-      <button onclick="color()">Color</button> 
+      <button onclick="color()">Cambiar Color</button> 
 </p>
 
-<p>Seleccion la posición deseada</p>
+<div>
 
-<label for="x_pos">X:</label>
-<input type="number" id="x_pos" name="x_pos"><br><br>
+  <p>Constantes Control Lineal:</p>
+  
+  <label for="x_pos">KP</label>
+  <input type="number" step=0.01 id="kp_l" name="kp_l" value = 0><br><br>
+  
+  <label for="y_pos">KD</label>
+  <input type="number" step=0.01 id="kd_l" name="kd_l" value = 0><br><br>
+  
+  <label for="theta_ang">KI</label>
+  <input type="number" step=0.01 id="ki_l" name="ki_l" value = 0><br><br>
+  
+</div>
 
-<label for="y_pos">Y:</label>
-<input type="number" id="y_pos" name="y_pos"><br><br>
+<div>
 
-<label for="theta_ang">Angulo:</label>
-<input type="number" id="theta_ang" name="theta_angle"><br><br>
+  <p>Constantes Control Angular:</p>
+  
+  <label for="x_pos">KP</label>
+  <input type="number" step=0.01 id="kp_a" name="kp_a" value = 0><br><br>
+  
+  <label for="y_pos">KD</label>
+  <input type="number" step=0.01 id="kd_a" name="kd_a" value = 0><br><br>
+  
+  <label for="theta_ang">KI</label>
+  <input type="number" step=0.01 id="ki_a" name="ki_a" value = 0><br><br>
+  
+</div>
 
 <p>
-  <button onclick="updateState()">Actualizar</button> 
+  <button onclick="setConstants()">Ejecutar</button> 
 </p>
 
 </div>
