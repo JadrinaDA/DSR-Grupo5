@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
+from flask_session import Session
 
 import numpy as np
 from flask_socketio import SocketIO, send
@@ -45,6 +46,11 @@ def get_changes(user, form):
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secretkey'
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_TYPE'] = 'filesystem'
+Session(app)
+
+
 Payload.max_decode_packets = 500
 socketio = SocketIO(app, cors_allowed_origins='*')
 
@@ -71,13 +77,32 @@ def index():
 def main():
     return render_template("pagina_principal/info_lab.html")
 
-@app.route("/login")
+@app.route("/login", methods = ['POST', 'GET'])
 def login():
-    return render_template("login/index.html")
+    error = None
+    if request.method == 'POST':
+        mail = request.form['email']
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM usuarios WHERE mail = ?',
+                        (mail,)).fetchone()
+        conn.close()
+        if user is None:
+            error = 'Correo no registrado'
+        else:
+            if user['password'] == request.form["password"]:
+                session['user_id'] = user["id"]
+                return redirect("/main")
+            else:
+                error = 'Contraseña incorrecta'
+    return render_template("login/index.html", error = error)
 
 @app.route("/exp")
 def exper():
-    return render_template("pagina_exp/exp.html")
+    conn = get_db_connection()
+    exp = conn.execute('SELECT * FROM experiencias WHERE id = ?',
+                        (1,)).fetchone()
+    conn.close()
+    return render_template("pagina_exp/exp.html", exp = exp)
 
 @app.route("/reg", methods=('GET', 'POST'))
 def reg():
@@ -92,13 +117,26 @@ def reg():
             (request.form['name'], request.form['lastname'], request.form['email'],
              request.form['psw'], request.form['cargo'], uni, request.form["carrera"], is_robot))
         conn.commit()
+        user = conn.execute('SELECT * FROM usuarios WHERE mail = ?',
+                        (request.form['email'],)).fetchone()
         conn.close()
+        session['user_id'] = user["id"]
         return redirect(url_for('main'))
 
     return render_template("registro/main.html")
 
-@app.route("/res")
+@app.route("/res", methods =('GET', 'POST'))
 def res():
+    user_id = session["user_id"]
+
+    if request.method == 'POST':
+        conn = get_db_connection()
+        conn.execute('INSERT INTO reservas (id_user, id_exp, fecha) VALUES (?, ?, ?))',
+         (user_id, request.form['id_exp'], request.form['fecha']))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('exps'))
+
     return render_template("reserva_horas/reserva.html")
 
 @app.route("/sim")
@@ -107,7 +145,7 @@ def sim():
 
 @app.route("/cuenta", methods=('GET', 'POST'))
 def perfil():
-    user = get_user(1)
+    user = get_user(session["user_id"])
 
     if request.method == 'POST':
         new = get_changes(user, request.form)
@@ -163,16 +201,27 @@ def handleMessage(msg):
 
 @app.route("/cuenta/exp")
 def exps():
-    return render_template("perfil/historial_experiencias.html")
+    user_id = session["user_id"]
+    conn = get_db_connection()
+    reservas = conn.execute('SELECT * FROM reservas WHERE id_user = ?',
+                        (id_user,)).fetchAll()
+    conn.close()
+    return render_template("perfil/historial_experiencias.html", reservas)
 
-@app.route("/cuenta/del/<int:id_user>", methods =('POST', ))
-def delete(id_user):
+@app.route("/cuenta/del", methods =('POST', ))
+def delete():
+    id_user = session.get("user_id")
     usuario = get_user(id_user)
     conn = get_db_connection()
     conn.execute('DELETE FROM usuarios WHERE id = ?', (id_user,))
     conn.commit()
     conn.close()
     flash('"{}" was successfully deleted!'.format(usuario['name']))
+    return redirect(url_for('index'))
+
+@app.route("/salir", methods =('POST',))
+def salir():
+    session['user_id'] = None
     return redirect(url_for('index'))
 
 if __name__ == '__main__':

@@ -64,12 +64,16 @@
           <th>Fecha</th>
           <th>Encargado</th> 
         </tr>
+
+        {% for res in reservas %}
   
         <tr>
-          <td>Brazo Robótico</td>
-          <td>20/10/2021</td>
+          <td>{{res['id']}}</td>
+          <td>{{res['fecha']}}</td>
           <td>Daniel Calabi</td>
         </tr>
+
+        {% endfor %}
         
       </table>
         
