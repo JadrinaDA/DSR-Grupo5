@@ -53,6 +53,7 @@ for (let j=1; j <= nextDays; j ++) {
 	days += `<li><span class="inactive">${j}</span></li>`;
 	monthDays.innerHTML = days;
 }
+
 }
 
 
@@ -68,5 +69,8 @@ addEventListener('click', () => {
 	date.setMonth(date.getMonth() + 1);
 	renderCalendar();
 });
+
+hoy = new Date()
+document.getElementById("dia").value = hoy.getDate().toString() + "/" + hoy.getMonth().toString() + "/" + hoy.getFullYear().toString();
 
 renderCalendar();

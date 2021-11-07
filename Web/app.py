@@ -131,8 +131,8 @@ def res():
 
     if request.method == 'POST':
         conn = get_db_connection()
-        conn.execute('INSERT INTO reservas (id_user, id_exp, fecha) VALUES (?, ?, ?))',
-         (user_id, request.form['id_exp'], request.form['fecha']))
+        conn.execute('INSERT INTO reservas (id_user, id_exp, fecha, hora) VALUES (?, ?, ?, ?)',
+         (user_id, request.form['id_exp'], request.form['dia'], request.form['hora']))
         conn.commit()
         conn.close()
         return redirect(url_for('exps'))
@@ -204,9 +204,10 @@ def exps():
     user_id = session["user_id"]
     conn = get_db_connection()
     reservas = conn.execute('SELECT * FROM reservas WHERE id_user = ?',
-                        (id_user,)).fetchAll()
+                        (user_id,)).fetchall()
+    nomexp = ['Robot PID']
     conn.close()
-    return render_template("perfil/historial_experiencias.html", reservas)
+    return render_template("perfil/historial_experiencias.html", reservas = reservas, nombres_exp = nomexp)
 
 @app.route("/cuenta/del", methods =('POST', ))
 def delete():

@@ -30,8 +30,9 @@ CREATE TABLE reservas (
     id_user INTEGER,
     id_exp INTEGER,
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    fecha TIMESTAMP NOT NULL,
+    fecha TEXT NOT NULL,
+    hora TEXT NOT NULL,
     FOREIGN KEY (id_user) REFERENCES usuarios(id),
     FOREIGN KEY (id_exp) REFERENCES experiencias(id),
-    PRIMARY KEY (id_user, id_exp)
+    PRIMARY KEY (id_user, id_exp, fecha, hora)
 );
