@@ -19,6 +19,7 @@ def get_db_connection():
     return conn
 
 def send_message(message):
+    client.connect('broker.mqttdashboard.com', 1883, 60)
     client.publish('DSR5/1', message)
 
 app = Flask(__name__)
@@ -32,7 +33,6 @@ ref = np.array([0.0, 0.0])
 
 client = mqtt.Client()
 client.connect('broker.mqttdashboard.com', 1883, 60)
-
 
 
 kp_l = 0.0 # 0.01
