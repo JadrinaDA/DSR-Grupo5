@@ -58,8 +58,8 @@ class MobileBasePID():
     def update(self):
         self.update_error()
 
-        u_0 = self.kp_l*self.error[0] - self.kp_a*self.error[1] + 0 - self.kd_a*(self.error[1]-self.past_error[1])/self.mobile_base._Ts
-        u_1 = self.kp_l*self.error[0] + self.kp_a*self.error[1] + 0 + self.kd_a*(self.error[1]-self.past_error[1])/self.mobile_base._Ts
+        u_0 = self.kp_l*self.error[0] - self.kp_a*self.error[1] + self.ki_l*self.ac_error[0]*self.mobile_base._Ts - self.ki_a*self.ac_error[1]*self.mobile_base._Ts + self.kd_l*(self.error[0]-self.past_error[0])/self.mobile_base._Ts - self.kd_a*(self.error[1]-self.past_error[1])/self.mobile_base._Ts
+        u_1 = self.kp_l*self.error[0] + self.kp_a*self.error[1] + self.ki_l*self.ac_error[0]*self.mobile_base._Ts + self.ki_a*self.ac_error[1]*self.mobile_base._Ts + self.kd_l*(self.error[0]-self.past_error[0])/self.mobile_base._Ts + self.kd_a*(self.error[1]-self.past_error[1])/self.mobile_base._Ts
         # def PID():
         #     u[0] = kp_lineal*error_actual[0] - kp_angular*error_actual[1] + ki_lineal*error_acumulado[0]*botin._Ts - ki_angular*error_acumulado[1]*botin._Ts + kd_lineal*(error_actual[0]-error_previo[0])/botin._Ts - kd_angular*(error_actual[1]-error_previo[1])/botin._Ts
         #     u[1] = kp_lineal*error_actual[0] + kp_angular*error_actual[1] + ki_lineal*error_acumulado[0]*botin._Ts + ki_angular*error_acumulado[1]*botin._Ts + kd_lineal*(error_actual[0]-error_previo[0])/botin._Ts + kd_angular*(error_actual[1]-error_previo[1])/botin._Ts
