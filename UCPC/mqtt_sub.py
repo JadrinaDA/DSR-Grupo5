@@ -3,11 +3,11 @@ import serial
 import paho.mqtt.client as mqtt
 
 class Subscriber():
-    def __init__(self, port, bluetooth = False):
-        if bluetooth:
+    def __init__(self, port = None):
+        if port:
             self.ser = self.bt_connect(port)
 
-        self.bluetooth = bluetooth
+        self.bluetooth = not(port == None)
 
         client = mqtt.Client()
         client.on_connect = self.on_connect
@@ -47,4 +47,4 @@ class Subscriber():
 port = "/dev/cu.G01-DevB"
 port = "/dev/cu.iPhonedeIgnacio-Wireles"
 
-sub = Subscriber(port, True)
+sub = Subscriber()
