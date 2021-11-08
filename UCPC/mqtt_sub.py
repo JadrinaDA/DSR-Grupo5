@@ -3,7 +3,7 @@ import serial
 import paho.mqtt.client as mqtt
 
 class Subscriber():
-    def __ini__(self, port, bluetooth = False):
+    def __init__(self, port, bluetooth = False):
         if bluetooth:
             self.ser = self.bt_connect(port)
 
@@ -21,9 +21,10 @@ class Subscriber():
         client.subscribe('DSR5/#')
 
     def on_message(self, client, userdata, msg):
-        print(msg.topic + ' ' + str(msg.payload.decode('utf-8')))
+        decoded_msg = str(msg.payload.decode('utf-8'))
+        print(msg.topic + ' ' + decoded_msg)
         if self.bluetooth:
-            self.bt_send(msg)
+            self.bt_send(decoded_msg)
 
     def bt_send(self, msg):
         msgOnEncode = str.encode(msg)
@@ -44,5 +45,6 @@ class Subscriber():
         self.ser.close()
 
 port = "/dev/cu.G01-DevB"
+port = "/dev/cu.iPhonedeIgnacio-Wireles"
 
-sub = Subscriber(port, False)
+sub = Subscriber(port, True)
