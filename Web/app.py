@@ -14,6 +14,8 @@ import threading
 import sqlite3
 from flask import Flask, render_template, url_for, flash, redirect
 
+from datetime import datetime
+
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
@@ -62,6 +64,8 @@ kd_l = 0.0
 kp_a = 1.0
 ki_a = 0.0
 kd_a = 0.0
+
+horas = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00","17:00","18:00"]
 
 botin = BaseMovil()
 cont = MobileBasePID(botin, ref, kp_l, kd_l, ki_l, kp_a, kd_a, ki_a)
@@ -128,6 +132,11 @@ def reg():
 @app.route("/res", methods =('GET', 'POST'))
 def res():
     user_id = session["user_id"]
+    full_date = datetime.now().strftime("%d/%m/%Y %H:%M").split(" ")
+    hoy = full_date[0]
+    if hoy[0] == "0":
+        hoy = hoy[1:]
+        
 
     if request.method == 'POST':
         conn = get_db_connection()
@@ -137,7 +146,13 @@ def res():
         conn.close()
         return redirect(url_for('exps'))
 
-    return render_template("reserva_horas/reserva.html")
+    conn = get_db_connection()
+    taken = conn.execute('SELECT hora FROM reservas WHERE fecha = ?', (hoy, )).fetchall()
+    conn.close()
+    available = horas
+    for hora in taken:
+        available.remove(hora["hora"])
+    return render_template("reserva_horas/reserva.html", ava = available)
 
 @app.route("/sim")
 def sim():
@@ -212,13 +227,31 @@ def exps():
 @app.route("/cuenta/del", methods =('POST', ))
 def delete():
     id_user = session.get("user_id")
-    usuario = get_user(id_user)
     conn = get_db_connection()
     conn.execute('DELETE FROM usuarios WHERE id = ?', (id_user,))
     conn.commit()
     conn.close()
-    flash('"{}" was successfully deleted!'.format(usuario['name']))
     return redirect(url_for('index'))
+
+@app.route("/exp_con", methods =('GET', ))
+def exp_con():
+    id_user = session.get("user_id")
+    usuario = get_user(id_user)
+    full_date = datetime.now().strftime("%d/%m/%Y %H").split(" ")
+    hoy = full_date[0]
+    if hoy[0] == "0":
+        hoy = hoy[1:]
+    ahora = full_date[1] +":00"
+    conn = get_db_connection()
+    tiene_hora  = conn.execute('SELECT * FROM reservas WHERE id_user = ? AND fecha = ? AND hora = ?', (id_user, hoy, ahora,)).fetchone()
+    conn.close()
+    if tiene_hora:
+        return redirect(url_for('index'))
+    else: 
+        flash("No tienes reservada esta hora, reserva una aquí.")
+        return redirect(url_for('res'))
+
+
 
 @app.route("/salir", methods =('POST',))
 def salir():

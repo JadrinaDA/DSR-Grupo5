@@ -45,6 +45,10 @@ body{
 	text-decoration: none;
 }
 
+a {
+	text-decoration: none;
+}
+
 .boton:hover {
 	border-color: mediumpurple;
 	background-color: lightgrey;

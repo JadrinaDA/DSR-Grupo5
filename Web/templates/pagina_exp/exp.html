@@ -5,7 +5,7 @@
 		ERobotLab UC
 		</title>
 		<meta charset="uft-8">
-		<link rel="stylesheet" href="{{ url_for('static', filename = 'css/estilo_lab.css') }}">
+		<link rel="stylesheet" href="{{ url_for('static', filename = 'css/exp.css') }}">
 	</head>
 	<body>
 		<div class="header">
@@ -30,14 +30,16 @@
 			<div class="square">
 				<h2> Experiencias</h2>
 				<div class="container_bts">
-					<a href="{{ url_for('sim') }}">
+					<a href="{{ url_for('sim') }}" id = "links_spec">
 					<div class="boton">
 						Simulación Robot PID
 					</div>
 					</a>
+					<a href="{{ url_for('exp_con') }}">
 					<div class="boton">
 						Experiencia Robot PID
 					</div>
+					</a>
 				</div>
 			</div>
 		</div>

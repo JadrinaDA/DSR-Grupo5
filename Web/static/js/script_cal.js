@@ -71,6 +71,6 @@ addEventListener('click', () => {
 });
 
 hoy = new Date()
-document.getElementById("dia").value = hoy.getDate().toString() + "/" + hoy.getMonth().toString() + "/" + hoy.getFullYear().toString();
+document.getElementById("dia").value = hoy.getDate().toString() + "/" + (hoy.getMonth() + 1).toString() + "/" + hoy.getFullYear().toString();
 
 renderCalendar();
