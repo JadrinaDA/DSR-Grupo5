@@ -55,10 +55,22 @@
 			<div class="square">
 				<h2> Horas actuales y próximas</h2>
 				<div class="container_horas">
-					<p> Hora actual: No tienes esta hora reservada </p>
+					<p> Hora actual:
+				{% if now %}
+					<a href="{{ url_for('index') }}"> Tienes reservada la hora: accede aquí!</a>
+				{% else %}
+					No tienes esta hora reservada.
+   				{% endif %}
+				</p>
 				</div>
 				<div = class="container_horas">
-					<p> Horas próximas: No tienes horas reservadas esta semana. </p>
+					<p> Horas próximas: 
+						{% if week %}
+						{% for day in week %}
+      					({{day["fecha"]}} , {{day["hora"]}})
+      					{% endfor %}
+      					{% else %}
+   						{% endif %} </p>
 				</div>
 			</div>
 		</div>

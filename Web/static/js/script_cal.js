@@ -1,5 +1,22 @@
 const date = new Date();
 
+function changeSel(day) {
+	let val = day.innerText;
+	let days = document.getElementsByTagName("li");
+	for(let x = 0; x < days.length; x++) {
+		let y = days[x];
+		let span = document.querySelector('#sel');
+		if (y.contains(span))
+		{
+			let val = y.innerText;
+			y.innerHTML = `<li onclick = "changeSel(this)">${val}</li>`;
+		}		
+	}
+	month_sel = document.querySelector(".month_name").innerT
+	document.getElementById("dia").value = val.toString() + "/" + (date.getMonth() + 1).toString() + "/" + date.getFullYear().toString();
+	day.innerHTML = `<li onclick = "changeSel(this)"><span id ="sel" class="selected">${val}</span></li>`;
+}
+
 const renderCalendar = () => {
 	date.setDate(1);
 
@@ -42,10 +59,10 @@ for(let x = firstDayIndex; x > 0; x--) {
 for (let i=1; i <= lastDay; i ++) {
 	if(i === new Date().getDate() && date.getMonth() === new Date().getMonth())
 	{
-		days += `<li><span class="active">${i}</span></li>`
+		days += `<li onclick = "changeSel(this)"><span class="active">${i}</span></li>`
 	}
 	else {
-		days += `<li>${i}</li>`;
+		days += `<li onclick = "changeSel(this)">${i}</li>`;
 	}
 }
 

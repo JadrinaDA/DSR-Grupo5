@@ -78,13 +78,20 @@ body{
 /* Highlight the "current" day */
 .days li .active {
   padding: 5px;
-  background: #fed802;
+  background: rgb(255, 210, 0, 0.2);
   color: black; 
 }
 
 /* Highlight the "current" day */
 .days li .inactive {
   color: lightgrey; 
+}
+
+/* Highlight the "current" day */
+.days li .selected {
+  padding: 5px;
+  background: #fed802;
+  color: black; 
 }
 
 li a {

@@ -79,7 +79,22 @@ def index():
 
 @app.route("/main")
 def main():
-    return render_template("pagina_principal/info_lab.html")
+    id_user = session["user_id"]
+    usuario = get_user(id_user)
+    full_date = datetime.now().strftime("%d/%m/%Y %H").split(" ")
+    hoy = full_date[0]
+    if hoy[0] == "0":
+        hoy = hoy[1:]
+    ahora = full_date[1] +":00"
+    conn = get_db_connection()
+    tiene_hora  = conn.execute('SELECT * FROM reservas WHERE id_user = ? AND fecha = ? AND hora = ?', (id_user, hoy, ahora,)).fetchone()
+    week = conn.execute('SELECT * FROM reservas WHERE id_user = ?',
+                        (id_user,)).fetchall()
+    print(tiene_hora)
+    if week:
+        week = week[0:3]
+    conn.close()
+    return render_template("pagina_principal/info_lab.html", now = tiene_hora, week = week)
 
 @app.route("/login", methods = ['POST', 'GET'])
 def login():
