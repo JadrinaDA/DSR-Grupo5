@@ -13,6 +13,27 @@ import sqlite3
 from flask import Flask, render_template, url_for, flash, redirect
 
 import paho.mqtt.client as mqtt
+
+import base64
+import cv2 as cv
+frame = np.zeros((80, 120, 3), np.uint8)
+def show_camera():
+    while True:
+        print(frame)
+        #cv.imshow("Stream", frame)
+        if cv.waitKey(1) & 0xFF == ord('q'):
+            break
+
+# The callback for when a PUBLISH message is received from the server.
+def on_message(client, userdata, msg):
+    global frame
+    # Decoding the message
+    img = base64.b64decode(msg.payload)
+    # converting into numpy array from buffer
+    npimg = np.frombuffer(img, dtype=np.uint8)
+    # Decode to Original Frame
+    frame = cv.imdecode(npimg, 1)
+
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
@@ -144,7 +165,23 @@ def speed():
     m1_speed = request.args.get('m1')
     m2_speed = request.args.get('m2')
     send_message(f"{m1_speed}{m2_speed}000")
-    return render_template('speed/speed.html')
+    return render_template('speed/index.html')
+
+@app.route('/camera', methods=['post', 'get'])
+def camera():
+    # Abrir pantalla de stream
+    send_message('CAM')
+    show_camera()
+    client = mqtt.Client()
+    client.on_message = on_message
+
+    client.connect('broker.mqttdashboard.com', 1883, 60)
+
+    # Starting thread which will receive the frames
+    client.loop_start()
+    # t = threading.Thread(target=show_camera)
+    # t.start()
+    return render_template('speed/index.html')
 
 @socketio.on('update')
 def handleMessage(msg):
