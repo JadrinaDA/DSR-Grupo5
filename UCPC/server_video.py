@@ -6,7 +6,7 @@ import paho.mqtt.client as mqtt
 MQTT_BROKER = 'broker.mqttdashboard.com'
 MQTT_RECEIVE = "DSR5/CAM"
 
-frame = np.zeros((80, 120, 3), np.uint8)
+frame = np.zeros((120, 160, 3), np.uint8)
 
 
 # The callback for when the client receives a CONNACK response from the server.
