@@ -10,19 +10,67 @@ from simulacion2 import MobileBasePID, Simulacion
 import threading
 
 import sqlite3
-from flask import Flask, render_template, url_for, flash, redirect
+from flask import Flask, render_template, url_for, flash, redirect, Response
 
 import paho.mqtt.client as mqtt
 
 import base64
 import cv2 as cv
-frame = np.zeros((80, 120, 3), np.uint8)
+
+import threading
+
+lock = threading.Lock()
+frame = np.ones((80, 120, 3), np.uint8)
+
+MQTT_BROKER = 'broker.mqttdashboard.com'
+MQTT_RECEIVE = "DSR5/CAM"
+
 def show_camera():
+    global frame
     while True:
         print(frame)
         #cv.imshow("Stream", frame)
-        if cv.waitKey(1) & 0xFF == ord('q'):
-            break
+        # if cv.waitKey(1) & 0xFF == ord('q'):
+        #     break
+
+# The callback for when the client receives a CONNACK response from the server.
+def cam_on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
+
+    # Subscribing in on_connect() means that if we lose the connection and
+    # reconnect then subscriptions will be renewed.
+    client.subscribe(MQTT_RECEIVE)
+
+
+# The callback for when a PUBLISH message is received from the server.
+def cam_on_message(client, userdata, msg):
+    global frame
+    # Decoding the message
+    img = base64.b64decode(msg.payload)
+    # converting into numpy array from buffer
+    npimg = np.frombuffer(img, dtype=np.uint8)
+    # Decode to Original Frame
+    frame = cv.imdecode(npimg, 1)
+
+def generate():
+    # grab global references to the output frame and lock variables
+	global frame, lock
+	# loop over frames from the output stream
+	while True:
+		# wait until the lock is acquired
+		with lock:
+			# check if the output frame is available, otherwise skip
+			# the iteration of the loop
+			if frame is None:
+				continue
+			# encode the frame in JPEG format
+			(flag, encodedImage) = cv.imencode(".jpg", frame)
+			# ensure the frame was successfully encoded
+			if not flag:
+				continue
+		# yield the output frame in the byte format
+		yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + 
+			bytearray(encodedImage) + b'\r\n')
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
@@ -33,6 +81,7 @@ def on_message(client, userdata, msg):
     npimg = np.frombuffer(img, dtype=np.uint8)
     # Decode to Original Frame
     frame = cv.imdecode(npimg, 1)
+    print(frame)
 
 def get_db_connection():
     conn = sqlite3.connect('database.db')
@@ -156,32 +205,33 @@ def set_goal(x,y):
         return 'Sucesss', 200
 
 
-@app.route('/speed-index')
+@app.route('/experiencia_base_movil')
 def speed_index():
-    return render_template('speed/index.html')
+    return render_template('experiencia_base_movil/index.html')
 
-@app.route('/speed', methods=['post', 'get'])
-def speed():
+@app.route('/experiencia_base_movil', methods=['post', 'get'])
+def experiencia_base_movil():
     m1_speed = request.args.get('m1')
     m2_speed = request.args.get('m2')
     send_message(f"{m1_speed}{m2_speed}000")
-    return render_template('speed/index.html')
+    return render_template('experiencia_base_movil/index.html')
 
 @app.route('/camera', methods=['post', 'get'])
 def camera():
     # Abrir pantalla de stream
     send_message('CAM')
-    show_camera()
-    client = mqtt.Client()
-    client.on_message = on_message
 
-    client.connect('broker.mqttdashboard.com', 1883, 60)
+    client = mqtt.Client()
+    client.on_connect = cam_on_connect
+    client.on_message = cam_on_message
+
+    client.connect(MQTT_BROKER)
 
     # Starting thread which will receive the frames
     client.loop_start()
     # t = threading.Thread(target=show_camera)
     # t.start()
-    return render_template('speed/index.html')
+    return render_template('experiencia_base_movil/index.html')
 
 @socketio.on('update')
 def handleMessage(msg):
@@ -197,6 +247,15 @@ def handleMessage(msg):
 @app.route("/cuenta/exp")
 def exps():
     return render_template("perfil/historial_experiencias.html")
+
+
+@app.route("/video_feed")
+def video_feed():
+	# return the response generated along with the specific media
+	# type (mime type)
+	return Response(generate(),
+		mimetype = "multipart/x-mixed-replace; boundary=frame")
+        
 
 if __name__ == '__main__':
     app.run(debug=True)
