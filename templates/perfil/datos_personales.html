@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<title>Datos Personales</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="{{ url_for('static', filename = 'css/estilo_perfil.css') }}">
+
+</head>
+<body>
+
+<div class="header">
+
+  <nav>
+    <a class="inlink" href= "{{ url_for('main') }}"><h1> ERobotLab UC</h1></a>
+    <div class="nav-links">
+        <a class='link' href="">Mi Cuenta</a>		
+        <a class='link' href="{{ url_for('res') }}">Reservar Hora</a>
+    </div>
+    
+  </nav>
+ 
+
+</div>
+<!-- <hr id="header_hr"> -->
+
+
+<div id="wrapper">
+    <div class="sidenav">
+    <a class ="current" href="#">Datos personales</a>
+    <a class="not_current" href="{{ url_for('exps') }}">Experiencias</a>
+    <a class="not_current" href="#">Link</a>
+    </div>
+
+    <div class="content">
+    <h2>Datos Personales</h2>
+    
+    <table>
+      <col style="width:5%">
+	    <col style="width:95%">
+      <form method="post" id = "editf">
+
+        <th><label for="name"><b>Nombre</b></label></td>
+        <td><input type="text" placeholder="{{user['name']}}" name="name" id="name"></td>
+      </tr>
+      <tr>
+        <th> <label for="lastname"><b>Apellido</b></label></td>
+        <td><input type="text" placeholder="{{user['lastname']}}" name="lastname" id="lastname"></td>
+      </tr>
+      <tr>
+        <th> <label for="mail"><b>Mail</b></label></td>
+        <td> <input type="text" placeholder="{{user['mail']}}" name="mail" id="mail"></td>
+      </tr>
+
+      <tr>
+        <th><label for="tipo"><b>Cargo</b></label></td>
+        <td> <input type="text" placeholder="{{user['tipo']}}" name="tipo" id="tipo"></td>
+      </tr>
+      
+      <tr>
+        <th> <label for="inst"><b>Institución</b></label></td>
+        <td> <input type="text" placeholder="{{user['inst']}}" name="inst" id="inst"></td>
+      </tr>
+
+      <tr>
+        <th> <label for="carrera"><b>Carrera</b></label></td>
+        <td> <input type="text" placeholder="Ingeniería" name="carrera" id="carrera" ></td>
+      </tr>
+
+      <tr>
+        <th> <label for="major"><b>Major</b></label></td>
+        <td> <input type="text" placeholder="Ingeniería Robótica" name="major" id="major"></td>
+      </tr>
+      </form>
+    </table>
+
+    <button class="boton" type="submit" form = "editf"> Actualizar Datos</button>
+    <form action="cuenta/del/" method="post">
+    <button class="boton" type="submit"> Borrar Cuenta</a>
+    </form>
+
+    <form action="salir" method="post">
+    <button class="boton" type="submit"> Cerrar Sesión</a>
+    </form>
+
+
+    </div>
+</div>
+
+</body>
+</html>
+
+
+</body>
+</html>

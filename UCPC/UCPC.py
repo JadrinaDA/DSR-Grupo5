@@ -90,4 +90,4 @@ class Subscriber():
 port = "/dev/cu.G01-DevB"
 port = "/dev/cu.iPhonedeIgnacio-Wireles"
 
-sub = Subscriber(port)
+sub = Subscriber()

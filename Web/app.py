@@ -6,8 +6,8 @@ from flask_socketio import SocketIO, send
 from engineio.payload import Payload
 
 from modelo import BaseMovil
-from simulacion2 import MobileBasePID
-from werkzeug.exceptions import abort, Simulacion
+from simulacion2 import MobileBasePID, Simulacion
+from werkzeug.exceptions import abort
 
 
 import threading
