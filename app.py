@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, session
 from flask_session import Session
+from flask_cors import CORS
 
 import numpy as np
 from flask_socketio import SocketIO, send
@@ -124,6 +125,7 @@ def send_message(message):
     client.publish('DSR5/1', message)
 
 app = Flask(__name__)
+#CORS(app)
 app.config['SECRET_KEY'] = 'secretkey'
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -131,7 +133,7 @@ Session(app)
 
 
 Payload.max_decode_packets = 500
-socketio = SocketIO(app, cors_allowed_origins='*')
+socketio = SocketIO(app, cors_allowed_origins='*', logger = True)
 simulation_list = []
 
 
