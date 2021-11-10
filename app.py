@@ -158,7 +158,7 @@ def index():
     conn = get_db_connection()
     users = conn.execute('SELECT * FROM usuarios').fetchall()
     conn.close()
-    return render_template("inicio/pagina_inicio.html", users = users)
+    return render_template("inicio/pagina_inicio.html", users = None)
 
 @app.route("/main")
 def main():
@@ -390,8 +390,6 @@ def exp_con():
         return redirect(url_for('experiencia_base_movil'))
     else: 
         flash("No tienes reservada esta hora, reserva una aquí.")
-        flash(hoy)
-        flash(ahora)
         return redirect(url_for('res'))
 
 
