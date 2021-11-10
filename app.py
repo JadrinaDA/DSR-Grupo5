@@ -247,7 +247,7 @@ def res():
     conn = get_db_connection()
     taken = conn.execute('SELECT hora FROM reservas WHERE fecha = ?', (hoy, )).fetchall()
     conn.close()
-    available = horas
+    available = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00","17:00","18:00"]
     for hora in taken:
         available.remove(hora["hora"])
     return render_template("reserva_horas/reserva.html", ava = available)
