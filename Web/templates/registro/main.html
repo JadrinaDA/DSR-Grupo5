@@ -15,8 +15,8 @@
     <label for="name"><b>Nombre</b></label>
     <input type="text" placeholder="Ingresar Nombre" name="name" id="name" required>
 
-    <label for="last_name"><b>Apellido</b></label>
-    <input type="text" placeholder="Ingresar Apellido" name="last_name" id="last_name" required>
+    <label for="lastname"><b>Apellido</b></label>
+    <input type="text" placeholder="Ingresar Apellido" name="lastname" id="lastname" required>
 
     <label for="email"><b>Mail</b></label>
     <input type="text" placeholder="Ingresar Mail" name="email" id="email" required>
@@ -30,7 +30,7 @@
     <div id=cargo_div>
       <label for="cargo"><b>Cargo</b></label>
       <div class=full_horizontal>
-      <select id="cargo">
+      <select id="cargo" name ="cargo">
         <option value="" selected disabled hidden>Escoja su cargo</option>
         <option value="alumno">Alumno</option>
         <option value="profesor">Profesor</option>
@@ -42,7 +42,7 @@
     <div id=institucion_div>
     <label for="institucion"><b>Institución</b></label>
     <div class=full_horizontal>
-    <select id="institucion">
+    <select id="institucion" name="inst">
       <option value="" selected disabled hidden>Escoja su institucion</option>
       <option value="UC">Universidad Católica de Chile</option>
       <option value="UCh">Universidad de Chile</option>
@@ -58,7 +58,7 @@
     <div id=carrera_div>
     <label for="carrera"><b>Carrera</b></label>
     <div class=full_horizontal>
-    <select id="carrera">
+    <select id="carrera" name="carrera">
       <option value="" selected disabled hidden>Escoja su carrera</option>
       <option value="ing">Ingeniería Civil</option>
       <option value="ing_comercial">Ingeniería Comercial</option>
@@ -73,7 +73,7 @@
     <div id=major_div>
     <label for="major"><b>Major</b></label>
     <div class=full_horizontal>
-    <select id="major">
+    <select id="major" name = "major">
       <option value="" selected disabled hidden>Escoja su major</option>
       <option value="computacion">Computación</option>
       <option value="mecanica">Mecánica</option>

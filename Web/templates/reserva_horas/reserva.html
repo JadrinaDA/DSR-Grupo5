@@ -16,22 +16,30 @@
 			</nav>
 		</div>
 		<h3> Reserva de horas</h3>
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+			{% for message in messages %}
+      			Oops: {{message}}
+      		{% endfor %}
+      		{% else %}
+   			{% endif %}
+   		{% endwith %}
 		<div class="month">
 		  <ul>
 		    <li class="prev">&#10094;</li>
 		    <li class="next">&#10095;</li>
-		    <li>Octubre<br><span style="font-size:18px">2021</span></li>
+		    <li><div class ="month_name"></div><br><span style="font-size:18px">2021</span></li>
 		  </ul>
 		</div>
 
 		<ul class="weekdays">
-		  <li>Mo</li>
-		  <li>Tu</li>
-		  <li>We</li>
-		  <li>Th</li>
-		  <li>Fr</li>
+		  <li>Do</li>
+		  <li>Lu</li>
+		  <li>Ma</li>
+		  <li>Mi</li>
+		  <li>Ju</li>
+		  <li>Vi</li>
 		  <li>Sa</li>
-		  <li>Su</li>
 		</ul>
 
 		<ul class="days">
@@ -76,10 +84,16 @@
 		<div class="square">
 			Horas disponibles:
 			<div class="container_horas">
-				<div class="hora_bubble">10:30</div>
-				<div class="hora_bubble">11:30</div>
-				<div class="hora_bubble">2:00</div>
+				<form method = "POST"> 
+					<input type="hidden" name="dia" id = "dia" value="">
+					<input type="hidden" name="id_exp" id = "id_exp" value=1>
+					{% for hora in ava %}
+		        		<button class="hora_bubble" type="submit" name="hora" value={{hora}}>{{hora}}</button>
+		    		{% endfor %}
+				</form>
 			</div>
 		</div>
+
+		<script src ="{{ url_for('static', filename = 'js/script_cal.js') }}"></script>
 	</body>
 	</html>

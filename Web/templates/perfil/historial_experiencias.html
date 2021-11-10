@@ -62,14 +62,20 @@
         <tr>
           <th> Experiencia</th>
           <th>Fecha</th>
+          <th>Hora</th>
           <th>Encargado</th> 
         </tr>
+
+        {% for res in reservas %}
   
         <tr>
-          <td>Brazo Robótico</td>
-          <td>20/10/2021</td>
+          <td>{{nombres_exp[res['id_exp'] - 1]}}</td>
+          <td>{{res['fecha']}}</td>
+          <td>{{res['hora']}}</td>
           <td>Daniel Calabi</td>
         </tr>
+
+        {% endfor %}
         
       </table>
         

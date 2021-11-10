@@ -1,11 +1,14 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
+from flask_session import Session
 
 import numpy as np
 from flask_socketio import SocketIO, send
 from engineio.payload import Payload
 
 from modelo import BaseMovil
-from simulacion2 import MobileBasePID, Simulacion
+from simulacion2 import MobileBasePID
+from werkzeug.exceptions import abort, Simulacion
+
 
 import threading
 
@@ -83,10 +86,38 @@ def on_message(client, userdata, msg):
     frame = cv.imdecode(npimg, 1)
     print(frame)
 
+from datetime import datetime
+
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
     return conn
+
+
+def get_user(id_user):
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM usuarios WHERE id = ?',
+                        (id_user,)).fetchone()
+    conn.close()
+    if user is None:
+        abort(404)
+    return user
+
+def get_changes(user, form):
+    new = {}
+    for x in form.keys():
+        print(x)
+        if x == "major":
+            if form[x] == "robotica":
+                new['robotica'] = 1
+            else:
+                new['robotica'] = 0
+        elif form[x]:
+            new[x] = form[x]
+        else:
+            new[x] = user[x]
+    return new
+       
 
 def send_message(message):
     client.connect('broker.mqttdashboard.com', 1883, 60)
@@ -94,6 +125,11 @@ def send_message(message):
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secretkey'
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_TYPE'] = 'filesystem'
+Session(app)
+
+
 Payload.max_decode_packets = 500
 socketio = SocketIO(app, cors_allowed_origins='*')
 simulation_list = []
@@ -112,6 +148,8 @@ kp_a = 0.0 # 1.0
 ki_a = 0.0
 kd_a = 0.0
 
+horas = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00","17:00","18:00"]
+
 botin = BaseMovil()
 cont = MobileBasePID(botin, ref, kp_l, kd_l, ki_l, kp_a, kd_a, ki_a)
 
@@ -124,38 +162,116 @@ def index():
 
 @app.route("/main")
 def main():
-    return render_template("pagina_principal/info_lab.html")
+    id_user = session["user_id"]
+    usuario = get_user(id_user)
+    full_date = datetime.now().strftime("%d/%m/%Y %H").split(" ")
+    hoy = full_date[0]
+    if hoy[0] == "0":
+        hoy = hoy[1:]
+    ahora = full_date[1] +":00"
+    conn = get_db_connection()
+    tiene_hora  = conn.execute('SELECT * FROM reservas WHERE id_user = ? AND fecha = ? AND hora = ?', (id_user, hoy, ahora,)).fetchone()
+    week = conn.execute('SELECT * FROM reservas WHERE id_user = ?',
+                        (id_user,)).fetchall()
+    print(tiene_hora)
+    if week:
+        week = week[0:3]
+    conn.close()
+    return render_template("pagina_principal/info_lab.html", now = tiene_hora, week = week)
 
-@app.route("/login")
+@app.route("/login", methods = ['POST', 'GET'])
 def login():
-    return render_template("login/index.html")
+    error = None
+    if request.method == 'POST':
+        mail = request.form['email']
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM usuarios WHERE mail = ?',
+                        (mail,)).fetchone()
+        conn.close()
+        if user is None:
+            error = 'Correo no registrado'
+        else:
+            if user['password'] == request.form["password"]:
+                session['user_id'] = user["id"]
+                return redirect("/main")
+            else:
+                error = 'Contraseña incorrecta'
+    return render_template("login/index.html", error = error)
 
 @app.route("/exp")
 def exper():
-    return render_template("pagina_exp/exp.html")
+    conn = get_db_connection()
+    exp = conn.execute('SELECT * FROM experiencias WHERE id = ?',
+                        (1,)).fetchone()
+    conn.close()
+    return render_template("pagina_exp/exp.html", exp = exp)
 
 @app.route("/reg", methods=('GET', 'POST'))
 def reg():
     if request.method == 'POST':
-        is_robot = 0 #int((request.form['major'] == 'rob'))
-        name = request.form['name'] + " " + request.form['last_name'] 
+        uni = request.form['inst']
+        if (uni == "UC" and request.form['carrera'] == "ing"):
+            is_robot = int((request.form['major'] == 'robotica'))
+        else:
+            is_robot = 0
         conn = get_db_connection()
-        conn.execute("INSERT INTO usuarios (name, mail, password, tipo, robotica) VALUES (?, ?, ?, ?, ?)",
-            (name, request.form['email'],
-             request.form['psw'], 'alumno', is_robot))
+        conn.execute("INSERT INTO usuarios (name, lastname, mail, password, tipo, inst, carrera, robotica) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (request.form['name'], request.form['lastname'], request.form['email'],
+             request.form['psw'], request.form['cargo'], uni, request.form["carrera"], is_robot))
         conn.commit()
+        user = conn.execute('SELECT * FROM usuarios WHERE mail = ?',
+                        (request.form['email'],)).fetchone()
         conn.close()
+        session['user_id'] = user["id"]
         return redirect(url_for('main'))
 
     return render_template("registro/main.html")
 
-@app.route("/res")
+@app.route("/res", methods =('GET', 'POST'))
 def res():
-    return render_template("reserva_horas/reserva.html")
+    user_id = session["user_id"]
+    full_date = datetime.now().strftime("%d/%m/%Y %H:%M").split(" ")
+    hoy = full_date[0]
+    if hoy[0] == "0":
+        hoy = hoy[1:]
+        
 
-@app.route("/cuenta")
+    if request.method == 'POST':
+        conn = get_db_connection()
+        conn.execute('INSERT INTO reservas (id_user, id_exp, fecha, hora) VALUES (?, ?, ?, ?)',
+         (user_id, request.form['id_exp'], request.form['dia'], request.form['hora']))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('exps'))
+
+    conn = get_db_connection()
+    taken = conn.execute('SELECT hora FROM reservas WHERE fecha = ?', (hoy, )).fetchall()
+    conn.close()
+    available = horas
+    for hora in taken:
+        available.remove(hora["hora"])
+    return render_template("reserva_horas/reserva.html", ava = available)
+
+
+@app.route("/sim")
+def sim():
+    return render_template("Simulacion/simulacion_base_movil.html")
+
+@app.route("/cuenta", methods=('GET', 'POST'))
 def perfil():
-    return render_template("perfil/datos_personales.html")
+    user = get_user(session["user_id"])
+
+    if request.method == 'POST':
+        new = get_changes(user, request.form)
+        conn = get_db_connection()
+        conn.execute('UPDATE usuarios SET name = ?, lastname = ?, mail = ?,'
+         ' tipo = ?, inst = ?, carrera = ?, robotica = ? WHERE mail = ?',
+         (new['name'], new['lastname'], new['mail'], new['tipo'], new['inst'], new['carrera'], new['robotica'], user['mail']))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('main'))
+
+    return render_template("perfil/datos_personales.html", user = user)
 
 @app.route("/sim")
 def sim():
@@ -246,7 +362,47 @@ def handleMessage(msg):
 
 @app.route("/cuenta/exp")
 def exps():
-    return render_template("perfil/historial_experiencias.html")
+    user_id = session["user_id"]
+    conn = get_db_connection()
+    reservas = conn.execute('SELECT * FROM reservas WHERE id_user = ?',
+                        (user_id,)).fetchall()
+    nomexp = ['Robot PID']
+    conn.close()
+    return render_template("perfil/historial_experiencias.html", reservas = reservas, nombres_exp = nomexp)
+
+@app.route("/cuenta/del", methods =('POST', ))
+def delete():
+    id_user = session.get("user_id")
+    conn = get_db_connection()
+    conn.execute('DELETE FROM usuarios WHERE id = ?', (id_user,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('index'))
+
+@app.route("/exp_con", methods =('GET', ))
+def exp_con():
+    id_user = session.get("user_id")
+    usuario = get_user(id_user)
+    full_date = datetime.now().strftime("%d/%m/%Y %H").split(" ")
+    hoy = full_date[0]
+    if hoy[0] == "0":
+        hoy = hoy[1:]
+    ahora = full_date[1] +":00"
+    conn = get_db_connection()
+    tiene_hora  = conn.execute('SELECT * FROM reservas WHERE id_user = ? AND fecha = ? AND hora = ?', (id_user, hoy, ahora,)).fetchone()
+    conn.close()
+    if tiene_hora:
+        return redirect(url_for('index'))
+    else: 
+        flash("No tienes reservada esta hora, reserva una aquí.")
+        return redirect(url_for('res'))
+
+
+
+@app.route("/salir", methods =('POST',))
+def salir():
+    session['user_id'] = None
+    return redirect(url_for('index'))
 
 
 @app.route("/video_feed")

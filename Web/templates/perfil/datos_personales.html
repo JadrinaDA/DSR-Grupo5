@@ -39,41 +39,50 @@
     <table>
       <col style="width:5%">
 	    <col style="width:95%">
+      <form method="post" id = "editf">
 
         <th><label for="name"><b>Nombre</b></label></td>
-        <td><input type="text" placeholder="Alumno" name="name" id="name" readonly></td>
+        <td><input type="text" placeholder="{{user['name']}}" name="name" id="name"></td>
       </tr>
       <tr>
-        <th> <label for="last_name"><b>Apellido</b></label></td>
-        <td><input type="text" placeholder="de Prueba" name="last_name" id="last_name" readonly></td>
+        <th> <label for="lastname"><b>Apellido</b></label></td>
+        <td><input type="text" placeholder="{{user['lastname']}}" name="lastname" id="lastname"></td>
       </tr>
       <tr>
-        <th> <label for="email"><b>Mail</b></label></td>
-        <td> <input type="text" placeholder="alumnodeprueba@uc.cl" name="email" id="email" readonly></td>
+        <th> <label for="mail"><b>Mail</b></label></td>
+        <td> <input type="text" placeholder="{{user['mail']}}" name="mail" id="mail"></td>
       </tr>
 
       <tr>
-        <th><label for="cargo"><b>Cargo</b></label></td>
-        <td> <input type="text" placeholder="Alumno" name="cargo" id="cargo" readonly></td>
+        <th><label for="tipo"><b>Cargo</b></label></td>
+        <td> <input type="text" placeholder="{{user['tipo']}}" name="tipo" id="tipo"></td>
       </tr>
       
       <tr>
-        <th> <label for="institucion"><b>Institución</b></label></td>
-        <td> <input type="text" placeholder="Pontificia Universidad Católica de Chile" name="institucion" id="institucion" readonly></td>
+        <th> <label for="inst"><b>Institución</b></label></td>
+        <td> <input type="text" placeholder="{{user['inst']}}" name="inst" id="inst"></td>
       </tr>
 
       <tr>
         <th> <label for="carrera"><b>Carrera</b></label></td>
-        <td> <input type="text" placeholder="Ingeniería" name="carrera" id="carrera" readonly></td>
+        <td> <input type="text" placeholder="Ingeniería" name="carrera" id="carrera" ></td>
       </tr>
 
       <tr>
         <th> <label for="major"><b>Major</b></label></td>
-        <td> <input type="text" placeholder="Ingeniería Robótica" name="major" id="major" readonly></td>
+        <td> <input type="text" placeholder="Ingeniería Robótica" name="major" id="major"></td>
       </tr>
+      </form>
     </table>
 
-    <a class="boton"> Actualizar Datos</a>
+    <button class="boton" type="submit" form = "editf"> Actualizar Datos</button>
+    <form action="cuenta/del/" method="post">
+    <button class="boton" type="submit"> Borrar Cuenta</a>
+    </form>
+
+    <form action="salir" method="post">
+    <button class="boton" type="submit"> Cerrar Sesión</a>
+    </form>
 
 
     </div>
