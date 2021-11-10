@@ -138,7 +138,7 @@ simulation_list = []
 ref = np.array([0.0, 0.0])
 
 client = mqtt.Client()
-client.connect('broker.mqttdashboard.com', 1883, 60)
+#client.connect('broker.mqttdashboard.com', 1883, 60)
 
 
 kp_l = 0.0 # 0.01
@@ -252,10 +252,6 @@ def res():
         available.remove(hora["hora"])
     return render_template("reserva_horas/reserva.html", ava = available)
 
-
-@app.route("/sim")
-def sim():
-    return render_template("Simulacion/simulacion_base_movil.html")
 
 @app.route("/cuenta", methods=('GET', 'POST'))
 def perfil():
