@@ -173,7 +173,6 @@ def main():
     tiene_hora  = conn.execute('SELECT * FROM reservas WHERE id_user = ? AND fecha = ? AND hora = ?', (id_user, hoy, ahora,)).fetchone()
     week = conn.execute('SELECT * FROM reservas WHERE id_user = ?',
                         (id_user,)).fetchall()
-    print(tiene_hora)
     if week:
         week = week[0:3]
     conn.close()
@@ -391,6 +390,8 @@ def exp_con():
         return redirect(url_for('experiencia_base_movil'))
     else: 
         flash("No tienes reservada esta hora, reserva una aquí.")
+        flash(hoy)
+        flash(ahora)
         return redirect(url_for('res'))
 
 
