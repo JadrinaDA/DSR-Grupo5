@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Inicio</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="{{ url_for('static', filename = 'css/estilo_inicio.css') }}">
+
+</head>
+<body>
+
+<div class="header">
+
+  <nav>
+    <a href="index.html" class="w3-bar-item">
+      <img id="logo" src="{{ url_for('static', filename= 'img/logo.png') }}" alt="Logo UC">
+      </a>
+    <div class="nav-links">
+        <a class='link' href="{{ url_for('login') }}">Ingresar</a>		
+    </div>
+    
+  </nav>
+ 
+
+</div>
+<!-- <hr id="header_hr"> -->
+
+
+
+<div id="wrapper">
+    <div class="imagen_principal" id="imagen_fondo">
+      <!-- <img class="w3-image" src="../img/bg.jpeg" alt="RoboticArm" width="2000" height="800">   -->
+      <div id="div_main_title">
+        <h1 id="main_title"><b>Laboratorios Remotos Ingeniería UC</b> </h1>
+      </div>
+    </div>
+
+
+    <!-- Page Content -->
+    <div class="content_inicio" style="max-width:1564px">
+
+      {% for user in users %}
+        <a href="#">
+            <h2>{{ user['name'] }}</h2>
+        </a>
+        <span class="badge badge-primary">{{ user['password'] }}</span>
+        <span class="badge badge-primary">{{ user['inst'] }}</span>
+        <span class="badge badge-primary">{{ user['robotica'] }}</span>
+        <hr>
+    {% endfor %}
+
+      <!-- About Section -->
+      <div id="about">
+        <h3 class="subtitle">¿En qué consiste?
+        </h3>
+        <p>Robótica UC lleva a tu casa la experiencia de aprendizaje de los laboratorios de robótica. Contando con distintas experiencias
+          como el manejo de un brazo robótico, la programación de un robot móvil y el control de un péndulo invertido, además de otros 
+          proyectos en actual desarrollo. Buscamos crear una experiencia similar a la de un laboratorio presencial otorgándote control 
+          sobre sistemas robóticos reales ubicados en el Campus San Joaquín de la Universidad.
+        </p>
+      </div>
+    
+      <div class="fila">
+        <div class="col">
+          <div class="img_container">
+            <div class="img_title">Brazo Robótico</div>
+            <img src="../img/robotic_arm.jpeg" alt="House" style="width:100%">
+          </div>
+        </div>
+        <div class="col">
+          <div class="img_container">
+            <div class="img_title">Seguidor de Línea</div>
+            <img src="../img/line_follower.jpeg" alt="House" style="width:100%">
+          </div>
+        </div>
+        <div class="col">
+          <div class="img_container">
+            <div class="img_title">Base Móvil</div>
+            <img src="../img/mobile_base.jpeg" alt="House" style="width:100%">
+          </div>
+        </div>
+      </div>
+
+       <!-- Contact Section -->
+  <div id="contact">
+    <h3 class="subtitle">Contacto</h3>
+    <form action="#" target="_blank">
+      <input style="margin-left: 10px; width: 100%;" type="text" placeholder="Nombre" required="" name="Name">
+      <input style="margin-left: 10px; width: 100%;" type="text" placeholder="Email" required="" name="Email">
+      <input style="margin-left: 10px; width: 100%;" type="text" placeholder="Asunto" required="" name="Subject">
+      <input style="margin-left: 10px; width: 100%;" type="text" placeholder="Comentario" required="" name="Comment">
+      <button class="boton" type="submit">
+        <i class="fa fa-paper-plane"></i> ENVIAR MENSAJE
+      </button>
+    </form>
+  </div>
+  
+
+<!-- End page content -->
+</div>
+
+
+</div>
+
+</body>
+</html>
+
+
+</body>
+</html>
