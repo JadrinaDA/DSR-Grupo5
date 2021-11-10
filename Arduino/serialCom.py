@@ -5,7 +5,7 @@ import serial
 
 # cv2.namedWindow('frame')
 
-msgOn = "Hola IRB2001;" # Mensaje que queremos enviar
+msgOn = "100002003;" # Mensaje que queremos enviar
 # El Ambos mensajes que estan en formato Sring deben ser transformados en un arreglo de bytes mediante la funcion .encode
 msgOnEncode = str.encode(msgOn) 
 
