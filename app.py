@@ -388,7 +388,7 @@ def exp_con():
     tiene_hora  = conn.execute('SELECT * FROM reservas WHERE id_user = ? AND fecha = ? AND hora = ?', (id_user, hoy, ahora,)).fetchone()
     conn.close()
     if tiene_hora:
-        return redirect(url_for('index'))
+        return redirect(url_for('experiencia_base_movil'))
     else: 
         flash("No tienes reservada esta hora, reserva una aquí.")
         return redirect(url_for('res'))
