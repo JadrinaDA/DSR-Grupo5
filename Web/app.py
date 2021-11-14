@@ -27,7 +27,7 @@ import cv2 as cv
 import threading
 
 lock = threading.Lock()
-frame = np.ones((80, 120, 3), np.uint8)
+frame = np.ones((160, 120, 3), np.uint8)
 
 MQTT_BROKER = 'broker.mqttdashboard.com'
 MQTT_RECEIVE = "DSR5/CAM"

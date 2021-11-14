@@ -70,7 +70,7 @@ class Subscriber():
                 _, frame = cap.read()
                 # Resize Frame
                 # frame = cv.resize(frame, [80, 120] )
-                frame = cv.resize(frame, [120, 160] )
+                frame = cv.resize(frame, [160, 120] )
                 # Encoding the Frame
                 _, buffer = cv.imencode('.jpg', frame)
                 # Converting into encoded bytes

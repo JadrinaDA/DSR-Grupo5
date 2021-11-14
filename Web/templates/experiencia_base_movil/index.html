@@ -1,23 +1,47 @@
-<!DOCTYPE html>
-<html>
-<body>
+<!doctype html>
+	<html>
+	<head>
+		<title>
+		ERobotLab UC / Experiencia 
+		</title>
+		<meta charset="uft-8">
+		<link rel="stylesheet" href="{{ url_for('static', filename = 'css/estilo_experiencia.css') }}">
+	</head>
+	<body>
+		<div class="header">
+			<nav>
+			<h1> ERobotLab UC</h1>
+			<div class="nav-links">
+				<a class='link' href="{{ url_for('perfil') }}">Mi Cuenta</a>	
+				<a class='link' href="{{ url_for('res') }}">Reservar Hora</a>
+			</div>
+			</nav>
+		</div>
 
-<h2>Set speeds</h2>
+		<div id="wrapper">
+      <div class="container"> 
+				<div class="square">
 
-<form action="/speed">
-  <label for="fname">M1 Speed:</label><br>
-  <input type="text" id="m1" name="m1"><br>
-  <label for="lname">M2 Speed:</label><br>
-  <input type="text" id="m2" name="m2"><br><br>
-  <input type="submit" value="Set speed">
-</form> 
+          <h2>Camara Laboratorio</h2>
+          <img id = "labcam" src="{{ url_for('video_feed') }}">
+          
+          <form action="/camera">
+            <input type="submit" value="Open camera">
+          </form>
+          
+      <h2>Set speeds</h2>
 
-<h2>Camara Laboratorio</h2>
-<img src="{{ url_for('video_feed') }}">
+      <form action="/speed">
+        <label for="fname">M1 Speed:</label><br>
+        <input type="text" id="m1" name="m1"><br>
+        <label for="lname">M2 Speed:</label><br>
+        <input type="text" id="m2" name="m2"><br><br>
+        <input type="submit" value="Set speed">
+      </form> 
 
-<form action="/camera">
-  <input type="submit" value="Open camera">
-</form> 
+    </div>
+      </div>
+    </div>
 
 </body>
 </html>
