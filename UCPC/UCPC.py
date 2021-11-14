@@ -87,7 +87,7 @@ class Subscriber():
             client.disconnect()
             print("\nNow you can restart fresh")
 
-port = "/dev/cu.G01-DevB"
-port = "/dev/cu.iPhonedeIgnacio-Wireles"
+port = "/dev/cu.IRB-G01-SPPDev"
+#port = "/dev/cu.iPhonedeIgnacio-Wireles"
 
 sub = Subscriber(port)
