@@ -139,7 +139,7 @@ simulation_list = []
 ref = np.array([0.0, 0.0])
 
 client = mqtt.Client()
-#client.connect('broker.mqttdashboard.com', 1883, 60)
+client.connect('broker.mqttdashboard.com', 1883, 60)
 
 
 kp_l = 0.0 # 0.01
@@ -209,15 +209,21 @@ def exper():
 @app.route("/reg", methods=('GET', 'POST'))
 def reg():
     if request.method == 'POST':
+        if (request.form['cargo'] == "profesor"):
+            carrera = "profe"
+        elif (request.form['cargo'] == "otro"):
+            carrera = "otro"
+        else:
+            carrera = request.form['carrera']
         uni = request.form['inst']
-        if (uni == "UC" and request.form['carrera'] == "ing"):
+        if (uni == "UC" and carrera == "ing"):
             is_robot = int((request.form['major'] == 'robotica'))
         else:
             is_robot = 0
         conn = get_db_connection()
         conn.execute("INSERT INTO usuarios (name, lastname, mail, password, tipo, inst, carrera, robotica) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             (request.form['name'], request.form['lastname'], request.form['email'],
-             request.form['psw'], request.form['cargo'], uni, request.form["carrera"], is_robot))
+             request.form['psw'], request.form['cargo'], uni, carrera, is_robot))
         conn.commit()
         user = conn.execute('SELECT * FROM usuarios WHERE mail = ?',
                         (request.form['email'],)).fetchone()
