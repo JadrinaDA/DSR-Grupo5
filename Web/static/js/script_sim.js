@@ -1,11 +1,52 @@
+const kpa = document.getElementById("kp_a");
+
+kpa.addEventListener('change', setConstants)
+
+document.getElementById("kp_a").addEventListener('change', setConstants)
+document.getElementById("ki_a").addEventListener('change', setConstants)
+document.getElementById("kd_a").addEventListener('change', setConstants)
+document.getElementById("kp_l").addEventListener('change', setConstants)
+document.getElementById("ki_l").addEventListener('change', setConstants)
+document.getElementById("kd_l").addEventListener('change', setConstants)
+
+document.getElementById("kp_a").onchange = function(){setConstants};
+document.getElementById("ki_a").onchange = function(){setConstants};
+document.getElementById("kd_a").onchange = function(){setConstants};
+document.getElementById("kp_l").onchange = function(){setConstants};
+document.getElementById("ki_l").onchange = function(){setConstants};
+document.getElementById("kd_l").onchange = function(){setConstants};
+
 console.log("Hola!")
 var socket = io.connect('http://127.0.0.1:5000');
 
 const ppm = 400; // Pixeles por metro
 
-socket.on('connect', function() {
-    socket.send('User has connected!');
-    console.log("User has connected");
+socket.emit('get_parameters',
+{
+    'value':0
+});
+
+var field_par;
+
+socket.on('parameters', function(msg)
+{
+    console.log("Recibi mis parametros");
+    par = JSON.parse(msg);
+    field_par = par.field;
+    robot_par = par.robot
+
+    field = document.getElementById('field');
+    field.style.width = field_par.width*ppm+"px";
+    field.style.height = field_par.height*ppm+"px";
+
+    robot = document.getElementById('botin');
+    robot.style.width = robot_par.width*ppm+"px";
+    robot.style.height = robot_par.height*ppm+"px";
+
+    frente = document.getElementById("frente_botin");
+    frente.style.height = "5px";
+    frente.style.marginTop = (robot_par.height*ppm - 5) / 2 + "px";
+
 });
 
 socket.on('message', function(msg) {
@@ -17,7 +58,6 @@ socket.on('message', function(msg) {
 });
 
 function send(){
-
     socket.emit('update',
     {
         'value':0
@@ -25,7 +65,7 @@ function send(){
 }
 
 //sending = setInterval(send, 1000)
-sending = setInterval(send, 20)
+sending = setInterval(send, 40)
 
 
 function setConstants()
@@ -36,6 +76,7 @@ function setConstants()
     kp_a = document.getElementById('kp_a').value;
     kd_a = document.getElementById('kd_a').value;
     ki_a = document.getElementById('ki_a').value;
+    console.log("constantes seteadas");
     fetch('/set_constants/'+kp_l+'/'+kd_l+'/'+ki_l+'/'+kp_a+'/'+kd_a+'/'+ki_a);
 }
 

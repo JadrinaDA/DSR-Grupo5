@@ -9,6 +9,10 @@ from modelo import BaseMovil
 from simulacion2 import MobileBasePID, Simulacion
 from werkzeug.exceptions import abort
 
+import json
+
+from parametros import p_sim
+
 
 import threading
 
@@ -253,9 +257,6 @@ def res():
     return render_template("reserva_horas/reserva.html", ava = available)
 
 
-@app.route("/sim")
-def sim():
-    return render_template("Simulacion/simulacion_base_movil.html")
 
 @app.route("/cuenta", methods=('GET', 'POST'))
 def perfil():
@@ -359,6 +360,11 @@ def handleMessage(msg):
         'theta': state[2]
     }
     send(state_dict, broadcast=True)
+
+@socketio.on('get_parameters')
+def send_parameters(msg):
+    socketio.emit('parameters', json.dumps(p_sim))
+
 
 @app.route("/cuenta/exp")
 def exps():
