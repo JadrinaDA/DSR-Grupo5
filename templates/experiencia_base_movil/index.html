@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Set speeds</h2>
+
+<form action="/speed">
+  <label for="fname">M1 Speed:</label><br>
+  <input type="text" id="m1" name="m1"><br>
+  <label for="lname">M2 Speed:</label><br>
+  <input type="text" id="m2" name="m2"><br><br>
+  <input type="submit" value="Set speed">
+</form> 
+
+<h2>Camara Laboratorio</h2>
+<img src="{{ url_for('video_feed') }}">
+
+<form action="/camera">
+  <input type="submit" value="Open camera">
+</form> 
+
+</body>
+</html>
