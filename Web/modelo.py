@@ -2,10 +2,13 @@ import numpy as np
 from scipy.integrate import solve_ivp
 from functools import partial
 
+from parametros import p_sim
+
 class BaseMovil:
 
     def __init__(self, name='botin'):
         self.name = name
+        # x, y, theta, v, omega
         self._x = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
         # self._x_min
         # self._x_max
@@ -22,11 +25,18 @@ class BaseMovil:
         # model parameters
         self._m = 2.0
         self._r = 0.04
-        self._l = 0.2
-        self._w = 0.1
+        self._l = p_sim["robot"]["height"]
+        self._w = p_sim["robot"]["width"]
         self._c = 1.0
         self._b = 1.0
         self._j = self._m*(self._l**2 + self._w**2)/12
+        self.ce = 1  # Coeficiente de elasticidad
+ 
+        # Restrictions
+        self.x_max = p_sim["field"]["width"] - max([self._l, self._w])
+        self.y_max = p_sim["field"]["height"] - max([self._l, self._w])
+        self.x_min = 0
+        self.y_min = 0
 
     def SetState(self, x):
         self._x = x
@@ -48,17 +58,7 @@ class BaseMovil:
         return xdot
     
     def UpdateState(self):
-    
-        #print('Updating crane state')
-        # t, x = step_model(model, t0, x0, u, step_size)
-    
-        # odeint - Perform integration using Fortran's LSODA (Adams & BDF methods)
-        # This function has been deprecated.  It is slower and the integration methods
-        # cannot handle ODEs with noise, producing diverging results.
-        #x = odeint(lambda x, t, *args : model(t, x, *args), x0, tX, args=(u, sigma_v))   
-        #t = tfinal
-        #return t, x.T
-    
+
         # solve_ivp
         x0 = self._x
         x = solve_ivp(partial(self._modelo_base_movil, u=self._u), (self._t0,self._tf), x0, method='BDF') #, teval=self._tX)
@@ -67,6 +67,17 @@ class BaseMovil:
         self._t = self._t + self._Ts
         
         # Check state bounds
+        if self._x[0] > self.x_max:
+            self._x[0] = self.x_max
+        if self._x[0] < self.x_min:
+            self._x[0] = self.x_min
+
+        if self._x[1] > self.y_max:
+            self._x[1] = self.y_max
+        if self._x[1] < self.y_min:
+            self._x[1] = self.y_min
+
+
         '''
         for k in range(len(self._x)):
             self._x[k] = self._x_min[k] if (self._x[k] < self._x_min[k]) else self._x[k]
