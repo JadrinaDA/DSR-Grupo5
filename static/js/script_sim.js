@@ -1,5 +1,5 @@
 console.log("Hola!")
-var socket = io.connect('http://robotlabuc.herokuapp.com/');
+var socket = io.connect('/');
 
 const ppm = 400; // Pixeles por metro
 
