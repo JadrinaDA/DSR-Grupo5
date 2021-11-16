@@ -18,9 +18,9 @@
 			</nav>
 		</div>
 
-	<div id="wrapper">
+		<div id="wrapper">
       <div class="container"> 
-		<div class="square">
+				<div class="square">
 
           <h2>Camara Laboratorio</h2>
           <img id = "labcam" src="{{ url_for('video_feed') }}">
@@ -29,60 +29,19 @@
             <input type="submit" value="Open camera">
           </form>
           
-		</div>
+      <h2>Set speeds</h2>
 
-		<div class="sidenav">
-		
-		<h2>Constantes PID</h2>
-		<p>Ingrese los valores deseados para las constantes del control PID del robot. A continuación, presione el botón "Enviar".</p>
-
-		<form action="/experiencia_base_movil/set_constants">
-
-			<div>
-				<h3>Control Distancia</h3>
-				<label for="kp">K<sub>p</sub>:</label>
-				<input type="text" id="kpl" name="kpl"><br>
-				
-				<label for="kp">K<sub>i</sub>:</label>
-				<input type="text" id="kil" name="kil"><br>
-				
-				<label for="kp">K<sub>d</sub>:</label>
-				<input type="text" id="kdl" name="kdl"><br>
-			</div>
-
-			<div>
-				<h3>Control Ángulo</h3>
-				<label for="kp">K<sub>p</sub>:</label>
-				<input type="text" id="kpa" name="kpa"><br>
-				
-				<label for="kp">K<sub>i</sub>:</label>
-				<input type="text" id="kia" name="kia"><br>
-				
-				<label for="kp">K<sub>d</sub>:</label>
-				<input type="text" id="kda" name="kda"><br>
-			</div>
-
-
-			<input type="submit" value="Enviar">
-		</form> 
-		  
-
-	
-	<br>
-	
-	<hr>
-      <h2>Velocidad Motores</h2>
-	  <p>Ingrese los valores deseados para la velocidad de cada motor del robot. A continuación, presione el botón "Enviar".</p>
-
-      <form action="/experiencia_base_movil/set_speed">
+      <form action="/speed">
         <label for="fname">M1 Speed:</label><br>
         <input type="text" id="m1" name="m1"><br>
         <label for="lname">M2 Speed:</label><br>
         <input type="text" id="m2" name="m2"><br><br>
-        <input type="submit" value="Enviar">
+        <input type="submit" value="Set speed">
       </form> 
 
-	
-	</div>
+    </div>
+      </div>
+    </div>
+
 </body>
 </html>
