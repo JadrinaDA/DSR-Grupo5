@@ -24,8 +24,8 @@ function send(){
     })
 }
 
-//sending = setInterval(send, 1000)
-sending = setInterval(send, 20)
+sending = setInterval(send, 1000)
+//sending = setInterval(send, 20)
 
 
 function setConstants()
