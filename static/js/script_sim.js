@@ -1,5 +1,5 @@
 console.log("Hola!")
-var socket = io.connect('/', {transports: ['websocket']});
+var socket = io();
 
 const ppm = 400; // Pixeles por metro
 
