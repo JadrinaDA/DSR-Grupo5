@@ -9,6 +9,10 @@ from modelo import BaseMovil
 from simulacion2 import MobileBasePID, Simulacion
 from werkzeug.exceptions import abort
 
+import json
+
+from parametros import p_sim
+
 
 import threading
 
@@ -23,7 +27,7 @@ import cv2 as cv
 import threading
 
 lock = threading.Lock()
-frame = np.ones((80, 120, 3), np.uint8)
+frame = np.ones((160, 120, 3), np.uint8)
 
 MQTT_BROKER = 'broker.mqttdashboard.com'
 MQTT_RECEIVE = "DSR5/CAM"
@@ -257,9 +261,6 @@ def res():
     return render_template("reserva_horas/reserva.html", ava = available)
 
 
-@app.route("/sim")
-def sim():
-    return render_template("Simulacion/simulacion_base_movil.html")
 
 @app.route("/cuenta", methods=('GET', 'POST'))
 def perfil():
@@ -329,12 +330,25 @@ def set_goal(x,y):
 def speed_index():
     return render_template('experiencia_base_movil/index.html')
 
-@app.route('/experiencia_base_movil', methods=['post', 'get'])
+@app.route('/experiencia_base_movil/set_speed', methods=['post', 'get'])
 def experiencia_base_movil():
     m1_speed = request.args.get('m1')
     m2_speed = request.args.get('m2')
-    send_message(f"{m1_speed}{m2_speed}000")
+    send_message(f"SPD{m1_speed}${m2_speed}$")
+    # send_message(f"SPD{m1_speed}{m2_speed}0000")
     return render_template('experiencia_base_movil/index.html')
+
+@app.route('/experiencia_base_movil/set_constants', methods=['post', 'get'])
+def set_exp_constants():
+    kpl = request.args.get('kpl')
+    kil = request.args.get('kil')
+    kdl = request.args.get('kdl')
+    kpa = request.args.get('kpa')
+    kia = request.args.get('kia')
+    kda = request.args.get('kda')
+    send_message(f"K{kpl}${kdl}${kil}${kpa}${kda}${kia}$")
+    return render_template('experiencia_base_movil/index.html')
+
 
 @app.route('/camera', methods=['post', 'get'])
 def camera():
@@ -363,6 +377,11 @@ def handleMessage(msg):
         'theta': state[2]
     }
     send(state_dict, broadcast=True)
+
+@socketio.on('get_parameters')
+def send_parameters(msg):
+    socketio.emit('parameters', json.dumps(p_sim))
+
 
 @app.route("/cuenta/exp")
 def exps():

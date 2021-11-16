@@ -53,7 +53,7 @@ class Subscriber():
         self.ser.close()
 
     def video(self):
-        # Raspberry PI IP address
+        # IP address
         MQTT_BROKER = 'broker.mqttdashboard.com'
         # Topic on which frame will be published
         MQTT_SEND = "DSR5/CAM"
@@ -63,6 +63,7 @@ class Subscriber():
         client = mqtt.Client()
         # Establishing Connection with the Broker
         client.connect(MQTT_BROKER)
+        # counter = 0
         try:
             while True:
                 # start = time.time()
@@ -70,7 +71,7 @@ class Subscriber():
                 _, frame = cap.read()
                 # Resize Frame
                 # frame = cv.resize(frame, [80, 120] )
-                frame = cv.resize(frame, [120, 160] )
+                frame = cv.resize(frame, [160, 120] )
                 # Encoding the Frame
                 _, buffer = cv.imencode('.jpg', frame)
                 # Converting into encoded bytes
@@ -81,13 +82,15 @@ class Subscriber():
                 # t = end - start
                 # fps = 1/t
                 # print(fps)
-                time.sleep(0.1)
+                # print(counter)
+                # counter += 1
+                time.sleep(0.5)
         except:
             cap.release()
             client.disconnect()
             print("\nNow you can restart fresh")
 
-port = "/dev/cu.G01-DevB"
-port = "/dev/cu.iPhonedeIgnacio-Wireles"
+port = "/dev/cu.IRB-G01-SPPDev"
+#port = "/dev/cu.iPhonedeIgnacio-Wireles"
 
 sub = Subscriber()
