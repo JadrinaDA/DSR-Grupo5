@@ -1,5 +1,5 @@
 console.log("Hola!")
-var socket = io.connect('http://robotlabuc.herokuapp.com');
+var socket = io.connect('http://robotlabuc.herokuapp.com/');
 
 const ppm = 400; // Pixeles por metro
 
@@ -24,8 +24,8 @@ function send(){
     })
 }
 
-sending = setInterval(send, 1000)
-//sending = setInterval(send, 20)
+//sending = setInterval(send, 1000)
+sending = setInterval(send, 20)
 
 
 function setConstants()
