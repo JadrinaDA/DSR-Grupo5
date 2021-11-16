@@ -326,12 +326,25 @@ def set_goal(x,y):
 def speed_index():
     return render_template('experiencia_base_movil/index.html')
 
-@app.route('/experiencia_base_movil', methods=['post', 'get'])
+@app.route('/experiencia_base_movil/set_speed', methods=['post', 'get'])
 def experiencia_base_movil():
     m1_speed = request.args.get('m1')
     m2_speed = request.args.get('m2')
-    send_message(f"{m1_speed}{m2_speed}000")
+    send_message(f"SPD{m1_speed}${m2_speed}$")
+    # send_message(f"SPD{m1_speed}{m2_speed}0000")
     return render_template('experiencia_base_movil/index.html')
+
+@app.route('/experiencia_base_movil/set_constants', methods=['post', 'get'])
+def set_exp_constants():
+    kpl = request.args.get('kpl')
+    kil = request.args.get('kil')
+    kdl = request.args.get('kdl')
+    kpa = request.args.get('kpa')
+    kia = request.args.get('kia')
+    kda = request.args.get('kda')
+    send_message(f"K{kpl}${kdl}${kil}${kpa}${kda}${kia}$")
+    return render_template('experiencia_base_movil/index.html')
+
 
 @app.route('/camera', methods=['post', 'get'])
 def camera():

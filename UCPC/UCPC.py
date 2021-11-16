@@ -53,7 +53,7 @@ class Subscriber():
         self.ser.close()
 
     def video(self):
-        # Raspberry PI IP address
+        # IP address
         MQTT_BROKER = 'broker.mqttdashboard.com'
         # Topic on which frame will be published
         MQTT_SEND = "DSR5/CAM"
@@ -63,6 +63,7 @@ class Subscriber():
         client = mqtt.Client()
         # Establishing Connection with the Broker
         client.connect(MQTT_BROKER)
+        # counter = 0
         try:
             while True:
                 # start = time.time()
@@ -81,7 +82,9 @@ class Subscriber():
                 # t = end - start
                 # fps = 1/t
                 # print(fps)
-                time.sleep(0.1)
+                # print(counter)
+                # counter += 1
+                time.sleep(0.5)
         except:
             cap.release()
             client.disconnect()
