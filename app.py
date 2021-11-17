@@ -174,10 +174,14 @@ def main():
     tiene_hora  = conn.execute('SELECT * FROM reservas WHERE id_user = ? AND fecha = ? AND hora = ?', (id_user, hoy, ahora,)).fetchone()
     week = conn.execute('SELECT * FROM reservas WHERE id_user = ?',
                         (id_user,)).fetchall()
-    if week:
-        week = week[0:3]
+    coming_up = []
+    dia_h, mes_h, año_h = hoy.split("/")
+    for res in week:
+        dia_r, mes_r, año_r = res['fecha'].split("/")
+        if ((dia_r >= dia_h) & (mes_r >= mes_h) & (año_r >= año_h)):
+            coming_up.append(res)
     conn.close()
-    return render_template("pagina_principal/info_lab.html", now = tiene_hora, week = week)
+    return render_template("pagina_principal/info_lab.html", now = tiene_hora, week = coming_up)
 
 @app.route("/login", methods = ['POST', 'GET'])
 def login():

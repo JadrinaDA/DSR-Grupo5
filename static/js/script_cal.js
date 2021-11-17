@@ -2,7 +2,9 @@ const date = new Date();
 
 function changeSel(day) {
 	let val = day.innerText;
-	let days = document.getElementsByTagName("li");
+	if (val >= new Date().getDate())
+	{
+		let days = document.getElementsByTagName("li");
 	for(let x = 0; x < days.length; x++) {
 		let y = days[x];
 		let span = document.querySelector('#sel');
@@ -12,9 +14,10 @@ function changeSel(day) {
 			y.innerHTML = `<li onclick = "changeSel(this)">${val}</li>`;
 		}		
 	}
-	month_sel = document.querySelector(".month_name").innerT
 	document.getElementById("dia").value = val.toString() + "/" + (date.getMonth() + 1).toString() + "/" + date.getFullYear().toString();
 	day.innerHTML = `<li onclick = "changeSel(this)"><span id ="sel" class="selected">${val}</span></li>`;
+	}
+	
 }
 
 const renderCalendar = () => {
@@ -77,8 +80,10 @@ for (let j=1; j <= nextDays; j ++) {
 
 document.querySelector('.prev').
 addEventListener('click', () => {
-	date.setMonth(date.getMonth() -1);
-	renderCalendar();
+	if (date.getMonth() != new Date().getMonth()) {
+		date.setMonth(date.getMonth() -1);
+		renderCalendar();
+	}
 });
 
 document.querySelector('.next').
