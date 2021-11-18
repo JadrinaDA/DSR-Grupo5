@@ -374,7 +374,18 @@ def exps():
                         (user_id,)).fetchall()
     nomexp = ['Robot PID']
     conn.close()
-    return render_template("perfil/historial_experiencias.html", reservas = reservas, nombres_exp = nomexp)
+    full_date = datetime.now().strftime("%d/%m/%Y %H").split(" ")
+    hoy = full_date[0]
+    if hoy[0] == "0":
+        hoy = hoy[1:]
+    coming_up = []
+    dia_h, mes_h, año_h = hoy.split("/")
+    for res in reservas:
+        dia_r, mes_r, año_r = res['fecha'].split("/")
+        if ((dia_r >= dia_h) & (mes_r >= mes_h) & (año_r >= año_h)):
+            coming_up.append(res)
+            reservas.remove(res)
+    return render_template("perfil/historial_experiencias.html", reservas = reservas, nombres_exp = nomexp, reservas_cu = coming_up)
 
 @app.route("/cuenta/del", methods =('POST', ))
 def delete():
