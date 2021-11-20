@@ -282,7 +282,6 @@ def perfil():
 @app.route("/sim", methods = ('GET', 'POST'))
 def sim():
     print("entre a sim run")
-    
     global simulation_list
     if simulation_list != []:
         print(f"simulation_list: {simulation_list}")
@@ -315,6 +314,7 @@ def set_constants(kp_l,kd_l,ki_l,kp_a,kd_a,ki_a):
 
 @app.route("/setGoal/<x>/<y>")
 def set_goal(x,y):
+    print("Hi")
     if request.method == 'GET':
         x = float(x)
         y = float(y)
