@@ -80,10 +80,10 @@ class Simulacion(threading.Thread):
 
     def run(self):
         print("Corriendo Sim")
-        self.robot.SetState([0,0,0,0,0])
+        #self.robot.SetState([0,0,0,0,0])
         while(self.loop):
-            self.controler.update()
-            self.robot.UpdateState()
+            #self.controler.update()
+            #self.robot.UpdateState()
             print("Corriendo Sim")
 
     def stop(self):
