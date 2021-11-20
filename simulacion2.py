@@ -64,7 +64,7 @@ class MobileBasePID():
         #     u[0] = kp_lineal*error_actual[0] - kp_angular*error_actual[1] + ki_lineal*error_acumulado[0]*botin._Ts - ki_angular*error_acumulado[1]*botin._Ts + kd_lineal*(error_actual[0]-error_previo[0])/botin._Ts - kd_angular*(error_actual[1]-error_previo[1])/botin._Ts
         #     u[1] = kp_lineal*error_actual[0] + kp_angular*error_actual[1] + ki_lineal*error_acumulado[0]*botin._Ts + ki_angular*error_acumulado[1]*botin._Ts + kd_lineal*(error_actual[0]-error_previo[0])/botin._Ts + kd_angular*(error_actual[1]-error_previo[1])/botin._Ts
 
-        print(u0, u_1)
+        print(u_0, u_1)
         self.mobile_base.SetActuator([u_0,u_1])
 
     def set_reference(self, x, y):
@@ -84,6 +84,7 @@ class Simulacion(threading.Thread):
         while(self.loop):
             self.controler.update()
             self.robot.UpdateState()
+            print("Corriendo Sim")
 
     def stop(self):
         self.loop = False
