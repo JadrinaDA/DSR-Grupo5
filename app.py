@@ -294,6 +294,7 @@ def sim():
 
 @app.route('/set_constants/<kp_l>/<kd_l>/<ki_l>/<kp_a>/<kd_a>/<ki_a>')
 def set_constants(kp_l,kd_l,ki_l,kp_a,kd_a,ki_a):
+    print("Hi")
     if request.method == 'GET':
         kp_l=float(kp_l)
         kd_l=float(kd_l)
@@ -318,7 +319,6 @@ def set_goal(x,y):
         x = float(x)
         y = float(y)
         cont.set_reference(x,y)
-        cont.set_linear_constants(1.0,0.0,0.0)
         message = f'Goal set in ({x},{y})'
         return jsonify(message)  # serialize and use JSON headers
     # POST request
@@ -364,6 +364,7 @@ def handleMessage(msg):
         'y': state[1],
         'theta': state[2]
     }
+    print(state_dict)
     send(state_dict, broadcast=True)
 
 @app.route("/cuenta/exp")
