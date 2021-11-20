@@ -314,11 +314,11 @@ def set_constants(kp_l,kd_l,ki_l,kp_a,kd_a,ki_a):
 
 @app.route("/setGoal/<x>/<y>")
 def set_goal(x,y):
-    print("Hi")
     if request.method == 'GET':
         x = float(x)
         y = float(y)
         cont.set_reference(x,y)
+        cont.set_linear_constants(1.0,0.0,0.0)
         message = f'Goal set in ({x},{y})'
         return jsonify(message)  # serialize and use JSON headers
     # POST request
