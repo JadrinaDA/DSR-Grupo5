@@ -29,7 +29,7 @@ function send(){
 sending = setInterval(send, 20)
 
 
-function setConstants()
+async function setConstants()
 {
     kp_l = document.getElementById('kp_l').value;
     kd_l = document.getElementById('kd_l').value;
@@ -37,7 +37,7 @@ function setConstants()
     kp_a = document.getElementById('kp_a').value;
     kd_a = document.getElementById('kd_a').value;
     ki_a = document.getElementById('ki_a').value;
-    fetch('/set_constants/'+kp_l+'/'+kd_l+'/'+ki_l+'/'+kp_a+'/'+kd_a+'/'+ki_a);
+    await fetch('/set_constants/'+kp_l+'/'+kd_l+'/'+ki_l+'/'+kp_a+'/'+kd_a+'/'+ki_a);
 }
 
 function updateState(x, y, theta)
@@ -60,7 +60,7 @@ function load(){
     }
 }
 
-function setGoal(e){
+async function setGoal(e){
     console.log("Set Goal ejecutado");
     console.log(e);
     var rect = e.target.getBoundingClientRect();
@@ -72,7 +72,7 @@ function setGoal(e){
     goal.style.top = y*ppm + 'px';
     goal.style.visibility = 'visible';
 
-    fetch('/setGoal/' + x + "/" + y);
+    await fetch('/setGoal/' + x + "/" + y);
     setConstants()
 }
 

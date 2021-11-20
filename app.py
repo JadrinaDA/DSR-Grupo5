@@ -279,7 +279,7 @@ def perfil():
 
     return render_template("perfil/datos_personales.html", user = user)
 
-@app.route("/sim")
+@app.route("/sim", methods = ('GET', 'POST'))
 def sim():
     print("entre a sim run")
     
