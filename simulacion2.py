@@ -82,7 +82,7 @@ class Simulacion(threading.Thread):
         print("Corriendo Sim")
         #self.robot.SetState([0,0,0,0,0])
         while(self.loop):
-            #self.controler.update()
+            self.controler.update()
             #self.robot.UpdateState()
             print("Corriendo Sim")
 
