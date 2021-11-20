@@ -13,6 +13,7 @@ socket.on('message', function(msg) {
     x 	  = msg['x'];
     y 	  = msg['y'];
     theta = msg['theta'];
+    //document.getElementById("topper").innerHTML += "<br>" + "message received";
     updateState(x, y, theta);
 });
 
@@ -42,7 +43,7 @@ function setConstants()
 function updateState(x, y, theta)
 {
     var elem = document.getElementById("botin");
-    // console.log("Robot a " + x + ", " + y );
+    console.log("Robot a " + x + ", " + y );
 
     elem.style.left = ppm*x + 'px';
     elem.style.top = ppm*y + 'px';
