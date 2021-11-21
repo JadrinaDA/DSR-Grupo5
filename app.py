@@ -163,6 +163,8 @@ def index():
 
 @app.route("/main")
 def main():
+    if not session:
+        return redirect(url_for('index'))
     id_user = session["user_id"]
     usuario = get_user(id_user)
     full_date = datetime.now().strftime("%d/%m/%Y %H").split(" ")
@@ -212,6 +214,8 @@ def exper():
 
 @app.route("/reg", methods=('GET', 'POST'))
 def reg():
+    if not session:
+        return redirect(url_for('index'))
     if request.method == 'POST':
         if (request.form['cargo'] == "profesor"):
             carrera = "profe"
@@ -239,6 +243,8 @@ def reg():
 
 @app.route("/res", methods =('GET', 'POST'))
 def res():
+    if not session:
+        return redirect(url_for('index'))
     user_id = session["user_id"]
     full_date = datetime.now().strftime("%d/%m/%Y %H:%M").split(" ")
     hoy = full_date[0]
@@ -265,6 +271,8 @@ def res():
 
 @app.route("/cuenta", methods=('GET', 'POST'))
 def perfil():
+    if not session:
+        return redirect(url_for('index'))
     user = get_user(session["user_id"])
 
     if request.method == 'POST':
@@ -369,6 +377,8 @@ def handleMessage(msg):
 
 @app.route("/cuenta/exp")
 def exps():
+    if not session:
+        return redirect(url_for('index'))
     user_id = session["user_id"]
     conn = get_db_connection()
     reservas = conn.execute('SELECT * FROM reservas WHERE id_user = ?',
@@ -390,6 +400,8 @@ def exps():
 
 @app.route("/cuenta/del", methods =('POST', ))
 def delete():
+    if not session:
+        return redirect(url_for('index'))
     id_user = session.get("user_id")
     conn = get_db_connection()
     conn.execute('DELETE FROM usuarios WHERE id = ?', (id_user,))
@@ -399,6 +411,8 @@ def delete():
 
 @app.route("/exp_con", methods =('GET', ))
 def exp_con():
+    if not session:
+        return redirect(url_for('index'))
     id_user = session.get("user_id")
     usuario = get_user(id_user)
     full_date = datetime.now().strftime("%d/%m/%Y %H").split(" ")
