@@ -214,8 +214,6 @@ def exper():
 
 @app.route("/reg", methods=('GET', 'POST'))
 def reg():
-    if not session:
-        return redirect(url_for('index'))
     if request.method == 'POST':
         if (request.form['cargo'] == "profesor"):
             carrera = "profe"
@@ -251,7 +249,6 @@ def res():
     if hoy[0] == "0":
         hoy = hoy[1:]
         
-
     if request.method == 'POST':
         conn = get_db_connection()
         conn.execute('INSERT INTO reservas (id_user, id_exp, fecha, hora) VALUES (?, ?, ?, ?)',
@@ -261,12 +258,22 @@ def res():
         return redirect(url_for('exps'))
 
     conn = get_db_connection()
-    taken = conn.execute('SELECT hora FROM reservas WHERE fecha = ?', (hoy, )).fetchall()
+    taken = conn.execute('SELECT fecha, hora FROM reservas').fetchall()
     conn.close()
     available = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00","17:00","18:00"]
-    for hora in taken:
-        available.remove(hora["hora"])
-    return render_template("reserva_horas/reserva.html", ava = available)
+    coming_up = []
+    dia_h, mes_h, año_h = hoy.split("/")
+    for res in taken:
+        dia_r, mes_r, año_r = res['fecha'].split("/")
+        if ((dia_r >= dia_h) & (mes_r >= mes_h) & (año_r >= año_h)):
+            coming_up.append(res)
+        if ((dia_r == dia_h) & (mes_r == mes_h) & (año_r == año_h)):
+            available.remove(res["hora"])
+    coming_up_dic = ""
+    for ress in coming_up:
+        coming_up_dic += ress["fecha"] + "," + ress["hora"] + "*"
+    coming_up_dic = coming_up_dic[:-1]
+    return render_template("reserva_horas/reserva.html", ava = available, taken = coming_up_dic)
 
 
 @app.route("/cuenta", methods=('GET', 'POST'))
