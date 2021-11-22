@@ -215,6 +215,23 @@ def exper():
 @app.route("/reg", methods=('GET', 'POST'))
 def reg():
     if request.method == 'POST':
+        errors = []
+        if request.form['psw'] != request.form['psw-repeat']:
+            errors.append('Las contraseñas no coinciden.')
+        if 'cargo' not in request.form.keys() or 'inst' not in request.form.keys():
+            errors.append('Seleccione un cargo e institución.')
+        elif 'inst' in request.form.keys() and 'cargo' in request.form.keys():
+            if 'carrera' not in request.form.keys() and request.form['cargo'] == 'alumno' and request.form['inst'] == "UC":
+                errors.append('Seleccione una carrera.')
+            elif 'carrera' in request.form.keys():
+                if 'major' not in request.form.keys() and request.form['inst'] == "UC" and request.form['carrera'] == "ing":
+                  errors.append('Seleccione un major.')  
+        if len(request.form['psw']) < 6:
+            errors.append('Contraseña debe ser mínmo 6 caracteres.')
+        if (('@' not in request.form['email']) & ('.cl' not in request.form['email']) & ('.com' not in request.form['email'])) :
+            errors.append('Correo no es valido.')
+        if len(errors) > 0:
+            return render_template("registro/main.html", errors = errors) 
         if (request.form['cargo'] == "profesor"):
             carrera = "profe"
         elif (request.form['cargo'] == "otro"):
@@ -397,13 +414,15 @@ def exps():
     if hoy[0] == "0":
         hoy = hoy[1:]
     coming_up = []
+    reservas_new = []
     dia_h, mes_h, año_h = hoy.split("/")
     for res in reservas:
         dia_r, mes_r, año_r = res['fecha'].split("/")
         if ((dia_r >= dia_h) & (mes_r >= mes_h) & (año_r >= año_h)):
             coming_up.append(res)
-            reservas.remove(res)
-    return render_template("perfil/historial_experiencias.html", reservas = reservas, nombres_exp = nomexp, reservas_cu = coming_up)
+        else:
+            reservas_new.append(res)
+    return render_template("perfil/historial_experiencias.html", reservas = reservas_new, nombres_exp = nomexp, reservas_cu = coming_up)
 
 @app.route("/cuenta/del", methods =('POST', ))
 def delete():

@@ -20,7 +20,7 @@ function changeSel(day) {
 	let taken = document.getElementsByName('taken')[0].content;
 	taken = taken.split("*");
 	let toods = [];
-	let times = `<input type="hidden" name="dia" id = "dia" value=""><input type="hidden" name="id_exp" id = "id_exp" value=1>`;
+	let times = `<input type="hidden" name="dia" id = "dia" value="${day_f}"><input type="hidden" name="id_exp" id = "id_exp" value=1>`;
 	for (let t = 0; t < taken.length; t++){
 		let taken_t = taken[t].split(",")
 		if (taken_t[0] == day_f){
