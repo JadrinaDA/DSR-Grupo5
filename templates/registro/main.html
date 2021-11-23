@@ -11,6 +11,12 @@
     <h1>Regístrate</h1>
     <p>Por favor rellena los siguientes datos.</p>
     <hr>
+    {% if errors %}
+      {% for error in errors %}
+          <p>Oops: {{error}}</p>
+          {% endfor %}
+          {% else %}
+    {% endif %}
 
     <label for="name"><b>Nombre</b></label>
     <input type="text" placeholder="Ingresar Nombre" name="name" id="name" required>

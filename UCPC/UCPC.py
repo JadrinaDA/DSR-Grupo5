@@ -4,6 +4,7 @@ import paho.mqtt.client as mqtt
 import cv2 as cv
 import base64
 import threading
+from seg_ref import run_cv, StoreCoor
 
 class Subscriber():
     def __init__(self, port = None):
@@ -33,6 +34,8 @@ class Subscriber():
         elif decoded_msg[:3] == "CAM":
             t =threading.Thread(target=self.video)
             t.start()
+        elif decoded_msg[:3] == "REF":
+            store_coor.ref = (decoded_msg[3:])
 
     def bt_send(self, msg):
         msgOnEncode = str.encode(msg)
@@ -94,3 +97,5 @@ port = "/dev/cu.IRB-G01-SPPDev"
 #port = "/dev/cu.iPhonedeIgnacio-Wireles"
 
 sub = Subscriber()
+store_coor = StoreCoor()
+run_cv(store_coor)

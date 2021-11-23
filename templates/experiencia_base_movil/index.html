@@ -13,11 +13,12 @@
 </form> 
 
 <h2>Camara Laboratorio</h2>
-<img src="{{ url_for('video_feed') }}">
+<img src="{{ url_for('video_feed') }}" id = 'feed'>
 
 <form action="/camera">
   <input type="submit" value="Open camera">
 </form> 
 
+<script src ="{{ url_for('static', filename = 'js/script_exp.js') }}"></script>
 </body>
 </html>

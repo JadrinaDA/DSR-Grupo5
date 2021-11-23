@@ -1,7 +1,8 @@
 console.log("Hola!")
-var socket = io.connect('http://127.0.0.1:5000');
+var socket = io();
 
 const ppm = 400; // Pixeles por metro
+
 
 let kp_l = 0;
 let kd_l = 0;
@@ -16,6 +17,35 @@ let theta = 0;
 
 console.log("que ondax");
 function setConstants()
+
+socket.on('connect', function() {
+    socket.send('User has connected!');
+    console.log("User has connected");
+});
+
+socket.on('message', function(msg) {
+    let x,y, theta;
+    x 	  = msg['x'];
+    y 	  = msg['y'];
+    theta = msg['theta'];
+    //document.getElementById("topper").innerHTML += "<br>" + "message received";
+    updateState(x, y, theta);
+});
+
+function send(){
+
+    socket.emit('update',
+    {
+        'value':0
+    })
+}
+
+//sending = setInterval(send, 1000)
+sending = setInterval(send, 20)
+
+
+async function setConstants()
+
 {
     kp_l = document.getElementById('kp_l').value;
     kd_l = document.getElementById('kd_l').value;
@@ -23,12 +53,15 @@ function setConstants()
     kp_a = document.getElementById('kp_a').value;
     kd_a = document.getElementById('kd_a').value;
     ki_a = document.getElementById('ki_a').value;
+
+    await fetch('/set_constants/'+kp_l+'/'+kd_l+'/'+ki_l+'/'+kp_a+'/'+kd_a+'/'+ki_a);
+
 }
 
 function updateState()
 {
     var elem = document.getElementById("botin");
-    // console.log("Robot a " + x + ", " + y );
+    console.log("Robot a " + x + ", " + y );
 
     elem.style.left = ppm*x + 'px';
     elem.style.top = ppm*y + 'px';
@@ -45,7 +78,7 @@ function load(){
     }
 }
 
-function setGoal(e){
+async function setGoal(e){
     console.log("Set Goal ejecutado");
     console.log(e);
     var rect = e.target.getBoundingClientRect();
@@ -56,6 +89,9 @@ function setGoal(e){
     goal.style.left = xg*ppm + 'px';
     goal.style.top = yg*ppm + 'px';
     goal.style.visibility = 'visible';
+
+
+    await fetch('/setGoal/' + x + "/" + y);
 
     setConstants()
 }
