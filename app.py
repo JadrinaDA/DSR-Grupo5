@@ -5,8 +5,6 @@ import numpy as np
 from flask_socketio import SocketIO, send
 from engineio.payload import Payload
 
-from modelo import BaseMovil
-from simulacion2 import MobileBasePID, Simulacion
 from werkzeug.exceptions import abort
 
 
@@ -93,7 +91,6 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-
 def get_user(id_user):
     conn = get_db_connection()
     user = conn.execute('SELECT * FROM usuarios WHERE id = ?',
@@ -118,7 +115,6 @@ def get_changes(user, form):
             new[x] = user[x]
     return new
        
-
 def send_message(message):
     client.connect('broker.mqttdashboard.com', 1883, 60)
     client.publish('DSR5/1', message)
@@ -150,9 +146,6 @@ ki_a = 0.0
 kd_a = 0.0
 
 horas = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00","17:00","18:00"]
-
-botin = BaseMovil()
-cont = MobileBasePID(botin, ref, kp_l, kd_l, ki_l, kp_a, kd_a, ki_a)
 
 @app.route("/")
 def index():
@@ -317,6 +310,10 @@ def perfil():
 
 @app.route("/sim", methods = ('GET', 'POST'))
 def sim():
+<<<<<<< HEAD
+    return render_template("Simulacion/simulacion_base_movil.html")
+
+=======
     print("entre a sim run")
     global simulation_list
     if simulation_list != []:
@@ -363,6 +360,7 @@ def set_goal(x,y):
         return 'Sucesss', 200
 
 
+>>>>>>> main
 @app.route('/experiencia_base_movil')
 def speed_index():
     return render_template('experiencia_base_movil/index.html')
@@ -404,17 +402,6 @@ def camera():
     # t.start()
     return render_template('experiencia_base_movil/index.html')
 
-@socketio.on('update')
-def handleMessage(msg):
-    # print("Enviando Mensaje")
-    state = botin.GetSensor()
-    state_dict = {
-        'x': state[0], 
-        'y': state[1],
-        'theta': state[2]
-    }
-    print(state_dict)
-    send(state_dict, broadcast=True)
 
 @app.route("/cuenta/exp")
 def exps():

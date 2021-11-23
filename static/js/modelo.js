@@ -43,14 +43,13 @@ class BaseMovil
     }
 
     SetActuator(u){
-        for (let k = 0; i<u.length; i++){
-            if (Math.abs(u[k] > this._u_max[k]))
             {
                 u[k] = this._u_max[k] * Math.sign(u[k]);
             }
         this._u = u;
         }
     }
+
 
     Model(t, x, u)
     {
