@@ -161,6 +161,10 @@ def index():
     conn.close()
     return render_template("inicio/pagina_inicio.html", users = None)
 
+@app.route("/capture")
+def capture():
+    return render_template("capture.html")
+
 @app.route("/main")
 def main():
     if not session:
@@ -369,6 +373,19 @@ def experiencia_base_movil():
     m2_speed = request.args.get('m2')
     send_message(f"{m1_speed}{m2_speed}000")
     return render_template('experiencia_base_movil/index.html')
+
+@app.route("/setRef/<x>/<y>")
+def set_ref(x,y):
+    if request.method == 'GET':
+        x = float(x)
+        y = float(y)
+        send_message(f'ref:{x},{y}')
+        message = f'Ref set in ({x},{y})'
+        return jsonify(message)  # serialize and use JSON headers
+    # POST request
+    if request.method == 'POST':
+        print(request.get_json())  # parse as JSON
+        return 'Sucesss', 200
 
 @app.route('/camera', methods=['post', 'get'])
 def camera():
