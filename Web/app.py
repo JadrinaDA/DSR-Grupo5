@@ -5,13 +5,9 @@ import numpy as np
 from flask_socketio import SocketIO, send
 from engineio.payload import Payload
 
-from modelo import BaseMovil
-from simulacion2 import MobileBasePID, Simulacion
 from werkzeug.exceptions import abort
 
 import json
-
-from parametros import p_sim
 
 
 import threading
@@ -154,8 +150,6 @@ kd_a = 0.0
 
 horas = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00","17:00","18:00"]
 
-botin = BaseMovil()
-cont = MobileBasePID(botin, ref, kp_l, kd_l, ki_l, kp_a, kd_a, ki_a)
 
 @app.route("/")
 def index():
@@ -280,50 +274,7 @@ def perfil():
 
 @app.route("/sim")
 def sim():
-    print("entre a sim run")
-    
-    global simulation_list
-    if simulation_list != []:
-        print(f"simulation_list: {simulation_list}")
-        simulation_list[0].stop()
-    simulation = Simulacion(botin, cont)
-    simulation.start()
-    print("Sigo paralelo al thread")
-    simulation_list.append(simulation)
     return render_template("Simulacion/simulacion_base_movil.html")
-
-@app.route('/set_constants/<kp_l>/<kd_l>/<ki_l>/<kp_a>/<kd_a>/<ki_a>')
-def set_constants(kp_l,kd_l,ki_l,kp_a,kd_a,ki_a):
-    if request.method == 'GET':
-        kp_l=float(kp_l)
-        kd_l=float(kd_l)
-        ki_l=float(ki_l)
-        cont.set_linear_constants(kp_l,kd_l,ki_l)
-        kp_a=float(kp_a)
-        kd_a=float(kd_a)
-        ki_a=float(ki_a)
-        cont.set_angular_constants(kp_a,kd_a,ki_a)
-        print(f"Constantes recibidas: {kp_l}, {kd_l}, {ki_l}")
-        message = f'Constants set in ({kp_l},{kd_l}, {ki_l})'
-        return jsonify(message)  # serialize and use JSON headers
-    # POST request
-    if request.method == 'POST':
-        print(request.get_json())  # parse as JSON
-        return 'Sucesss', 200
-    
-
-@app.route("/setGoal/<x>/<y>")
-def set_goal(x,y):
-    if request.method == 'GET':
-        x = float(x)
-        y = float(y)
-        cont.set_reference(x,y)
-        message = f'Goal set in ({x},{y})'
-        return jsonify(message)  # serialize and use JSON headers
-    # POST request
-    if request.method == 'POST':
-        print(request.get_json())  # parse as JSON
-        return 'Sucesss', 200
 
 
 @app.route('/experiencia_base_movil')
