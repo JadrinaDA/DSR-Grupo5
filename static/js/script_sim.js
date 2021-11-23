@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const par = {
     "field" : {
         "width": 2,
@@ -36,6 +37,34 @@ let ki_l = 0;
 let kp_a = 0;
 let kd_a = 0;
 let ki_a = 0;
+=======
+console.log("Hola!")
+var socket = io();
+
+const ppm = 400; // Pixeles por metro
+
+socket.on('connect', function() {
+    socket.send('User has connected!');
+    console.log("User has connected");
+});
+
+socket.on('message', function(msg) {
+    let x,y, theta;
+    x 	  = msg['x'];
+    y 	  = msg['y'];
+    theta = msg['theta'];
+    //document.getElementById("topper").innerHTML += "<br>" + "message received";
+    updateState(x, y, theta);
+});
+
+function send(){
+
+    socket.emit('update',
+    {
+        'value':0
+    })
+}
+>>>>>>> main
 
 let x = 0;
 let y = 0;
@@ -62,7 +91,7 @@ let robot = new BaseMovil();
 let controler = new MobileBasePID(robot, reference);
 
 
-function setConstants()
+async function setConstants()
 {
     kp_l = document.getElementById('kp_l').value;
     kd_l = document.getElementById('kd_l').value;
@@ -70,18 +99,26 @@ function setConstants()
     kp_a = document.getElementById('kp_a').value;
     kd_a = document.getElementById('kd_a').value;
     ki_a = document.getElementById('ki_a').value;
+<<<<<<< HEAD
     controler.SetLinearConstants(kp_l, kd_l, ki_l);
     controler.SetAngularConstants(kp_a, kd_a, ki_a);
+=======
+    await fetch('/set_constants/'+kp_l+'/'+kd_l+'/'+ki_l+'/'+kp_a+'/'+kd_a+'/'+ki_a);
+>>>>>>> main
 }
 
 function updateState()
 {
     controler.Update();
     var elem = document.getElementById("botin");
+<<<<<<< HEAD
     var state = robot.GetSensor();
     var x = state[0];
     var y = state[1];
     var theta = state[2]; 
+=======
+    console.log("Robot a " + x + ", " + y );
+>>>>>>> main
 
     elem.style.left = ppm*x + 'px';
     elem.style.top = ppm*y + 'px';
@@ -99,7 +136,13 @@ function load(){
     }
 }
 
+<<<<<<< HEAD
 function setGoal(e){
+=======
+async function setGoal(e){
+    console.log("Set Goal ejecutado");
+    console.log(e);
+>>>>>>> main
     var rect = e.target.getBoundingClientRect();
     var x = (e.clientX - rect.left)/ppm;
     var y = (e.clientY - rect.top)/ppm;
@@ -108,8 +151,13 @@ function setGoal(e){
     goal.style.top = y*ppm + 'px';
     goal.style.visibility = 'visible';
 
+<<<<<<< HEAD
     controler.SetReference(x,y);
     setConstants();
+=======
+    await fetch('/setGoal/' + x + "/" + y);
+    setConstants()
+>>>>>>> main
 }
 
 load();

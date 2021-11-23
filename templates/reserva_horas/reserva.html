@@ -84,7 +84,7 @@
 		<div class="square">
 			Horas disponibles:
 			<div class="container_horas">
-				<form method = "POST"> 
+				<form method = "POST" class = "horform"> 
 					<input type="hidden" name="dia" id = "dia" value="">
 					<input type="hidden" name="id_exp" id = "id_exp" value=1>
 					{% for hora in ava %}
@@ -93,6 +93,8 @@
 				</form>
 			</div>
 		</div>
+
+		<meta name = "taken"  content="{{taken}}"/>
 
 		<script src ="{{ url_for('static', filename = 'js/script_cal.js') }}"></script>
 	</body>

@@ -39,7 +39,7 @@
 
     <!-- Page Content -->
     <div class="content_inicio" style="max-width:1564px">
-
+      {% if users%}
       {% for user in users %}
         <a href="#">
             <h2>{{ user['name'] }}</h2>
@@ -48,7 +48,10 @@
         <span class="badge badge-primary">{{ user['inst'] }}</span>
         <span class="badge badge-primary">{{ user['robotica'] }}</span>
         <hr>
-    {% endfor %}
+      }
+      {% endfor %}
+      {% else %}
+      {% endif %}
 
       <!-- About Section -->
       <div id="about">
@@ -65,19 +68,19 @@
         <div class="col">
           <div class="img_container">
             <div class="img_title">Brazo Robótico</div>
-            <img src="../img/robotic_arm.jpeg" alt="House" style="width:100%">
+            <img src="{{ url_for('static', filename = 'img/mobile_base.jpeg') }}" alt="House" style="width:100%">
           </div>
         </div>
         <div class="col">
           <div class="img_container">
             <div class="img_title">Seguidor de Línea</div>
-            <img src="../img/line_follower.jpeg" alt="House" style="width:100%">
+            <img src="{{ url_for('static', filename = 'img/line_follower.jpeg') }}" alt="House" style="width:100%">
           </div>
         </div>
         <div class="col">
           <div class="img_container">
             <div class="img_title">Base Móvil</div>
-            <img src="../img/mobile_base.jpeg" alt="House" style="width:100%">
+            <img src="{{ url_for('static', filename = 'img/robotic_arm.jpeg') }}" alt="House" style="width:100%">
           </div>
         </div>
       </div>

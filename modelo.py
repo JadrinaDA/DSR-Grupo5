@@ -61,7 +61,8 @@ class BaseMovil:
     
         # solve_ivp
         x0 = self._x
-        x = solve_ivp(partial(self._modelo_base_movil, u=self._u), (self._t0,self._tf), x0, method='BDF') #, teval=self._tX)
+        x.y = 1 
+        #x = solve_ivp(partial(self._modelo_base_movil, u=self._u), (self._t0,self._tf), x0, method='BDF') #, teval=self._tX)
         #return x.t, x.y
         self._x = ((x.y).T)[-1,:]
         self._t = self._t + self._Ts
