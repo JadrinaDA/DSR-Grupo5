@@ -62,8 +62,7 @@ let robot = new BaseMovil();
 let controler = new MobileBasePID(robot, reference);
 
 
-async function setConstants()
-
+function setConstants()
 {
     kp_l = document.getElementById('kp_l').value;
     kd_l = document.getElementById('kd_l').value;
@@ -73,7 +72,6 @@ async function setConstants()
     ki_a = document.getElementById('ki_a').value;
     controler.SetLinearConstants(kp_l, kd_l, ki_l);
     controler.SetAngularConstants(kp_a, kd_a, ki_a);
-    await fetch('/set_constants/'+kp_l+'/'+kd_l+'/'+ki_l+'/'+kp_a+'/'+kd_a+'/'+ki_a);
 }
 
 function updateState()
@@ -101,21 +99,17 @@ function load(){
     }
 }
 
-
-async function setGoal(e){
-    console.log("Set Goal ejecutado");
-    console.log(e);
+function setGoal(e){
     var rect = e.target.getBoundingClientRect();
     var x = (e.clientX - rect.left)/ppm;
     var y = (e.clientY - rect.top)/ppm;
     goal = document.getElementById("goal")
-    goal.style.left = xg*ppm + 'px';
-    goal.style.top = yg*ppm + 'px';
+    goal.style.left = x*ppm + 'px';
+    goal.style.top = y*ppm + 'px';
     goal.style.visibility = 'visible';
 
     controler.SetReference(x,y);
     setConstants();
-
 }
 
 load();
@@ -138,50 +132,3 @@ function color() {
 }
 
 update = setInterval(updateState, 10);
-}
-
-
-class MobileBasePID {
-    constructor(mobile_base, reference, kp_l=0, kd_l=0, ki_l=0, kp_a=0, kd_a=0, ki_a=0, error=np.array([0.0, 0.0]), past_error=np.array([0.0, 0.0]), ac_error=np.array([0.0, 0.0]))
-    {
-        this.kp_l = kp_l;
-        this.kd_l = kd_l;
-        this.ki_l = ki_l;
-        this.kp_a = kp_a;
-        this.kd_a = kd_a;
-        this.ki_a = ki_a;
-        this.error = error;
-        this.past_error = past_error;
-        this.ac_error = ac_error;
-        this.mobile_base = mobile_base;
-        this.reference = reference;
-    }
-
-    set_linear_constants(self, kp, kd, ki)
-    {
-        this.kp_l = kp;
-        this.kd_l = kd;
-        this.ki_l = ki;
-    }
-
-    set_angular_constants(self, kp, kd, ki)
-    {
-        this.kp_a = kp;
-        this.kd_a = kd;
-        this.ki_a = ki;
-    }
-
-    update_error()
-    {
-        this.past_error = this.error;
-        state = this.mobile_base.GetSensor();
-        ref = this.reference;
-    }
-}
-
-while(true)
-{
-    console.log("Actualizando estado");
-    robot
-}
-
