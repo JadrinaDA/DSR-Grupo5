@@ -21,7 +21,7 @@ import cv2 as cv
 import threading
 
 lock = threading.Lock()
-frame = np.ones((80, 120, 3), np.uint8)
+frame = np.ones((160, 120, 3), np.uint8)
 
 MQTT_BROKER = 'broker.mqttdashboard.com'
 MQTT_RECEIVE = "DSR5/CAM"
@@ -135,7 +135,10 @@ simulation_list = []
 ref = np.array([0.0, 0.0])
 
 client = mqtt.Client()
-client.connect('broker.mqttdashboard.com', 1883, 60)
+try:
+    client.connect('broker.mqttdashboard.com', 1883, 60)
+except:
+    print("No se pudo conectar al MQTT")
 
 
 kp_l = 0.0 # 0.01
@@ -310,67 +313,32 @@ def perfil():
 
 @app.route("/sim", methods = ('GET', 'POST'))
 def sim():
-<<<<<<< HEAD
     return render_template("Simulacion/simulacion_base_movil.html")
 
-=======
-    print("entre a sim run")
-    global simulation_list
-    if simulation_list != []:
-        print(f"simulation_list: {simulation_list}")
-        simulation_list[0].stop()
-    simulation = Simulacion(botin, cont)
-    simulation.start()
-    print("Sigo paralelo al thread")
-    simulation_list.append(simulation)
-    return render_template("Simulacion/simulacion_base_movil.html")
 
-@app.route('/set_constants/<kp_l>/<kd_l>/<ki_l>/<kp_a>/<kd_a>/<ki_a>')
-def set_constants(kp_l,kd_l,ki_l,kp_a,kd_a,ki_a):
-    print("Hi")
-    if request.method == 'GET':
-        kp_l=float(kp_l)
-        kd_l=float(kd_l)
-        ki_l=float(ki_l)
-        cont.set_linear_constants(kp_l,kd_l,ki_l)
-        kp_a=float(kp_a)
-        kd_a=float(kd_a)
-        ki_a=float(ki_a)
-        cont.set_angular_constants(kp_a,kd_a,ki_a)
-        print(f"Constantes recibidas: {kp_l}, {kd_l}, {ki_l}")
-        message = f'Constants set in ({kp_l},{kd_l}, {ki_l})'
-        return jsonify(message)  # serialize and use JSON headers
-    # POST request
-    if request.method == 'POST':
-        print(request.get_json())  # parse as JSON
-        return 'Sucesss', 200
-    
-
-@app.route("/setGoal/<x>/<y>")
-def set_goal(x,y):
-    if request.method == 'GET':
-        x = float(x)
-        y = float(y)
-        cont.set_reference(x,y)
-        message = f'Goal set in ({x},{y})'
-        return jsonify(message)  # serialize and use JSON headers
-    # POST request
-    if request.method == 'POST':
-        print(request.get_json())  # parse as JSON
-        return 'Sucesss', 200
-
-
->>>>>>> main
 @app.route('/experiencia_base_movil')
 def speed_index():
     return render_template('experiencia_base_movil/index.html')
 
-@app.route('/experiencia_base_movil', methods=['post', 'get'])
+@app.route('/experiencia_base_movil/set_speed', methods=['post', 'get'])
 def experiencia_base_movil():
     m1_speed = request.args.get('m1')
     m2_speed = request.args.get('m2')
-    send_message(f"{m1_speed}{m2_speed}000")
+    send_message(f"SPD{m1_speed}${m2_speed}$")
     return render_template('experiencia_base_movil/index.html')
+
+@app.route('/experiencia_base_movil/set_constants', methods=['post', 'get'])
+def set_exp_constants():
+    kpl = request.args.get('kpl')
+    kil = request.args.get('kil')
+    kdl = request.args.get('kdl')
+    kpa = request.args.get('kpa')
+
+    kia = request.args.get('kia')
+    kda = request.args.get('kda')
+    send_message(f"K{kpl}${kdl}${kil}${kpa}${kda}${kia}$")
+    return render_template('experiencia_base_movil/index.html')
+
 
 @app.route("/setRef/<x>/<y>")
 def set_ref(x,y):

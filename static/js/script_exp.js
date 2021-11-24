@@ -1,6 +1,6 @@
 const ppm = 400; // Pixeles por metro
 
-let elem = document.getElementById("feed");
+let elem = document.getElementById("labcam");
     elem.onclick = function clickEvent(e){
         setRef(e);
     }
@@ -13,5 +13,4 @@ async function setRef(e){
     console.log("(" + x + "," + y + ")");
 
     await fetch('/setRef/' + x + "/" + y);
-
 }
