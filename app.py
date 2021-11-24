@@ -345,7 +345,7 @@ def set_ref(x,y):
     if request.method == 'GET':
         x = float(x)
         y = float(y)
-        send_message(f'ref:{x},{y}')
+        send_message(f'REF{x},{y}')
         message = f'Ref set in ({x},{y})'
         return jsonify(message)  # serialize and use JSON headers
     # POST request
