@@ -30,7 +30,7 @@ class BaseMovil:
         self._c = 1.0
         self._b = 1.0
         self._j = self._m*(self._l**2 + self._w**2)/12
-        self.ce = 1  # Coeficiente de elasticidad
+        self.ce = 0.5  # Coeficiente de elasticidad
  
         # Restrictions
         self.x_max = p_sim["field"]["width"] - max([self._l, self._w])
@@ -69,13 +69,17 @@ class BaseMovil:
         # Check state bounds
         if self._x[0] > self.x_max:
             self._x[0] = self.x_max
+            self._x[3] = -self._x[3]*np.cos(self._x[2])*self.ce
         if self._x[0] < self.x_min:
             self._x[0] = self.x_min
+            self._x[3] = -self._x[3]*np.cos(self._x[2])*self.ce
 
         if self._x[1] > self.y_max:
             self._x[1] = self.y_max
+            self._x[3] = -self._x[3]*np.sin(self._x[2])*self.ce
         if self._x[1] < self.y_min:
             self._x[1] = self.y_min
+            self._x[3] = -self._x[3]*np.sin(self._x[2])*self.ce
 
 
         '''

@@ -2,7 +2,9 @@ const date = new Date();
 
 function changeSel(day) {
 	let val = day.innerText;
-	let days = document.getElementsByTagName("li");
+	if (val >= new Date().getDate())
+	{
+		let days = document.getElementsByTagName("li");
 	for(let x = 0; x < days.length; x++) {
 		let y = days[x];
 		let span = document.querySelector('#sel');
@@ -12,9 +14,38 @@ function changeSel(day) {
 			y.innerHTML = `<li onclick = "changeSel(this)">${val}</li>`;
 		}		
 	}
-	month_sel = document.querySelector(".month_name").innerT
-	document.getElementById("dia").value = val.toString() + "/" + (date.getMonth() + 1).toString() + "/" + date.getFullYear().toString();
+	let day_f = val.toString() + "/" + (date.getMonth() + 1).toString() + "/" + date.getFullYear().toString();
+	document.getElementById("dia").value =  day_f;
 	day.innerHTML = `<li onclick = "changeSel(this)"><span id ="sel" class="selected">${val}</span></li>`;
+	let taken = document.getElementsByName('taken')[0].content;
+	taken = taken.split("*");
+	let toods = [];
+	let times = `<input type="hidden" name="dia" id = "dia" value="${day_f}"><input type="hidden" name="id_exp" id = "id_exp" value=1>`;
+	for (let t = 0; t < taken.length; t++){
+		let taken_t = taken[t].split(",")
+		if (taken_t[0] == day_f){
+			toods.push(taken_t[1]);
+		}
+	}
+	for (let z = 8; z < 23; z++){
+		inthere = false;
+		for (let k = 0; k < toods.length; k++){
+			if (`${z}:00` == toods[k])
+			{
+				inthere = true;
+			}
+		}
+		if (inthere) {
+			continue
+		}
+		else {
+			times += `<button class="hora_bubble" type="submit" name="hora" value="${z}:00">${z}:00</button>`;
+		}
+	}
+	const times_bub = document.querySelector(".horform");
+	times_bub.innerHTML = times;
+	}
+	
 }
 
 const renderCalendar = () => {
@@ -77,8 +108,10 @@ for (let j=1; j <= nextDays; j ++) {
 
 document.querySelector('.prev').
 addEventListener('click', () => {
-	date.setMonth(date.getMonth() -1);
-	renderCalendar();
+	if (date.getMonth() != new Date().getMonth()) {
+		date.setMonth(date.getMonth() -1);
+		renderCalendar();
+	}
 });
 
 document.querySelector('.next').

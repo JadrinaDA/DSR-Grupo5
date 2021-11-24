@@ -42,17 +42,16 @@
         <th>Encargado</th> 
       </tr>
 
-      <tr>
-        <td>Brazo Robótico</td>
-        <td>25/05/2021</td>
-        <td>Daniel Calabi</td>
-      </tr>
+       {% for res in reservas %}
+  
+        <tr>
+          <td>{{nombres_exp[res['id_exp'] - 1]}}</td>
+          <td>{{res['fecha']}}</td>
+          <td>{{res['hora']}}</td>
+          <td>Daniel Calabi</td>
+        </tr>
 
-      <tr>
-        <td>Robot Móvil</td>
-        <td>27/06/2021</td>
-        <td>Daniel Calabi</td>
-      </tr>
+        {% endfor %}
       </table>
 
       <h2 style="margin-top: 40px">Experiencias Agendadas</h2>
@@ -66,7 +65,7 @@
           <th>Encargado</th> 
         </tr>
 
-        {% for res in reservas %}
+        {% for res in reservas_cu %}
   
         <tr>
           <td>{{nombres_exp[res['id_exp'] - 1]}}</td>

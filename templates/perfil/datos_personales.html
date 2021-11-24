@@ -65,13 +65,25 @@
 
       <tr>
         <th> <label for="carrera"><b>Carrera</b></label></td>
-        <td> <input type="text" placeholder="Ingeniería" name="carrera" id="carrera" ></td>
+        <td> <input type="text" placeholder="{{user['carrera']}}" name="carrera" id="carrera" ></td>
       </tr>
+
+      {% if user['robotica'] %}
 
       <tr>
         <th> <label for="major"><b>Major</b></label></td>
-        <td> <input type="text" placeholder="Ingeniería Robótica" name="major" id="major"></td>
+        <td> <input type="text" placeholder="Robótica" name="major" id="major"></td>
       </tr>
+
+      {% else %}
+
+      <tr>
+        <th> <label for="major"><b>Major</b></label></td>
+        <td> <input type="text" placeholder="No robótica" name="major" id="major"></td>
+      </tr>
+      {% endif %}
+
+      
       </form>
     </table>
 

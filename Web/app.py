@@ -5,13 +5,9 @@ import numpy as np
 from flask_socketio import SocketIO, send
 from engineio.payload import Payload
 
-from modelo import BaseMovil
-from simulacion2 import MobileBasePID, Simulacion
 from werkzeug.exceptions import abort
 
 import json
-
-from parametros import p_sim
 
 
 import threading
@@ -154,8 +150,6 @@ kd_a = 0.0
 
 horas = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00","17:00","18:00"]
 
-botin = BaseMovil()
-cont = MobileBasePID(botin, ref, kp_l, kd_l, ki_l, kp_a, kd_a, ki_a)
 
 @app.route("/")
 def index():
@@ -213,15 +207,19 @@ def exper():
 @app.route("/reg", methods=('GET', 'POST'))
 def reg():
     if request.method == 'POST':
+        if (request.form['cargo'] == "Profesor"):
+            carrera = "profe"
+        else:
+            carrera = request.form['carrera']
         uni = request.form['inst']
-        if (uni == "UC" and request.form['carrera'] == "ing"):
+        if (uni == "UC" and carrera == "ing"):
             is_robot = int((request.form['major'] == 'robotica'))
         else:
             is_robot = 0
         conn = get_db_connection()
         conn.execute("INSERT INTO usuarios (name, lastname, mail, password, tipo, inst, carrera, robotica) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             (request.form['name'], request.form['lastname'], request.form['email'],
-             request.form['psw'], request.form['cargo'], uni, request.form["carrera"], is_robot))
+             request.form['psw'], request.form['cargo'], uni, carrera, is_robot))
         conn.commit()
         user = conn.execute('SELECT * FROM usuarios WHERE mail = ?',
                         (request.form['email'],)).fetchone()
@@ -276,62 +274,32 @@ def perfil():
 
 @app.route("/sim")
 def sim():
-    print("entre a sim run")
-    
-    global simulation_list
-    if simulation_list != []:
-        print(f"simulation_list: {simulation_list}")
-        simulation_list[0].stop()
-    simulation = Simulacion(botin, cont)
-    simulation.start()
-    print("Sigo paralelo al thread")
-    simulation_list.append(simulation)
     return render_template("Simulacion/simulacion_base_movil.html")
-
-@app.route('/set_constants/<kp_l>/<kd_l>/<ki_l>/<kp_a>/<kd_a>/<ki_a>')
-def set_constants(kp_l,kd_l,ki_l,kp_a,kd_a,ki_a):
-    if request.method == 'GET':
-        kp_l=float(kp_l)
-        kd_l=float(kd_l)
-        ki_l=float(ki_l)
-        cont.set_linear_constants(kp_l,kd_l,ki_l)
-        kp_a=float(kp_a)
-        kd_a=float(kd_a)
-        ki_a=float(ki_a)
-        cont.set_angular_constants(kp_a,kd_a,ki_a)
-        print(f"Constantes recibidas: {kp_l}, {kd_l}, {ki_l}")
-        message = f'Constants set in ({kp_l},{kd_l}, {ki_l})'
-        return jsonify(message)  # serialize and use JSON headers
-    # POST request
-    if request.method == 'POST':
-        print(request.get_json())  # parse as JSON
-        return 'Sucesss', 200
-    
-
-@app.route("/setGoal/<x>/<y>")
-def set_goal(x,y):
-    if request.method == 'GET':
-        x = float(x)
-        y = float(y)
-        cont.set_reference(x,y)
-        message = f'Goal set in ({x},{y})'
-        return jsonify(message)  # serialize and use JSON headers
-    # POST request
-    if request.method == 'POST':
-        print(request.get_json())  # parse as JSON
-        return 'Sucesss', 200
 
 
 @app.route('/experiencia_base_movil')
 def speed_index():
     return render_template('experiencia_base_movil/index.html')
 
-@app.route('/experiencia_base_movil', methods=['post', 'get'])
+@app.route('/experiencia_base_movil/set_speed', methods=['post', 'get'])
 def experiencia_base_movil():
     m1_speed = request.args.get('m1')
     m2_speed = request.args.get('m2')
-    send_message(f"{m1_speed}{m2_speed}000")
+    send_message(f"SPD{m1_speed}${m2_speed}$")
+    # send_message(f"SPD{m1_speed}{m2_speed}0000")
     return render_template('experiencia_base_movil/index.html')
+
+@app.route('/experiencia_base_movil/set_constants', methods=['post', 'get'])
+def set_exp_constants():
+    kpl = request.args.get('kpl')
+    kil = request.args.get('kil')
+    kdl = request.args.get('kdl')
+    kpa = request.args.get('kpa')
+    kia = request.args.get('kia')
+    kda = request.args.get('kda')
+    send_message(f"K{kpl}${kdl}${kil}${kpa}${kda}${kia}$")
+    return render_template('experiencia_base_movil/index.html')
+
 
 @app.route('/camera', methods=['post', 'get'])
 def camera():

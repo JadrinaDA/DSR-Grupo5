@@ -1,6 +1,15 @@
-const kpa = document.getElementById("kp_a");
+const par = {
+    "field" : {
+        "width": 2,
+        "height": 5/4   
+    },
 
-kpa.addEventListener('change', setConstants)
+    "robot" : {
+        "width": 0.15,
+        "height": 0.15   
+    }
+    
+}
 
 document.getElementById("kp_a").addEventListener('change', setConstants)
 document.getElementById("ki_a").addEventListener('change', setConstants)
@@ -16,56 +25,41 @@ document.getElementById("kp_l").onchange = function(){setConstants};
 document.getElementById("ki_l").onchange = function(){setConstants};
 document.getElementById("kd_l").onchange = function(){setConstants};
 
-console.log("Hola!")
-var socket = io.connect('http://127.0.0.1:5000');
 
 const ppm = 400; // Pixeles por metro
 
-socket.emit('get_parameters',
-{
-    'value':0
-});
-
 var field_par;
 
-socket.on('parameters', function(msg)
-{
-    console.log("Recibi mis parametros");
-    par = JSON.parse(msg);
-    field_par = par.field;
-    robot_par = par.robot
+let kp_l = 0;
+let kd_l = 0;
+let ki_l = 0;
+let kp_a = 0;
+let kd_a = 0;
+let ki_a = 0;
 
-    field = document.getElementById('field');
-    field.style.width = field_par.width*ppm+"px";
-    field.style.height = field_par.height*ppm+"px";
+let x = 0;
+let y = 0;
+let theta = 0;
+let reference = [0,0];
 
-    robot = document.getElementById('botin');
-    robot.style.width = robot_par.width*ppm+"px";
-    robot.style.height = robot_par.height*ppm+"px";
 
-    frente = document.getElementById("frente_botin");
-    frente.style.height = "5px";
-    frente.style.marginTop = (robot_par.height*ppm - 5) / 2 + "px";
+field_par = par["field"];
+robot_par = par["robot"]
 
-});
+field = document.getElementById('field');
+field.style.width = field_par["width"]*ppm+"px";
+field.style.height = field_par["height"]*ppm+"px";
 
-socket.on('message', function(msg) {
-    let x,y, theta;
-    x 	  = msg['x'];
-    y 	  = msg['y'];
-    theta = msg['theta'];
-    updateState(x, y, theta);
-});
+let grobot = document.getElementById('botin');
+grobot.style.width = robot_par["width"]*ppm+"px";
+grobot.style.height = robot_par["height"]*ppm+"px";
 
-function send(){
-    socket.emit('update',
-    {
-        'value':0
-    })
-}
+let frente = document.getElementById("frente_botin");
+frente.style.height = "5px";
+frente.style.marginTop = (robot_par["height"]*ppm - 5) / 2 + "px";
 
-//sending = setInterval(send, 1000)
-sending = setInterval(send, 40)
+let robot = new BaseMovil();
+let controler = new MobileBasePID(robot, reference);
 
 
 function setConstants()
@@ -76,19 +70,24 @@ function setConstants()
     kp_a = document.getElementById('kp_a').value;
     kd_a = document.getElementById('kd_a').value;
     ki_a = document.getElementById('ki_a').value;
-    console.log("constantes seteadas");
-    fetch('/set_constants/'+kp_l+'/'+kd_l+'/'+ki_l+'/'+kp_a+'/'+kd_a+'/'+ki_a);
+    controler.SetLinearConstants(kp_l, kd_l, ki_l);
+    controler.SetAngularConstants(kp_a, kd_a, ki_a);
 }
 
-function updateState(x, y, theta)
+function updateState()
 {
+    controler.Update();
     var elem = document.getElementById("botin");
-    // console.log("Robot a " + x + ", " + y );
+    var state = robot.GetSensor();
+    var x = state[0];
+    var y = state[1];
+    var theta = state[2]; 
 
     elem.style.left = ppm*x + 'px';
     elem.style.top = ppm*y + 'px';
     elem.style.transform = "rotate(" + theta* 180 / Math.PI + "deg)";
 
+    robot.UpdateState();
     return;
 }
 
@@ -101,19 +100,16 @@ function load(){
 }
 
 function setGoal(e){
-    console.log("Set Goal ejecutado");
-    console.log(e);
     var rect = e.target.getBoundingClientRect();
     var x = (e.clientX - rect.left)/ppm;
     var y = (e.clientY - rect.top)/ppm;
-    console.log("(" + x + "," + y + ")");
     goal = document.getElementById("goal")
     goal.style.left = x*ppm + 'px';
     goal.style.top = y*ppm + 'px';
     goal.style.visibility = 'visible';
 
-    fetch('/setGoal/' + x + "/" + y);
-    setConstants()
+    controler.SetReference(x,y);
+    setConstants();
 }
 
 load();
@@ -133,5 +129,6 @@ function color() {
         elem.style.background = 'red'; 
         break;
   }
-
 }
+
+update = setInterval(updateState, 10);
