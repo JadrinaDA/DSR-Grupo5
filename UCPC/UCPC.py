@@ -96,6 +96,4 @@ class Subscriber():
 port = "/dev/cu.IRB-G01-SPPDev"
 #port = "/dev/cu.iPhonedeIgnacio-Wireles"
 
-sub = Subscriber()
-store_coor = StoreCoor()
-run_cv(store_coor)
+sub = Subscriber(port)
