@@ -336,7 +336,8 @@ def set_exp_constants():
 
     kia = request.args.get('kia')
     kda = request.args.get('kda')
-    send_message(f"K{kpl}${kdl}${kil}${kpa}${kda}${kia}$")
+    # send_message(f"K{kpl}${kdl}${kil}${kpa}${kda}${kia}$")
+    send_message(f"KSA{kpa}${kia}${kda}$")
     return render_template('experiencia_base_movil/index.html')
 
 
