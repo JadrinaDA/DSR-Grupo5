@@ -5,12 +5,15 @@ import paho.mqtt.client as mqtt
 import cv2 as cv
 import base64
 import threading
-from seg_ref import run_cv, StoreCoor
+# from seg_ref import run_cv, StoreCoor
 import numpy as np
 
-
 class Subscriber():
-    def __init__(self, port = None):
+    def __init__(self, store_coor, port = None):
+        self.bt_signal = False
+        self.bt_msg = ""
+        self.store_coor = store_coor
+        
         self.port = port
         if port:
             self.ser = self.bt_connect(port)
@@ -45,7 +48,7 @@ class Subscriber():
             pass
         elif decoded_msg[:3] == "REF":
             x,y = decoded_msg[3:].split(",")
-            store_coor.click_event(int(float(x)),int(float(y)))
+            self.store_coor.click_event(int(float(x)),int(float(y)))
         
         elif decoded_msg[:3] == "KSA":
             list_msg = decoded_msg[3:].split('$')
@@ -112,11 +115,10 @@ class Subscriber():
             client.disconnect()
             print("\nNow you can restart fresh")
 
-port = "/dev/cu.IRB-G01-SPPDev"
-#port = "/dev/cu.iPhonedeIgnacio-Wireles"
 
 
-store_coor = StoreCoor()
-sub = Subscriber(port)
 
-run_cv(store_coor, clase=sub)
+
+
+# run_cv(store_coor, clase=sub)
+

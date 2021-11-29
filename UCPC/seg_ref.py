@@ -1,6 +1,8 @@
+import threading
 import cv2
 import numpy as np
 from scipy.ndimage import center_of_mass
+from subscriber import Subscriber
 
 '''
 conversion de colores
@@ -73,7 +75,7 @@ def error(ref, state):
     if (a<-np.pi)and(a>-3*np.pi/2):
         a+= 2*np.pi
     '''
-    
+
     while a>np.pi:
         a-= 2*np.pi
     while a<-np.pi:
@@ -81,55 +83,71 @@ def error(ref, state):
     
     return np.array([d,a])
 
-def run_cv(store_coor, clase):
-    cap = cv2.VideoCapture(1)
-    screen_to_real = 0.42
-    clase.bt_send(f"KSA{0.5}${0.00001}${0}$")
-    while(1):
-        ret, frame = cap.read()
-        s = np.shape(frame)
+def manage_bt(sub):
+    while True:
+        if sub.bt_signal:
+            sub.bt_send(sub.bt_msg)
+            sub.bt_signal = False
 
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    
 
-        l = 5
-        
-        # green mask
-        green_mask = mask_hsv(hsv, "green")
-        x1, y1 = center_of_mass(green_mask)
-        if x1 and y1:
-            green_mask[int(x1)-l:int(x1)+l,int(y1)-l:int(y1)+l] = 0
-        
-        # brown mask
-        brown_mask = mask_hsv(hsv, "brown")
-        x2, y2 = center_of_mass(brown_mask)
-        if x2 and y2:
-            brown_mask[int(x2)-l:int(x2)+l,int(y2)-l:int(y2)+l] = 0
-        
-        a = angulo((x1,y1), (x2,y2))
-        
-        
-        # dist = int(((store_coor.ref[0] -y1)*2 + (store_coor.ref[1] -x1)2)*(0.5) * screen_to_real)
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        # cv2.putText(frame,'Dist:' + str(dist),(10,450), font, 2,(255,255,255),2,cv2.LINE_AA)
+port = "/dev/cu.IRB-G01-SPPDev"
+#port = "/dev/cu.iPhonedeIgnacio-Wireles"
 
-        state[:] = np.array([y1-320, 240-x1, a])
-        error_actual[:] = error(store_coor.ref_m, state)
-        clase.bt_send(f"ERA{error_actual[1]}$")
-        #dist = int(((store_coor.ref[0] -y1)**2 + (store_coor.ref[1] -x1)**2)**(0.5) * screen_to_real)
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        #cv2.putText(frame,'Dist:' + str(dist),(10,450), font, 2,(255,255,255),2,cv2.LINE_AA)
-
-
-        cv2.circle(frame, store_coor.ref_d, 10,(0,0, 255), -1)
-        cv2.line(frame, store_coor.ref_d, (int(y1),int(x1)), (255, 0, 0),5)
-        cv2.imshow('frame', frame)
-
-        if (cv2.waitKey(1) & 0xFF == ord('q')):
-            break
-
-
-    cap.release()
-    cv2.destroyAllWindows()
+store_coor = StoreCoor()
+clase = Subscriber(store_coor, port)
     
 state = np.array([0.0, 0.0, 0.0])
 error_actual = np.array([0.0, 0.0])
+
+cap = cv2.VideoCapture(1)
+screen_to_real = 0.42
+clase.bt_send(f"KSA{0.5}${0.00001}${0}$")
+
+bt_thread = threading.Thread(target = manage_bt, args = [clase], daemon = True)
+bt_thread.start()
+
+while(1):
+    ret, frame = cap.read()
+    s = np.shape(frame)
+
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    l = 5
+    
+    # green mask
+    green_mask = mask_hsv(hsv, "green")
+    x1, y1 = center_of_mass(green_mask)
+    if x1 and y1:
+        green_mask[int(x1)-l:int(x1)+l,int(y1)-l:int(y1)+l] = 0
+    
+    # brown mask
+    brown_mask = mask_hsv(hsv, "brown")
+    x2, y2 = center_of_mass(brown_mask)
+    if x2 and y2:
+        brown_mask[int(x2)-l:int(x2)+l,int(y2)-l:int(y2)+l] = 0
+    
+    a = angulo((x1,y1), (x2,y2))
+    
+    # dist = int(((store_coor.ref[0] -y1)*2 + (store_coor.ref[1] -x1)2)*(0.5) * screen_to_real)
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    # cv2.putText(frame,'Dist:' + str(dist),(10,450), font, 2,(255,255,255),2,cv2.LINE_AA)
+
+    state[:] = np.array([y1-320, 240-x1, a])
+    error_actual[:] = error(store_coor.ref_m, state)
+    clase.bt_msg = f"ERA{error_actual[1]}$"
+    clase.bt_signal = True
+    # print("cambie la señal")
+    #dist = int(((store_coor.ref[0] -y1)**2 + (store_coor.ref[1] -x1)**2)**(0.5) * screen_to_real)
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    #cv2.putText(frame,'Dist:' + str(dist),(10,450), font, 2,(255,255,255),2,cv2.LINE_AA)
+
+    cv2.circle(frame, store_coor.ref_d, 10,(0,0, 255), -1)
+    cv2.line(frame, store_coor.ref_d, (int(y1),int(x1)), (255, 0, 0),5)
+    # cv2.imshow('frame', frame)
+
+    if (cv2.waitKey(1) & 0xFF == ord('q')):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
