@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from scipy.ndimage import center_of_mass
-
+import UCPC
 '''
 conversion de colores
 
@@ -53,19 +53,6 @@ def angulo(p1, p2):
     a = np.arctan2(p2[1]-p1[1], p2[0]-p1[0]) + np.pi/2
     return a
 
-class StoreCoor:
-    def __init__(self, XMAX=640*2, YMAX=480*2):
-        self.ref_d = (170, 170) # Seteamos como input para la referencia
-        self.ref_m = (0,0)
-        self.XMAX = XMAX
-        self.YMAX = YMAX
-        self.error_angular = 0
-
-    def click_event(self, x, y):
-        self.ref_d = (x*2,y*2)
-        print(self.ref_d)
-        self.ref_m = (x-int(self.XMAX/2), int(self.YMAX/2)-y)
-
 def error(ref, state):
     d = np.linalg.norm(ref-state[0:2])
     a = state[2]-np.pi/2+np.arctan2(ref[0]-state[0],ref[1]-state[1])
@@ -81,13 +68,30 @@ def error(ref, state):
     
     return np.array([d,a])
 
+class StoreCoor:
+    def __init__(self, XMAX=640, YMAX=480):
+        self.ref_d = (-1,-1)
+        self.ref_m = (0,0)
+        self.XMAX = XMAX
+        self.YMAX = YMAX
+        self.error_angular = 0
+
+    def click_event(self, event, x, y, flags, params):
+            print('hola')
+            if event == cv2.EVENT_LBUTTONDOWN:
+                print("hi")
+                self.ref_d = (x,y)
+                self.ref_m = (x-int(self.XMAX/2), int(self.YMAX/2)-y)
+
+
 def run_cv(store_coor, clase):
     cap = cv2.VideoCapture(1)
     screen_to_real = 0.42
-    clase.bt_send(f"KSA{0.5}${0.00001}${0}$")
+    clase.bt_send(f"KSA{1}${0}${0}$")
     while(1):
         ret, frame = cap.read()
         s = np.shape(frame)
+
 
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
@@ -106,23 +110,25 @@ def run_cv(store_coor, clase):
             brown_mask[int(x2)-l:int(x2)+l,int(y2)-l:int(y2)+l] = 0
         
         a = angulo((x1,y1), (x2,y2))
-        
-        
+
+
         # dist = int(((store_coor.ref[0] -y1)*2 + (store_coor.ref[1] -x1)2)*(0.5) * screen_to_real)
         font = cv2.FONT_HERSHEY_SIMPLEX
         # cv2.putText(frame,'Dist:' + str(dist),(10,450), font, 2,(255,255,255),2,cv2.LINE_AA)
 
         state[:] = np.array([y1-320, 240-x1, a])
         error_actual[:] = error(store_coor.ref_m, state)
-        clase.bt_send(f"ERA{error_actual[1]}$")
-        #dist = int(((store_coor.ref[0] -y1)**2 + (store_coor.ref[1] -x1)**2)**(0.5) * screen_to_real)
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        #cv2.putText(frame,'Dist:' + str(dist),(10,450), font, 2,(255,255,255),2,cv2.LINE_AA)
-
+        
+        clase.bt_send(f"ERA{error_actual[1]*180/np.pi}$")
 
         cv2.circle(frame, store_coor.ref_d, 10,(0,0, 255), -1)
         cv2.line(frame, store_coor.ref_d, (int(y1),int(x1)), (255, 0, 0),5)
         cv2.imshow('frame', frame)
+        cv2.setMouseCallback('frame', store_coor.click_event)
+        cv2.imshow('green', green_mask)
+        cv2.imshow('brown', brown_mask)
+
+
 
         if (cv2.waitKey(1) & 0xFF == ord('q')):
             break
@@ -130,6 +136,14 @@ def run_cv(store_coor, clase):
 
     cap.release()
     cv2.destroyAllWindows()
-    
+
 state = np.array([0.0, 0.0, 0.0])
 error_actual = np.array([0.0, 0.0])
+
+port = "/dev/cu.IRB-G01-SPPDev"
+#port = "/dev/cu.iPhonedeIgnacio-Wireles"
+
+store_coor = StoreCoor()
+sub = UCPC.Subscriber(port)
+
+run_cv(store_coor, sub)

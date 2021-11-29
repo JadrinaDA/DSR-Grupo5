@@ -24,6 +24,12 @@ long oldposition0 = 0;
 long newposition1;
 long oldposition1 = 0;
 unsigned long newtime;
+
+
+float ref0 = 0;
+float ref1 = 0;
+
+
 float vel0;
 float vel1;
 float error_acumulado0 = 0;
@@ -33,6 +39,9 @@ float newerror1 = 0;
 float olderror0 = 0;
 float olderror1 = 0;
 
+float Kp_angular = 0;
+float Ki_angular = 0;
+float Kd_angular = 0;
 //-----------------------------------
 // CONFIGURANDO INTERRUPCIONES
 void doEncoder0A()
@@ -118,24 +127,146 @@ void loop()
 {
   float motorout0;
   float motorout1;
+
+  
   if ((micros() - time_ant) >= Period)
   {
     newtime = micros();
-    
+
+
   if (Serial3.available() > 0) {
     instruccion = readBuff(); //Leer el mensaje entrante
+    Serial.println(instruccion);
     float Kp;
-    float Kp2;
+
+    
+    // Anterior
+    //float Kp2;
    // float Ki;
    // float Kd;
-    Kp = instruccion.substring(0, 4).toFloat();
-    Kp2 = instruccion.substring(4, 8).toFloat();
+    //Kp = instruccion.substring(0, 4).toFloat();
+    //Kp2 = instruccion.substring(4, 8).toFloat();
    // Ki = instruccion.substring(3, 6).toFloat();
    // Kd = instruccion.substring(6, 9).toFloat();
-    md.setM1Speed(Kp);
-    md.setM2Speed(-Kp2);
-    Serial.println();
-  }
+    //md.setM1Speed(Kp);
+    //md.setM2Speed(-Kp2);
+    //Serial.println();
+  //}
+    
+    float Ki;
+    float Kd;
+    
+
+
+    int i;
+    int j = 0;
+    int l = 0;
+    int n = 0;
+     
+    // Instrucción de seteo de constantes instruccion = "KS{Kp}${Ki}${Kd}$"
+
+    if (instruccion.substring(0, 3) == "KSD")
+    {
+      // Setear las constantes
+
+      for (i = 3; i< instruccion.length(); i++)
+      {
+        if (instruccion[i] == '$')
+        {
+          j = i;
+          break;
+         }
+       }
+    Kp = instruccion.substring(3,j).toFloat();
+
+    for (i=j+1; i< instruccion.length(); i++)
+    {
+        if (instruccion[i] == '$')
+        {
+          l = i;
+          break;
+        }
+    }
+    Ki = instruccion.substring(j+1,l).toFloat();
+
+    for (i=l+1; i< instruccion.length(); i++)
+      {
+        if (instruccion[i] == '$')
+        {
+          n = i;
+          break;
+        }
+      }
+    Kd = instruccion.substring(l+1,n).toFloat();
+    }
+
+
+
+ /// Seteo constantes angulares
+    if (instruccion.substring(0, 3) == "KSA")
+    {
+      // Setear las constantes
+
+      for (i = 3; i< instruccion.length(); i++)
+      {
+        if (instruccion[i] == '$')
+        {
+          j = i;
+          break;
+         }
+       }
+    Kp_angular = instruccion.substring(3,j).toFloat();
+    Serial.println(Kp_angular);
+
+    for (i=j+1; i< instruccion.length(); i++)
+    {
+        if (instruccion[i] == '$')
+        {
+          l = i;
+          break;
+        }
+    }
+    Ki_angular = instruccion.substring(j+1,l).toFloat();
+    Serial.println(Ki_angular);
+    for (i=l+1; i< instruccion.length(); i++)
+      {
+        if (instruccion[i] == '$')
+        {
+          n = i;
+          break;
+        }
+      }
+    Kd_angular = instruccion.substring(l+1,n).toFloat();
+    Serial.println(Kd_angular);
+    }
+
+// ---- Término seteo constantes ---------------
+
+   // Seteo de referencia
+   j = 0;
+   if (instruccion.substring(0, 3) == "ERA") // Error angular
+   {
+      // Se enviarán los errores, entonces solo es necesario setearlo
+
+      for (i = 3; i< instruccion.length(); i++)
+      {
+        if (instruccion[i] == '$')
+        {
+          j = i;
+          break;
+         }
+       }
+    newerror0 = instruccion.substring(3,j).toFloat();
+    newerror1 = instruccion.substring(3,j).toFloat();
+      
+    }
+   }
+    //Kp = instruccion.substring(0, 4).toFloat();
+    //Kp2 = instruccion.substring(4, 8).toFloat();
+   // Ki = instruccion.substring(3, 6).toFloat();
+   // Kd = instruccion.substring(6, 9).toFloat();
+    //Serial.println(instruccion);
+    
 
   //-----------------------------------
     // Actualizando Informacion de los encoders
@@ -145,21 +276,24 @@ void loop()
 
     //-----------------------------------
     // Calculando Velocidad del motor
-          
-    float ref0;
-    float ref1;
-    if ((newtime / 5000000) % 2){
-      ref0 = 100.0;
-      ref1 = -100.0;}
-    else{
-      ref0 = 50.0;
-      ref1 = -50.0;}
+
+    
+    
+//    if ((newtime / 5000000) % 2){
+//      ref0 = 100.0;
+//      ref1 = -100.0;}
+//    else{
+//      ref0 = 50.0;
+//      ref1 = -50.0;}
+
 
     float rpm = 31250;
     vel0 = (float)(newposition0 - oldposition0) * rpm / (newtime - time_ant); //RPM
     vel1 = (float)(newposition1 - oldposition1) * rpm / (newtime - time_ant); //RPM
-    newerror0 = ref0 - vel0;
-    newerror1 = ref1 - vel1;
+
+    //newerror0 = ref0 - vel0;
+    //newerror1 = ref1 - vel1;
+
     error_acumulado0  = error_acumulado0 + newerror0;
     error_acumulado1  = error_acumulado1 + newerror1;
     oldposition0 = newposition0;
@@ -167,14 +301,13 @@ void loop()
     
 
     int k = (400/350);
-    int kp=5;
-    float ki;
-    ki = 0.0001;
-    float kd;
-    kd = 70;
-    Serial.println(kd*((newerror0 - olderror0)/(newtime - time_ant)));
-    motorout0 = k*(kp*(newerror0) + ki*error_acumulado0*(newtime - time_ant) + kd*((newerror0 - olderror0)/(newtime - time_ant)));
-    motorout1 = k*(kp*(newerror1) + ki*error_acumulado1*(newtime - time_ant) + kd*((newerror1 - olderror1)/(newtime - time_ant)));
+
+
+    motorout0 = k*(Kp_angular*(newerror0) + Ki_angular*error_acumulado0*(newtime - time_ant) + Kd_angular*((newerror0 - olderror0)/(newtime - time_ant)));
+    motorout1 = k*(Kp_angular*(newerror1) + Ki_angular*error_acumulado1*(newtime - time_ant) + Kd_angular*((newerror1 - olderror1)/(newtime - time_ant)));
+    Serial.println(Kp_angular);
+    Serial.println(newerror0);
+
     md.setM1Speed(motorout0);
     md.setM2Speed(motorout1);
     //Serial.print("Encoder position 0:");
@@ -183,11 +316,15 @@ void loop()
     //Serial.println(newposition1);
     //Serial.print(escalon);
     //Serial.print(",");
-    Serial.print("Velocidad 0: ");
-    Serial.print(vel0);
-    Serial.print("Velocidad 1: ");
-    Serial.print(-vel1);
-    Serial.println();
+
+    
+//    Serial.print("Velocidad 0: ");
+//    Serial.print(vel0);
+//    Serial.print("Velocidad 1: ");
+//    Serial.print(-vel1);
+//    Serial.println();
+
+    
     //Serial.print(motorout);
     //Serial.print(",");
     //Serial.print(md.getM1CurrentMilliamps());

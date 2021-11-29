@@ -1,13 +1,17 @@
 import time
+from numpy.core.defchararray import decode
 import serial
 import paho.mqtt.client as mqtt
 import cv2 as cv
 import base64
 import threading
 from seg_ref import run_cv, StoreCoor
+import numpy as np
+
 
 class Subscriber():
     def __init__(self, port = None):
+        self.port = port
         if port:
             self.ser = self.bt_connect(port)
 
@@ -19,7 +23,11 @@ class Subscriber():
         client.on_message = self.on_message
 
         client.connect('broker.mqttdashboard.com', 1883, 60)
-        client.loop_forever()
+    
+        def loop_infinito():
+            client.loop_forever()
+        t = threading.Thread(target=loop_infinito)
+        t.start()
 
     def on_connect(self, client, userdata, flags, rc):
         print('Se conectó con MQTT ' + str(rc))
@@ -34,16 +42,27 @@ class Subscriber():
         elif decoded_msg[:3] == "CAM":
             t =threading.Thread(target=self.video)
             t.start()
+            pass
         elif decoded_msg[:3] == "REF":
-            store_coor.ref = (decoded_msg[3:])
+            x,y = decoded_msg[3:].split(",")
+            store_coor.click_event(int(float(x)),int(float(y)))
+        
+        elif decoded_msg[:3] == "KSA":
+            list_msg = decoded_msg[3:].split('$')
+            kpa = list_msg[0]
+            kda = list_msg[1]
+            kia = list_msg[2]
+            self.bt_send(f"KSA{kpa}${kda}${kia}")
 
     def bt_send(self, msg):
+        if not self.port:
+            return
         msgOnEncode = str.encode(msg)
         self.ser.write(msgOnEncode) 
         time.sleep(1)
         self.ser.write(msgOnEncode)
         time.sleep(1)
-        print("Mensaje enviado")
+        print(f"Mensaje enviado {msg}")
 
     def bt_connect(self, port):
         # seria.Serial nos permite abrir el puerto COM deseado	
@@ -61,7 +80,7 @@ class Subscriber():
         # Topic on which frame will be published
         MQTT_SEND = "DSR5/CAM"
         # Object to capture the frames
-        cap = cv.VideoCapture(0)
+        cap = cv.VideoCapture(1)
         # Phao-MQTT Clinet
         client = mqtt.Client()
         # Establishing Connection with the Broker
@@ -96,4 +115,10 @@ class Subscriber():
 port = "/dev/cu.IRB-G01-SPPDev"
 #port = "/dev/cu.iPhonedeIgnacio-Wireles"
 
+
+
+store_coor = StoreCoor()
 sub = Subscriber(port)
+
+run_cv(store_coor, clase=sub)
+
