@@ -116,7 +116,9 @@ port = "/dev/cu.IRB-G01-SPPDev"
 #port = "/dev/cu.iPhonedeIgnacio-Wireles"
 
 
+
 store_coor = StoreCoor()
 sub = Subscriber(port)
 
 run_cv(store_coor, clase=sub)
+
