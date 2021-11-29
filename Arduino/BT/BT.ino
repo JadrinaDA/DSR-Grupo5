@@ -25,8 +25,10 @@ long newposition1;
 long oldposition1 = 0;
 unsigned long newtime;
 
+
 float ref0 = 0;
 float ref1 = 0;
+
 
 float vel0;
 float vel1;
@@ -125,15 +127,32 @@ void loop()
 {
   float motorout0;
   float motorout1;
+
   
   if ((micros() - time_ant) >= Period)
   {
     newtime = micros();
 
+
   if (Serial3.available() > 0) {
     instruccion = readBuff(); //Leer el mensaje entrante
     Serial.println(instruccion);
     float Kp;
+
+    
+    // Anterior
+    //float Kp2;
+   // float Ki;
+   // float Kd;
+    //Kp = instruccion.substring(0, 4).toFloat();
+    //Kp2 = instruccion.substring(4, 8).toFloat();
+   // Ki = instruccion.substring(3, 6).toFloat();
+   // Kd = instruccion.substring(6, 9).toFloat();
+    //md.setM1Speed(Kp);
+    //md.setM2Speed(-Kp2);
+    //Serial.println();
+  //}
+    
     float Ki;
     float Kd;
     
@@ -249,7 +268,6 @@ void loop()
     //Serial.println(instruccion);
     
 
-
   //-----------------------------------
     // Actualizando Informacion de los encoders
     newposition0 = encoder0Pos;
@@ -258,6 +276,7 @@ void loop()
 
     //-----------------------------------
     // Calculando Velocidad del motor
+
     
     
 //    if ((newtime / 5000000) % 2){
@@ -267,11 +286,14 @@ void loop()
 //      ref0 = 50.0;
 //      ref1 = -50.0;}
 
+
     float rpm = 31250;
     vel0 = (float)(newposition0 - oldposition0) * rpm / (newtime - time_ant); //RPM
     vel1 = (float)(newposition1 - oldposition1) * rpm / (newtime - time_ant); //RPM
+
     //newerror0 = ref0 - vel0;
     //newerror1 = ref1 - vel1;
+
     error_acumulado0  = error_acumulado0 + newerror0;
     error_acumulado1  = error_acumulado1 + newerror1;
     oldposition0 = newposition0;
@@ -279,10 +301,13 @@ void loop()
     
 
     int k = (400/350);
+
+
     motorout0 = k*(Kp_angular*(newerror0) + Ki_angular*error_acumulado0*(newtime - time_ant) + Kd_angular*((newerror0 - olderror0)/(newtime - time_ant)));
     motorout1 = k*(Kp_angular*(newerror1) + Ki_angular*error_acumulado1*(newtime - time_ant) + Kd_angular*((newerror1 - olderror1)/(newtime - time_ant)));
     Serial.println(Kp_angular);
     Serial.println(newerror0);
+
     md.setM1Speed(motorout0);
     md.setM2Speed(motorout1);
     //Serial.print("Encoder position 0:");

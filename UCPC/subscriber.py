@@ -117,8 +117,16 @@ class Subscriber():
 
 
 
+<<<<<<< HEAD:UCPC/subscriber.py
 
 
 
 # run_cv(store_coor, clase=sub)
+=======
+
+store_coor = StoreCoor()
+sub = Subscriber(port)
+
+run_cv(store_coor, clase=sub)
+>>>>>>> 0d8389f8d3df98ebc2d51f3a1c82c6a5f30a7afc:UCPC/UCPC.py
 
