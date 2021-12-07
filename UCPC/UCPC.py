@@ -111,10 +111,11 @@ while(1):
 
 
     # Mandamos señal de control
-    cont.ref = np.array(store_coor.ref_d)
-    u0, u1 = cont.control(state)
-    clase.bt_msg = f"REF{u0}${u1}$"
-    clase.bt_signal = True
+    if not clase.auto:
+        cont.ref = np.array(store_coor.ref_d)
+        u0, u1 = cont.control(state)
+        clase.bt_msg = f"REF{u0}${u1}$"
+        clase.bt_signal = True
 
 
     #dist = int(((store_coor.ref[0] -y1)**2 + (store_coor.ref[1] -x1)**2)**(0.5) * screen_to_real)
