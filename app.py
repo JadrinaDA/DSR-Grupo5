@@ -1,30 +1,27 @@
 from flask import Flask, render_template, request, jsonify, session
 from flask_session import Session
-
 import numpy as np
 from flask_socketio import SocketIO, send
 from engineio.payload import Payload
-
 from werkzeug.exceptions import abort
-
-
 import threading
-
 import sqlite3
 from flask import Flask, render_template, url_for, flash, redirect, Response
-
 import paho.mqtt.client as mqtt
-
 import base64
 import cv2 as cv
-
 import threading
+import time
+import json
 
 lock = threading.Lock()
 frame = np.ones((160, 120, 3), np.uint8)
 
 MQTT_BROKER = 'broker.mqttdashboard.com'
 MQTT_RECEIVE = "DSR5/CAM"
+MQTT_CAM = "DSR5/CAM"
+MQTT_DATA = "DSR5/DATA"
+
 
 def show_camera():
     global frame
@@ -40,18 +37,40 @@ def cam_on_connect(client, userdata, flags, rc):
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe(MQTT_RECEIVE)
-
+    client.subscribe([(MQTT_CAM,1) , (MQTT_DATA,1)])
 
 # The callback for when a PUBLISH message is received from the server.
 def cam_on_message(client, userdata, msg):
     global frame
-    # Decoding the message
-    img = base64.b64decode(msg.payload)
-    # converting into numpy array from buffer
-    npimg = np.frombuffer(img, dtype=np.uint8)
-    # Decode to Original Frame
-    frame = cv.imdecode(npimg, 1)
+    if msg.topic == MQTT_CAM:
+        # Decoding the message
+        img = base64.b64decode(msg.payload)
+        # converting into numpy array from buffer
+        npimg = np.frombuffer(img, dtype=np.uint8)
+        # Decode to Original Frame
+        frame = cv.imdecode(npimg, 1)
+    
+    else:
+        data = json.loads(msg.payload)
+        #  print(data)
+
+
+    # raw_text = base64.b64decode(msg.payload)
+    # npimg = np.frombuffer(raw_text, dtype=np.uint8)
+    # data = json.loads(raw_text)
+    # print(msg.payload)
+    # data = json.loads(msg.payload)
+    # print(data)
+    # img = base64.b64decode(data['img'])
+    # img_text = msg
+    
+
+    # # Decoding the message
+    # img = base64.b64decode(data['img'])
+    # # converting into numpy array from buffer
+    # npimg = np.frombuffer(img, dtype=np.uint8)
+    # # Decode to Original Frame
+    # frame = cv.imdecode(npimg, 1)
 
 def generate():
     # grab global references to the output frame and lock variables
@@ -292,7 +311,6 @@ def res():
     coming_up_dic = coming_up_dic[:-1]
     return render_template("reserva_horas/reserva.html", ava = available, taken = coming_up_dic)
 
-
 @app.route("/cuenta", methods=('GET', 'POST'))
 def perfil():
     if not session:
@@ -315,7 +333,6 @@ def perfil():
 def sim():
     return render_template("Simulacion/simulacion_base_movil.html")
 
-
 @app.route('/experiencia_base_movil')
 def speed_index():
     return render_template('experiencia_base_movil/index.html')
@@ -332,14 +349,18 @@ def set_exp_constants():
     kpl = request.args.get('kpl')
     kil = request.args.get('kil')
     kdl = request.args.get('kdl')
+    
     kpa = request.args.get('kpa')
-
     kia = request.args.get('kia')
     kda = request.args.get('kda')
     # send_message(f"K{kpl}${kdl}${kil}${kpa}${kda}${kia}$")
-    send_message(f"KSA{kpa}${kia}${kda}$")
+    send_message(f"KSL{kpl}${kil}${kdl}")
+    print("KSL enviado")
+    time.sleep(1)
+    send_message(f"KSA{kpa}${kia}${kda}")
+    print("KSA enviado")
+    print()
     return render_template('experiencia_base_movil/index.html')
-
 
 @app.route("/setRef/<x>/<y>")
 def set_ref(x,y):
@@ -370,7 +391,6 @@ def camera():
     # t = threading.Thread(target=show_camera)
     # t.start()
     return render_template('experiencia_base_movil/index.html')
-
 
 @app.route("/cuenta/exp")
 def exps():
@@ -428,13 +448,10 @@ def exp_con():
         flash("No tienes reservada esta hora, reserva una aquí.")
         return redirect(url_for('res'))
 
-
-
 @app.route("/salir", methods =('POST',))
 def salir():
     session['user_id'] = None
     return redirect(url_for('index'))
-
 
 @app.route("/video_feed")
 def video_feed():
@@ -443,7 +460,6 @@ def video_feed():
 	return Response(generate(),
 		mimetype = "multipart/x-mixed-replace; boundary=frame")
         
-
 if __name__ == '__main__':
     socketio.run(app)
 

@@ -8,7 +8,6 @@ const par = {
         "width": 0.15,
         "height": 0.15   
     }
-    
 }
 
 document.getElementById("kp_a").addEventListener('change', setConstants)
@@ -24,7 +23,6 @@ document.getElementById("kd_a").onchange = function(){setConstants};
 document.getElementById("kp_l").onchange = function(){setConstants};
 document.getElementById("ki_l").onchange = function(){setConstants};
 document.getElementById("kd_l").onchange = function(){setConstants};
-
 
 const ppm = 400; // Pixeles por metro
 

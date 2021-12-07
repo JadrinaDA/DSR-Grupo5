@@ -41,31 +41,33 @@
 			<div>
 				<h3>Control Distancia</h3>
 				<label for="kp">K<sub>p</sub>:</label>
-				<input type="text" id="kpl" name="kpl"><br>
+				<input type="number" id="kpl" name="kpl"  step = 0.1 value = 0><br>
 				
 				<label for="kp">K<sub>i</sub>:</label>
-				<input type="text" id="kil" name="kil"><br>
+				<input type="number" id="kil" name="kil" step = 0.1 value = 0><br>
 				
 				<label for="kp">K<sub>d</sub>:</label>
-				<input type="text" id="kdl" name="kdl"><br>
+				<input type="number" id="kdl" name="kdl" step = 0.1 value = 0><br>
 			</div>
 
 			<div>
 				<h3>Control Ángulo</h3>
 				<label for="kp">K<sub>p</sub>:</label>
-				<input type="text" id="kpa" name="kpa"><br>
+				<input type="number" id="kpa" name="kpa" step = 1 value = 0><br>
 				
 				<label for="kp">K<sub>i</sub>:</label>
-				<input type="text" id="kia" name="kia"><br>
+				<input type="number" id="kia" name="kia" step = 0.1 value = 0><br>
 				
 				<label for="kp">K<sub>d</sub>:</label>
-				<input type="text" id="kda" name="kda"><br>
+				<input type="number" id="kda" name="kda" step = 0.1 value = 0><br>
 			</div>
 
-
 			<input type="submit" value="Enviar">
-		</form> 
+		</form> 	
 		  
+		<form action = "/experiencia_base_movil/set_constants?kpl=0&kil=0&kdl=0&kpa=0&kia=0&kda=0">
+			<input type = "submit" value = "Detener">
+		</form>
 	<br>
 	
 	<hr>
@@ -79,6 +81,7 @@
         <input type="text" id="m2" name="m2"><br><br>
         <input type="submit" value="Enviar">
       </form> 
+
 
 	  <script src ="{{ url_for('static', filename = 'js/script_exp.js') }}"></script>
 	
