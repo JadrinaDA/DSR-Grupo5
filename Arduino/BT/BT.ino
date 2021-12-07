@@ -24,6 +24,8 @@ long oldposition0 = 0;
 long newposition1;
 long oldposition1 = 0;
 unsigned long newtime;
+float ref_0;
+float ref_1;
 
 // Definición de referencia
 float ref0 = 0;
@@ -146,6 +148,7 @@ void loop()
     int j = 0;
     int l = 0;
     int n = 0;
+
     
     // Instrucción de seteo de constantes instruccion = "KS{Kp}${Ki}${Kd}$"
   
@@ -182,15 +185,17 @@ void loop()
    j = 0;
    if (instruccion.substring(0, 3) == "REF") // Error angular
    {
+      
       // Se enviarán los errores, entonces solo es necesario setearlo
       j = return_pos(3, instruccion.length(), instruccion);
-      newerror0 = instruccion.substring(3,j).toFloat();
+      ref_0 = instruccion.substring(3,j).toFloat();
       l = return_pos(j+1, instruccion.length(), instruccion);
-      newerror1 = instruccion.substring(j+1,l).toFloat(); 
+      ref_1 = instruccion.substring(j+1,l).toFloat(); 
     }
   }
   
   float delta_t = newtime - time_ant;
+
   //-----------------------------------
     // Actualizando Informacion de los encoders
     newposition0 = encoder0Pos;
@@ -201,22 +206,33 @@ void loop()
     vel0 = (float)(newposition0 - oldposition0) * rpm / (delta_t); //RPM
     vel1 = (float)(newposition1 - oldposition1) * rpm / (delta_t); //RPM
 
+    newerror0 = ref_0 - vel0;
+    newerror1 = ref_1 - vel1;
+    
     error_acumulado0  = error_acumulado0 + newerror0;
     error_acumulado1  = error_acumulado1 + newerror1;
     oldposition0 = newposition0;
     oldposition1 = newposition1;
     
-
+    
     int k = (400/350);
 
     motorout0 = k*(Kp_angular*(newerror0) + Ki_angular*error_acumulado0*(delta_t) + Kd_angular*((newerror0 - olderror0)/(delta_t)));
     motorout1 = k*(Kp_angular*(newerror1) + Ki_angular*error_acumulado1*(delta_t) + Kd_angular*((newerror1 - olderror1)/(delta_t)));
     //Serial.println(Kp_angular);
+    Serial.print("motorout0  ");
+    Serial.print(motorout0);
     //Serial.println("Estoy en el loop");
-    md.setM2Speed(90);
-    md.setM1Speed(90);
-    Serial.println(vel0);
-    Serial.println(md.getM1CurrentMilliamps());
+    Serial.print("  motorout1  ");
+    Serial.print(motorout1);
+    Serial.print("vel0  ");
+    Serial.print(vel0);
+    //Serial.println("Estoy en el loop");
+    Serial.print("  vel1  ");
+    Serial.println(vel1);
+    md.setM2Speed(motorout1);
+    md.setM1Speed(motorout0);
+    //Serial.println(md.getM1CurrentMilliamps());
  
   time_ant = newtime;
   olderror0 = newerror0;

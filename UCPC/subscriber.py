@@ -51,7 +51,7 @@ class Subscriber():
         if decoded_msg[:3] == "SPD":
             self.auto = False
             if self.bluetooth:
-                self.bt_send(decoded_msg[3:])
+                self.bt_send("REF" + decoded_msg[3:])
         elif decoded_msg[:3] == "CAM":
             t = threading.Thread(target=self.video)
             t.start()
@@ -61,7 +61,7 @@ class Subscriber():
             self.store_coor.click_event(int(float(x)),int(float(y)))
         
         elif decoded_msg[:3] == "KSA":
-            auto = True
+            self.auto = True
             list_msg = decoded_msg[3:].split('$')
             list_msg = list(map(lambda x: float(x), list_msg))
             self.angular_constants = list_msg
@@ -71,7 +71,7 @@ class Subscriber():
             # self.bt_send(f"KSA{kpa}${kda}${kia}")
             
         elif decoded_msg[:3] == "KSL":
-            auto = True
+            self.auto = True
             list_msg = decoded_msg[3:].split('$')
             try: 
                 list_msg = list(map(lambda x: float(x), list_msg))

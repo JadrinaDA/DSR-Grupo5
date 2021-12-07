@@ -6,6 +6,7 @@ from scipy.ndimage import center_of_mass
 from subscriber import Subscriber
 from controler import Controler
 from store_coor import StoreCoor
+# import Filtro as filter
 
 '''
 conversion de colores
@@ -22,14 +23,14 @@ def mask_hsv(X,color):
         lb = np.array([0, 50, 50])
         ub = np.array([0, 255, 255])
     elif (color=="green")or(color=="verde"):
-        lb = np.array([33, 80, 100])
-        ub = np.array([102, 255, 255])
+        lb = np.array([33, 80, 70])
+        ub = np.array([90, 255, 255])
     elif (color=="blue")or(color=="azul"):
-        lb = np.array([110, 50, 50])
+        lb = np.array([110, 50, 70])
         ub = np.array([130, 255, 255])
     elif (color=="brown")or(color=="cafe"):
-        lb = np.array([10, 100, 100])
-        ub = np.array([20, 255, 255])
+        lb = np.array([10, 100, 20])
+        ub = np.array([15, 255, 255])
     return cv2.inRange(X,lb,ub)
 
 def angulo(p1, p2):
@@ -62,13 +63,14 @@ error_actual = np.array([0.0, 0.0])
 cap = cv2.VideoCapture(1)
 cap.set(cv2.CAP_PROP_FPS, fps)
 screen_to_real = 0.42
-clase.bt_send(f"KSA{1.2}${0.0}${0.05}$")
+clase.bt_send(f"KSA{10}${0.1}${0}$")
 
 bt_thread = threading.Thread(target = manage_bt, args = [clase], daemon = True)
 bt_thread.start()
 
 while(1):
     ret, frame = cap.read()
+    # frame = filter.FiltroTarea2(frame, 0.8,20,25)
     s = np.shape(frame)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
@@ -111,11 +113,13 @@ while(1):
 
 
     # Mandamos señal de control
-    if not clase.auto:
+    # print(clase.auto)
+    if clase.auto:
         cont.ref = np.array(store_coor.ref_d)
         u0, u1 = cont.control(state)
         clase.bt_msg = f"REF{u0}${u1}$"
         clase.bt_signal = True
+        # print(clase.bt_msg)
 
 
     #dist = int(((store_coor.ref[0] -y1)**2 + (store_coor.ref[1] -x1)**2)**(0.5) * screen_to_real)
@@ -138,9 +142,9 @@ while(1):
     clase.mqtt_dict['error_lineal']=cont.error[0]
     clase.mqtt_dict['error_angular']=cont.error[1]
     #print(cont.error[1]*180/np.pi)
-    print(cont.error[1]*180/np.pi)
-    clase.mqtt_dict['u0']=u0
-    clase.mqtt_dict['u1']=u1
+    #print(cont.error[1]*180/np.pi)
+    # clase.mqtt_dict['u0']=u0
+    # clase.mqtt_dict['u1']=u1
     clase.mqtt_dict['ref']=store_coor.ref_d
     clase.mqtt_dict['x']=state[0]
     clase.mqtt_dict['y']=state[1]
