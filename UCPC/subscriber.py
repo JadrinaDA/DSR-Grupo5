@@ -5,14 +5,21 @@ import paho.mqtt.client as mqtt
 import cv2 as cv
 import base64
 import threading
-# from seg_ref import run_cv, StoreCoor
 import numpy as np
+import json
+import base64
+import sys
 
 class Subscriber():
-    def __init__(self, store_coor, port = None):
+    def __init__(self, store_coor, port = None, fps = 10):
+        self.mqtt_dict = dict()
+        self.fps = fps
+        self.current_frame = None
         self.bt_signal = False
         self.bt_msg = ""
         self.store_coor = store_coor
+        self.linear_constants = [0.0, 0.0, 0.0] # kp, ki, kd
+        self.angular_constants = [0.0, 0.0, 0.0] # kp, ki, kd
         
         self.port = port
         if port:
@@ -29,6 +36,7 @@ class Subscriber():
     
         def loop_infinito():
             client.loop_forever()
+
         t = threading.Thread(target=loop_infinito)
         t.start()
 
@@ -43,7 +51,7 @@ class Subscriber():
             if self.bluetooth:
                 self.bt_send(decoded_msg[3:])
         elif decoded_msg[:3] == "CAM":
-            t =threading.Thread(target=self.video)
+            t = threading.Thread(target=self.video)
             t.start()
             pass
         elif decoded_msg[:3] == "REF":
@@ -52,10 +60,21 @@ class Subscriber():
         
         elif decoded_msg[:3] == "KSA":
             list_msg = decoded_msg[3:].split('$')
-            kpa = list_msg[0]
-            kda = list_msg[1]
-            kia = list_msg[2]
-            self.bt_send(f"KSA{kpa}${kda}${kia}")
+            list_msg = list(map(lambda x: float(x), list_msg))
+            self.angular_constants = list_msg
+            # kpa = list_msg[0]
+            # kda = list_msg[1]
+            # kia = list_msg[2]
+            # self.bt_send(f"KSA{kpa}${kda}${kia}")
+            
+        elif decoded_msg[:3] == "KSL":
+            list_msg = decoded_msg[3:].split('$')
+            try: 
+                list_msg = list(map(lambda x: float(x), list_msg))
+                self.linear_constants = list_msg
+            except: 
+                print("Favor ingrese valores numéricos")
+                print(f"Ingresado: {list_msg}")
 
     def bt_send(self, msg):
         if not self.port:
@@ -81,52 +100,63 @@ class Subscriber():
         # IP address
         MQTT_BROKER = 'broker.mqttdashboard.com'
         # Topic on which frame will be published
-        MQTT_SEND = "DSR5/CAM"
+        MQTT_CAM = "DSR5/CAM"
+        MQTT_DATA = "DSR5/DATA"
+        # MQTT_CAM = "DSR5/CAM"
         # Object to capture the frames
-        cap = cv.VideoCapture(1)
+        # cap = cv.VideoCapture(1)
         # Phao-MQTT Clinet
         client = mqtt.Client()
         # Establishing Connection with the Broker
         client.connect(MQTT_BROKER)
         # counter = 0
         try:
+            i = 0
             while True:
+
+                i += 1
                 # start = time.time()
                 # Read Frame
-                _, frame = cap.read()
+                # _, frame = cap.read()
+                frame = self.current_frame
                 # Resize Frame
                 # frame = cv.resize(frame, [80, 120] )
-                frame = cv.resize(frame, [160, 120] )
+                # frame = cv.resize(frame, [160, 120] )
+                frame = cv.resize(frame, [320, 240] )
                 # Encoding the Frame
                 _, buffer = cv.imencode('.jpg', frame)
                 # Converting into encoded bytes
                 jpg_as_text = base64.b64encode(buffer)
                 # Publishig the Frame on the Topic home/server
-                client.publish(MQTT_SEND, jpg_as_text)
+                # self.mqtt_dict['image'] = jpg_as_text
+                self.mqtt_dict['indx'] = i
+
+                # new_dict = {'x': 10, 'y': 20}
+                # json_data = json.dumps(new_dict)
+                # json_data = base64.b64encode(json_data)
+                # print(f"Json: {json_data}")
+
+                # MQTT_SEND = "DSR5/CAM"
+                client.publish(MQTT_CAM, jpg_as_text)
+
+                # MQTT_SEND = "DSR5/DATA"
+
+                json_data = json.dumps(self.mqtt_dict)
+                client.publish(MQTT_DATA, json_data)
+
                 # end = time.time()
                 # t = end - start
                 # fps = 1/t
                 # print(fps)
                 # print(counter)
                 # counter += 1
-                time.sleep(0.5)
-        except:
-            cap.release()
+                # time.sleep(0.5)
+                time.sleep(1/self.fps)
+        except Exception as e:
+            # cap.release()
+            print(f"Excepción ocurrida: {e.__class__}")
             client.disconnect()
             print("\nNow you can restart fresh")
 
-
-
-<<<<<<< HEAD:UCPC/subscriber.py
-
-
-
 # run_cv(store_coor, clase=sub)
-=======
-
-store_coor = StoreCoor()
-sub = Subscriber(port)
-
-run_cv(store_coor, clase=sub)
->>>>>>> 0d8389f8d3df98ebc2d51f3a1c82c6a5f30a7afc:UCPC/UCPC.py
 
