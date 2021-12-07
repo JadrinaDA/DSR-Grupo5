@@ -25,11 +25,11 @@ long newposition1;
 long oldposition1 = 0;
 unsigned long newtime;
 
-
+// Definición de referencia
 float ref0 = 0;
 float ref1 = 0;
 
-
+// Definición de errores y velocidades
 float vel0;
 float vel1;
 float error_acumulado0 = 0;
@@ -39,9 +39,13 @@ float newerror1 = 0;
 float olderror0 = 0;
 float olderror1 = 0;
 
-float Kp_angular = 0;
+// Constantes angulares y lineales.
+float Kp_angular = 2;
 float Ki_angular = 0;
 float Kd_angular = 0;
+float Kp_lineal = 0;
+float Ki_lineal = 0;
+float Kd_lineal = 0;
 //-----------------------------------
 // CONFIGURANDO INTERRUPCIONES
 void doEncoder0A()
@@ -134,165 +138,68 @@ void loop()
     newtime = micros();
 
 
-  if (Serial3.available() > 0) {
+  if (Serial3.available() > 0) 
+  {
     instruccion = readBuff(); //Leer el mensaje entrante
     Serial.println(instruccion);
-    float Kp;
-
-    
-    // Anterior
-    //float Kp2;
-   // float Ki;
-   // float Kd;
-    //Kp = instruccion.substring(0, 4).toFloat();
-    //Kp2 = instruccion.substring(4, 8).toFloat();
-   // Ki = instruccion.substring(3, 6).toFloat();
-   // Kd = instruccion.substring(6, 9).toFloat();
-    //md.setM1Speed(Kp);
-    //md.setM2Speed(-Kp2);
-    //Serial.println();
-  //}
-    
-    float Ki;
-    float Kd;
-    
-
-
     int i;
     int j = 0;
     int l = 0;
     int n = 0;
-     
+    
     // Instrucción de seteo de constantes instruccion = "KS{Kp}${Ki}${Kd}$"
-
+  
     if (instruccion.substring(0, 3) == "KSD")
     {
       // Setear las constantes
+      j = return_pos(3, instruccion.length(), instruccion);
+      Kp_lineal = instruccion.substring(3,j).toFloat();
 
-      for (i = 3; i< instruccion.length(); i++)
-      {
-        if (instruccion[i] == '$')
-        {
-          j = i;
-          break;
-         }
-       }
-    Kp = instruccion.substring(3,j).toFloat();
+      l = return_pos(j+1, instruccion.length(), instruccion);
+      Ki_lineal = instruccion.substring(j+1,l).toFloat();
 
-    for (i=j+1; i< instruccion.length(); i++)
-    {
-        if (instruccion[i] == '$')
-        {
-          l = i;
-          break;
-        }
+      n = return_pos(l+1, instruccion.length(), instruccion);
+      Kd_lineal = instruccion.substring(l+1,n).toFloat();
     }
-    Ki = instruccion.substring(j+1,l).toFloat();
-
-    for (i=l+1; i< instruccion.length(); i++)
-      {
-        if (instruccion[i] == '$')
-        {
-          n = i;
-          break;
-        }
-      }
-    Kd = instruccion.substring(l+1,n).toFloat();
-    }
-
-
 
  /// Seteo constantes angulares
     if (instruccion.substring(0, 3) == "KSA")
     {
       // Setear las constantes
+      j = return_pos(3, instruccion.length(), instruccion);
+      Kp_angular = instruccion.substring(3,j).toFloat();
 
-      for (i = 3; i< instruccion.length(); i++)
-      {
-        if (instruccion[i] == '$')
-        {
-          j = i;
-          break;
-         }
-       }
-    Kp_angular = instruccion.substring(3,j).toFloat();
-    Serial.println(Kp_angular);
+      l = return_pos(j+1, instruccion.length(), instruccion);
+      Ki_angular = instruccion.substring(j+1,l).toFloat();
 
-    for (i=j+1; i< instruccion.length(); i++)
-    {
-        if (instruccion[i] == '$')
-        {
-          l = i;
-          break;
-        }
-    }
-    Ki_angular = instruccion.substring(j+1,l).toFloat();
-    Serial.println(Ki_angular);
-    for (i=l+1; i< instruccion.length(); i++)
-      {
-        if (instruccion[i] == '$')
-        {
-          n = i;
-          break;
-        }
-      }
-    Kd_angular = instruccion.substring(l+1,n).toFloat();
-    Serial.println(Kd_angular);
+      n = return_pos(l+1, instruccion.length(), instruccion);
+      Kd_angular = instruccion.substring(l+1,n).toFloat();
     }
 
 // ---- Término seteo constantes ---------------
 
    // Seteo de referencia
    j = 0;
-   if (instruccion.substring(0, 3) == "ERA") // Error angular
+   if (instruccion.substring(0, 3) == "REF") // Error angular
    {
       // Se enviarán los errores, entonces solo es necesario setearlo
-
-      for (i = 3; i< instruccion.length(); i++)
-      {
-        if (instruccion[i] == '$')
-        {
-          j = i;
-          break;
-         }
-       }
-    newerror0 = instruccion.substring(3,j).toFloat();
-    newerror1 = instruccion.substring(3,j).toFloat();
-      
+      j = return_pos(3, instruccion.length(), instruccion);
+      newerror0 = instruccion.substring(3,j).toFloat();
+      l = return_pos(j+1, instruccion.length(), instruccion);
+      newerror1 = instruccion.substring(j+1,l).toFloat(); 
     }
-   }
-    //Kp = instruccion.substring(0, 4).toFloat();
-    //Kp2 = instruccion.substring(4, 8).toFloat();
-   // Ki = instruccion.substring(3, 6).toFloat();
-   // Kd = instruccion.substring(6, 9).toFloat();
-    //Serial.println(instruccion);
-    
-
+  }
+  
+  float delta_t = newtime - time_ant;
   //-----------------------------------
     // Actualizando Informacion de los encoders
     newposition0 = encoder0Pos;
     newposition1 = encoder1Pos;
-
-
     //-----------------------------------
     // Calculando Velocidad del motor
-
-    
-    
-//    if ((newtime / 5000000) % 2){
-//      ref0 = 100.0;
-//      ref1 = -100.0;}
-//    else{
-//      ref0 = 50.0;
-//      ref1 = -50.0;}
-
-
     float rpm = 31250;
-    vel0 = (float)(newposition0 - oldposition0) * rpm / (newtime - time_ant); //RPM
-    vel1 = (float)(newposition1 - oldposition1) * rpm / (newtime - time_ant); //RPM
-
-    //newerror0 = ref0 - vel0;
-    //newerror1 = ref1 - vel1;
+    vel0 = (float)(newposition0 - oldposition0) * rpm / (delta_t); //RPM
+    vel1 = (float)(newposition1 - oldposition1) * rpm / (delta_t); //RPM
 
     error_acumulado0  = error_acumulado0 + newerror0;
     error_acumulado1  = error_acumulado1 + newerror1;
@@ -302,37 +209,32 @@ void loop()
 
     int k = (400/350);
 
-
-    motorout0 = k*(Kp_angular*(newerror0) + Ki_angular*error_acumulado0*(newtime - time_ant) + Kd_angular*((newerror0 - olderror0)/(newtime - time_ant)));
-    motorout1 = k*(Kp_angular*(newerror1) + Ki_angular*error_acumulado1*(newtime - time_ant) + Kd_angular*((newerror1 - olderror1)/(newtime - time_ant)));
-    Serial.println(Kp_angular);
-    Serial.println(newerror0);
-
-    md.setM1Speed(motorout0);
-    md.setM2Speed(motorout1);
-    //Serial.print("Encoder position 0:");
-    //Serial.print(newposition0);
-    //Serial.print(" Encoder position 1:");
-    //Serial.println(newposition1);
-    //Serial.print(escalon);
-    //Serial.print(",");
-
-    
-//    Serial.print("Velocidad 0: ");
-//    Serial.print(vel0);
-//    Serial.print("Velocidad 1: ");
-//    Serial.print(-vel1);
-//    Serial.println();
-
-    
-    //Serial.print(motorout);
-    //Serial.print(",");
-    //Serial.print(md.getM1CurrentMilliamps());
-    //Serial.print(",");
-    //Serial.print(md.getM2CurrentMilliamps());
-    //Serial.println(",");
+    motorout0 = k*(Kp_angular*(newerror0) + Ki_angular*error_acumulado0*(delta_t) + Kd_angular*((newerror0 - olderror0)/(delta_t)));
+    motorout1 = k*(Kp_angular*(newerror1) + Ki_angular*error_acumulado1*(delta_t) + Kd_angular*((newerror1 - olderror1)/(delta_t)));
+    //Serial.println(Kp_angular);
+    //Serial.println("Estoy en el loop");
+    md.setM2Speed(90);
+    md.setM1Speed(90);
+    Serial.println(vel0);
+    Serial.println(md.getM1CurrentMilliamps());
  
   time_ant = newtime;
   olderror0 = newerror0;
   olderror1 = newerror1;
-}}
+  }
+}
+
+// Función que retorna la posición hasta donde está ubicado un número en lo entregado por Bluetooth
+float return_pos(int inicio, int length, String string)
+{
+  int j;
+  for(int i = inicio ; i<length ; i++)
+  {
+    if (string[i] == '$')
+        {
+          j = i;
+          break;
+         }
+  }
+  return j;
+}

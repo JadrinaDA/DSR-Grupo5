@@ -62,7 +62,7 @@ error_actual = np.array([0.0, 0.0])
 cap = cv2.VideoCapture(1)
 cap.set(cv2.CAP_PROP_FPS, fps)
 screen_to_real = 0.42
-clase.bt_send(f"KSA{1.0}${0.0}${0.0}$")
+clase.bt_send(f"KSA{1.2}${0.0}${0.05}$")
 
 bt_thread = threading.Thread(target = manage_bt, args = [clase], daemon = True)
 bt_thread.start()
@@ -111,7 +111,7 @@ while(1):
 
 
     # Mandamos señal de control
-    cont.ref = store_coor.ref_d
+    cont.ref = np.array(store_coor.ref_d)
     u0, u1 = cont.control(state)
     clase.bt_msg = f"REF{u0}${u1}$"
     clase.bt_signal = True
@@ -136,6 +136,8 @@ while(1):
     clase.current_frame = frame
     clase.mqtt_dict['error_lineal']=cont.error[0]
     clase.mqtt_dict['error_angular']=cont.error[1]
+    #print(cont.error[1]*180/np.pi)
+    print(cont.error[1]*180/np.pi)
     clase.mqtt_dict['u0']=u0
     clase.mqtt_dict['u1']=u1
     clase.mqtt_dict['ref']=store_coor.ref_d
