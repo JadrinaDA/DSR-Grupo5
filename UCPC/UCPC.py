@@ -130,6 +130,8 @@ while(1):
     circle_pos = 2*store_coor.ref_d[0], 2*store_coor.ref_d[1]
     cv2.circle(frame, circle_pos, 10,(0,0, 255), -1)
     cv2.line(frame, circle_pos, (int(y1),int(x1)), (255, 0, 0),5)
+    cv2.circle(frame, (y1,x1), 10,(0,255, 0), -1)
+    cv2.circle(frame, (y2,x2), 10,(100,50, 0), -1)
     # cv2.imshow('frame', frame)
 
     # Mostramos segmentaciones
