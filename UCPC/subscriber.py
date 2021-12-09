@@ -13,6 +13,7 @@ import parameters as p
 
 class Subscriber():
     def __init__(self, store_coor, port = None, fps = 10):
+        self.auto = False
         self.mqtt_dict = dict()
         self.fps = fps
         self.current_frame = None
@@ -49,8 +50,9 @@ class Subscriber():
         decoded_msg = str(msg.payload.decode('utf-8'))
         print(msg.topic + ' ' + decoded_msg)
         if decoded_msg[:3] == "SPD":
+            self.auto = False
             if self.bluetooth:
-                self.bt_send(decoded_msg[3:])
+                self.bt_send("REF" + decoded_msg[3:])
         elif decoded_msg[:3] == "CAM":
             t = threading.Thread(target=self.video)
             t.start()
@@ -60,6 +62,7 @@ class Subscriber():
             self.store_coor.click_event(int(float(x)),int(float(y)))
         
         elif decoded_msg[:3] == "KSA":
+            self.auto = True
             list_msg = decoded_msg[3:].split('$')
             list_msg = list(map(lambda x: float(x), list_msg))
             self.angular_constants = list_msg
@@ -69,6 +72,7 @@ class Subscriber():
             # self.bt_send(f"KSA{kpa}${kda}${kia}")
             
         elif decoded_msg[:3] == "KSL":
+            self.auto = True
             list_msg = decoded_msg[3:].split('$')
             try: 
                 list_msg = list(map(lambda x: float(x), list_msg))

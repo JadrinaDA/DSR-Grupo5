@@ -30,7 +30,8 @@ class Controler():
 
     def control(self, state):
         self.calculate_error(state)
-        av_error = self.average_error()
+        #av_error = self.average_error()
+        av_error = self.error
         # print(f"kpa: {self.kp_a}")
         #print(f"av_error_0: {av_error[0]}")s
         #u_0 = self.kp_l*av_error[0]   
@@ -78,6 +79,6 @@ class Controler():
         if not (self.past_ref == new_ref).all():
             self.ac_error = np.array([0.0, 0.0])
             self.past_ref = self.ref
-        else:
             self._ref = new_ref
+
 
