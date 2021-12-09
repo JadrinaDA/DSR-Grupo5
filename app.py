@@ -13,6 +13,7 @@ import cv2 as cv
 import threading
 import time
 import json
+import parameters as p
 
 lock = threading.Lock()
 frame = np.ones((160, 120, 3), np.uint8)
@@ -21,6 +22,7 @@ MQTT_BROKER = 'broker.mqttdashboard.com'
 MQTT_RECEIVE = "DSR5/CAM"
 MQTT_CAM = "DSR5/CAM"
 MQTT_DATA = "DSR5/DATA"
+idx_img = 0
 
 
 def show_camera():
@@ -42,14 +44,24 @@ def cam_on_connect(client, userdata, flags, rc):
 # The callback for when a PUBLISH message is received from the server.
 def cam_on_message(client, userdata, msg):
     global frame
+    global idx_img
     if msg.topic == MQTT_CAM:
-        # Decoding the message
-        img = base64.b64decode(msg.payload)
-        # converting into numpy array from buffer
-        npimg = np.frombuffer(img, dtype=np.uint8)
-        # Decode to Original Frame
-        frame = cv.imdecode(npimg, 1)
-    
+        # idx = int(msg.payload[:6].decode('utf8','strict'))
+        idx = int.from_bytes(msg.payload[:2],"little")
+        # print(f"idx: {idx}")
+        if idx > idx_img:
+            # Decoding the message
+            img = base64.b64decode(msg.payload[2:])
+            # converting into numpy array from buffer
+            npimg = np.frombuffer(img, dtype=np.uint8)
+            # Decode to Original Frame
+            frame = cv.imdecode(npimg, 1)
+            idx_img = idx
+        if idx > 290:
+        # if idx > 290:
+            idx_img = 0
+            print("Me di la vuelta")
+
     else:
         data = json.loads(msg.payload)
         #  print(data)

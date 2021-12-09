@@ -54,12 +54,12 @@ port = "/dev/cu.IRB-G01-SPPDev"
 
 store_coor = StoreCoor()
 # clase = Subscriber(store_coor, port)
-clase = Subscriber(store_coor, port)
+clase = Subscriber(store_coor)
     
 state = np.array([0.0, 0.0, 0.0])
 error_actual = np.array([0.0, 0.0])
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FPS, fps)
 screen_to_real = 0.42
 clase.bt_send(f"KSA{1.0}${0.0}${0.0}$")
@@ -108,7 +108,6 @@ while(1):
     # Actualizamos constantes
     cont.kp_a, cont.ki_a, cont.kd_a = clase.angular_constants
     cont.kp_l, cont.ki_l, cont.kd_l = clase.linear_constants
-
 
     # Mandamos señal de control
     cont.ref = store_coor.ref_d

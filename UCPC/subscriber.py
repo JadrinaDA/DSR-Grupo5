@@ -9,6 +9,7 @@ import numpy as np
 import json
 import base64
 import sys
+import parameters as p
 
 class Subscriber():
     def __init__(self, store_coor, port = None, fps = 10):
@@ -100,8 +101,8 @@ class Subscriber():
         # IP address
         MQTT_BROKER = 'broker.mqttdashboard.com'
         # Topic on which frame will be published
-        MQTT_CAM = "DSR5/CAM"
-        MQTT_DATA = "DSR5/DATA"
+        MQTT_CAM = p.MQTT_CAM
+        MQTT_DATA = p.MQTT_DATA
         # MQTT_CAM = "DSR5/CAM"
         # Object to capture the frames
         # cap = cv.VideoCapture(1)
@@ -113,7 +114,10 @@ class Subscriber():
         try:
             i = 0
             while True:
+                if i > 300:
+                # if i > 300: 
 
+                    i = 0
                 i += 1
                 # start = time.time()
                 # Read Frame
@@ -137,7 +141,12 @@ class Subscriber():
                 # print(f"Json: {json_data}")
 
                 # MQTT_SEND = "DSR5/CAM"
-                client.publish(MQTT_CAM, jpg_as_text)
+                # idx = str(i).zfill(5)[-5:]
+                idx_bytes = int(i).to_bytes(2,'little')
+                msg = idx_bytes + jpg_as_text
+                # print(f"idx: { int.from_bytes(msg[:2], 'little') }")
+                client.publish(MQTT_CAM, msg)
+
 
                 # MQTT_SEND = "DSR5/DATA"
 
