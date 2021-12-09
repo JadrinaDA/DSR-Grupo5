@@ -1,5 +1,6 @@
 const ppm = 400; // Pixeles por metro
 
+
 let elem = document.getElementById("feed");
     elem.onclick = function clickEvent(e){
         setRef(e);

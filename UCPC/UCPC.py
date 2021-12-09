@@ -1,10 +1,13 @@
 import time
+from numpy.core.defchararray import decode
 import serial
 import paho.mqtt.client as mqtt
 import cv2 as cv
 import base64
 import threading
-from seg_ref import run_cv, StoreCoor
+#from test_camara import run_cv, StoreCoor
+import numpy as np
+
 
 class Subscriber():
     def __init__(self, port = None):
@@ -18,8 +21,8 @@ class Subscriber():
         client.on_connect = self.on_connect
         client.on_message = self.on_message
 
-        client.connect('broker.mqttdashboard.com', 1883, 60)
-        client.loop_forever()
+        #client.connect('broker.mqttdashboard.com', 1883, 60)
+        #client.loop_forever()
 
     def on_connect(self, client, userdata, flags, rc):
         print('Se conectó con MQTT ' + str(rc))
@@ -36,6 +39,13 @@ class Subscriber():
             t.start()
         elif decoded_msg[:3] == "REF":
             store_coor.ref = (decoded_msg[3:])
+        
+        elif decoded_msg[:3] == "KSS":
+            list_msg = decoded_msg[3:].split('$')
+            kpa = list_msg[3]
+            kda = list_msg[4]
+            kia = list_msg[5]
+            self.bt_send(f"KSA{kpa}${kda}${kia}")
 
     def bt_send(self, msg):
         msgOnEncode = str.encode(msg)
@@ -43,10 +53,10 @@ class Subscriber():
         time.sleep(1)
         self.ser.write(msgOnEncode)
         time.sleep(1)
-        print("Mensaje enviado")
+        print(f"Mensaje enviado {msg}")
 
     def bt_connect(self, port):
-        # seria.Serial nos permite abrir el puerto COM deseado	
+        # seria.Serial nos permite abrir el puerto COM deseado  
         ser = serial.Serial(port, baudrate = 38400, timeout = 1)
         # Cuando se abre el puerto serial con el Arduino, este siempre se reinicia por lo que hay que esperar a que inicie para enviar los mensajes
         time.sleep(5)
@@ -93,9 +103,8 @@ class Subscriber():
             client.disconnect()
             print("\nNow you can restart fresh")
 
-port = "/dev/cu.IRB-G01-SPPDev"
+port = "COM5"
 #port = "/dev/cu.iPhonedeIgnacio-Wireles"
 
-sub = Subscriber()
-store_coor = StoreCoor()
-run_cv(store_coor)
+
+#sub = Subscriber(port)

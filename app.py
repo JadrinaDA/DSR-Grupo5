@@ -147,6 +147,7 @@ kd_a = 0.0
 
 horas = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00","17:00","18:00"]
 
+
 @app.route("/")
 def index():
     conn = get_db_connection()
@@ -196,6 +197,7 @@ def login():
         else:
             if user['password'] == request.form["password"]:
                 session['user_id'] = user["id"]
+                session['time_con'] = -1
                 return redirect("/main")
             else:
                 error = 'Contraseña incorrecta'
@@ -203,6 +205,13 @@ def login():
 
 @app.route("/exp")
 def exper():
+    if not session:
+        return redirect(url_for('index'))
+    if session['time_con'] != -1:
+        hour_n, min_n, sec_n = datetime.now().strftime("%H:%M:%S").split(':')
+        hour_c, min_c, sec_c = session['time_con'].split(':')
+        if int(hour_n) > int(hour_c):
+            session['time_con'] = -1
     conn = get_db_connection()
     exp = conn.execute('SELECT * FROM experiencias WHERE id = ?',
                         (1,)).fetchone()
@@ -224,7 +233,7 @@ def reg():
                 if 'major' not in request.form.keys() and request.form['inst'] == "UC" and request.form['carrera'] == "ing":
                   errors.append('Seleccione un major.')  
         if len(request.form['psw']) < 6:
-            errors.append('Contraseña debe ser mínmo 6 caracteres.')
+            errors.append('Contraseña debe ser mínimo 6 caracteres.')
         if (('@' not in request.form['email']) & ('.cl' not in request.form['email']) & ('.com' not in request.form['email'])) :
             errors.append('Correo no es valido.')
         if len(errors) > 0:
@@ -262,21 +271,59 @@ def res():
     hoy = full_date[0]
     if hoy[0] == "0":
         hoy = hoy[1:]
-        
-    if request.method == 'POST':
-        conn = get_db_connection()
-        conn.execute('INSERT INTO reservas (id_user, id_exp, fecha, hora) VALUES (?, ?, ?, ?)',
-         (user_id, request.form['id_exp'], request.form['dia'], request.form['hora']))
-        conn.commit()
-        conn.close()
-        return redirect(url_for('exps'))
+    dia_h, mes_h, año_h = hoy.split("/")
 
     conn = get_db_connection()
     taken = conn.execute('SELECT fecha, hora FROM reservas').fetchall()
+    users_res = conn.execute('SELECT * FROM reservas WHERE id_user = ?',
+                        (user_id,)).fetchall()
+    
     conn.close()
+
+    user = get_user(user_id)
+    if user['tipo'] == 'profesor':
+        is_teach = 1
+    else:
+        is_teach = 0
+        
+    if request.method == 'POST':
+
+        this_week = 0
+        this_month = 0
+        
+        dia_c, mes_c, año_c = request.form['dia'].split("/")
+        for res in users_res:
+            dia_r, mes_r, año_r = res['fecha'].split("/")
+            if abs(int(dia_r) - int(dia_c)) < 7:
+                this_week += 1
+            if mes_r == mes_c:
+                this_month += 1
+        # Check limit 
+        can_res = 1
+        if user['tipo'] == "alumno":
+            if user['robotica']:
+                if this_week >= 3:
+                    flash("Ya reservaste 3 horas esta semana.")
+                    can_res = 0
+            elif user['inst'] == "UC":
+                if this_week >= 1:
+                    flash("Ya reservaste una hora esta semana.")
+                    can_res = 0
+            else:
+                if this_month >= 1:
+                    flash("Ya reservaste una hora este mes.")
+                    can_res = 0
+
+        if can_res:
+            conn = get_db_connection()
+            conn.execute('INSERT INTO reservas (id_user, id_exp, fecha, hora) VALUES (?, ?, ?, ?)',
+             (user_id, request.form['id_exp'], request.form['dia'], request.form['hora']))
+            conn.commit()
+            conn.close()
+            return redirect(url_for('exps'))
+
     available = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00","17:00","18:00"]
     coming_up = []
-    dia_h, mes_h, año_h = hoy.split("/")
     for res in taken:
         dia_r, mes_r, año_r = res['fecha'].split("/")
         if ((dia_r >= dia_h) & (mes_r >= mes_h) & (año_r >= año_h)):
@@ -287,7 +334,8 @@ def res():
     for ress in coming_up:
         coming_up_dic += ress["fecha"] + "," + ress["hora"] + "*"
     coming_up_dic = coming_up_dic[:-1]
-    return render_template("reserva_horas/reserva.html", ava = available, taken = coming_up_dic)
+
+    return render_template("reserva_horas/reserva.html", ava = available, taken = coming_up_dic, is_teach = is_teach)
 
 
 @app.route("/cuenta", methods=('GET', 'POST'))
@@ -310,18 +358,28 @@ def perfil():
 
 @app.route("/sim", methods = ('GET', 'POST'))
 def sim():
+    if not session:
+        return redirect(url_for('index'))
     return render_template("Simulacion/simulacion_base_movil.html")
 
-@app.route('/experiencia_base_movil')
+@app.route('/experiencia_base_movil/s')
 def speed_index():
+    if not session:
+        return redirect(url_for('index'))
     return render_template('experiencia_base_movil/index.html')
 
 @app.route('/experiencia_base_movil', methods=['post', 'get'])
 def experiencia_base_movil():
+    if not session:
+        return redirect(url_for('index'))
     m1_speed = request.args.get('m1')
     m2_speed = request.args.get('m2')
-    send_message(f"{m1_speed}{m2_speed}000")
-    return render_template('experiencia_base_movil/index.html')
+    #send_message(f"{m1_speed}{m2_speed}000")
+    print(session['time_con'])
+    if session['time_con'] == -1:
+        print("beep")
+        session['time_con'] = datetime.now().strftime("%H:%M:%S");
+    return render_template('experiencia_base_movil/index.html', time_con = session['time_con'])
 
 @app.route("/setRef/<x>/<y>")
 def set_ref(x,y):
@@ -334,7 +392,7 @@ def set_ref(x,y):
     # POST request
     if request.method == 'POST':
         print(request.get_json())  # parse as JSON
-        return 'Sucesss', 200
+        return 'Success', 200
 
 @app.route('/camera', methods=['post', 'get'])
 def camera():

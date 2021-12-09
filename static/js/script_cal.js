@@ -1,4 +1,19 @@
 const date = new Date();
+document.getElementById('btn').onclick = changeSet;
+
+function changeSet() {
+	var button_set = document.getElementById('btn');
+	console.log("HI");
+	if (button_set.getAttribute('value') == 'enc'){
+		button_set.innerText = "Reservar para mi";
+		button_set.value = "res";
+		document.getElementById("is_enc").value =  0;}
+	else {
+		button_set.innerText = "Asignarse encargado";
+		document.getElementById("is_enc").value =  1;
+		button_set.value = "enc";
+	}
+}
 
 function changeSel(day) {
 	let val = day.innerText;
