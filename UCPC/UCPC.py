@@ -2,10 +2,11 @@ import threading
 import cv2
 import numpy as np
 from numpy.lib.function_base import average
-from scipy.ndimage import center_of_mass
+from scipy.ndimage import center_of_mass, gaussian_filter
 from subscriber import Subscriber
 from controler import Controler
 from store_coor import StoreCoor
+
 # import Filtro as filter
 
 '''
@@ -15,6 +16,9 @@ green = np.uint8([[[0,255,0 ]]])
 hsv_green = cv.cvtColor(green,cv.COLOR_BGR2HSV)
 print( hsv_green )
 '''
+
+bt = False
+cam = 0
 
 def mask_hsv(X,color):
     lb = np.array([0, 0, 0])
@@ -29,8 +33,8 @@ def mask_hsv(X,color):
         lb = np.array([110, 50, 70])
         ub = np.array([130, 255, 255])
     elif (color=="brown")or(color=="cafe"):
-        lb = np.array([10, 100, 20])
-        ub = np.array([15, 255, 255])
+        lb = np.array([11, 150, 30])
+        ub = np.array([21, 255, 100])
     return cv2.inRange(X,lb,ub)
 
 def angulo(p1, p2):
@@ -54,25 +58,33 @@ port = "/dev/cu.IRB-G01-SPPDev"
 #port = "/dev/cu.iPhonedeIgnacio-Wireles"
 
 store_coor = StoreCoor()
-# clase = Subscriber(store_coor, port)
-clase = Subscriber(store_coor)
+if bt:
+    clase = Subscriber(store_coor, port)
+else:
+    clase = Subscriber(store_coor)
     
 state = np.array([0.0, 0.0, 0.0])
 error_actual = np.array([0.0, 0.0])
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(cam)
 cap.set(cv2.CAP_PROP_FPS, fps)
 screen_to_real = 0.42
-clase.bt_send(f"KSA{10}${0.1}${0}$")
+clase.bt_send(f"KSA{10}${0.0001}${0}$")
 
 bt_thread = threading.Thread(target = manage_bt, args = [clase], daemon = True)
 bt_thread.start()
 
+i=90
 while(1):
+    i += 1
     ret, frame = cap.read()
     # frame = filter.FiltroTarea2(frame, 0.8,20,25)
     s = np.shape(frame)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    # if (100<i) and (i<200):
+    #     cv2.imwrite(f"imor_{i}.jpg",frame) 
+    #     print("guardando imagen")
 
     l = 5
     
@@ -85,6 +97,9 @@ while(1):
     
     # Brown mask
     brown_mask = mask_hsv(hsv, "brown")
+    # brown_mask = gaussian_filter(brown_mask, 2)
+
+
     x2, y2 = center_of_mass(brown_mask)
     if np.isnan(x2) or np.isnan(y2):
         x2, y2 = (0,0)
@@ -129,12 +144,14 @@ while(1):
     circle_pos = 2*store_coor.ref_d[0], 2*store_coor.ref_d[1]
     cv2.circle(frame, circle_pos, 10,(0,0, 255), -1)
     cv2.line(frame, circle_pos, (int(y1),int(x1)), (255, 0, 0),5)
-    cv2.circle(frame, (y1,x1), 10,(0,255, 0), -1)
-    cv2.circle(frame, (y2,x2), 10,(100,50, 0), -1)
+    cv2.circle(frame, (int(y1),int(x1)), 10,(0,255, 0), -1)
+    cv2.circle(frame, (int(y2),int(x2)), 10,(0,50, 100), -1)
     # cv2.imshow('frame', frame)
 
+
     # Mostramos segmentaciones
-    cv2.imshow('brown', brown_mask)
+    # cv2.imshow('brown', brown_mask)
+    cv2.imshow('frame', frame)
     cv2.imshow('green', green_mask)
 
     # Actualizamos frame actual y diccionario

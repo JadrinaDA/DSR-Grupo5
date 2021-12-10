@@ -11,6 +11,8 @@ class Controler():
         self.kp_a = kp_a
         self.kd_a = kd_a
         self.ki_a = ki_a
+        self.u_0 = 0
+        self.u_1 = 0
 
         self.error = [0.0, 0.0]
         self.past_error = [0.0, 0.0]
@@ -36,12 +38,12 @@ class Controler():
         #print(f"av_error_0: {av_error[0]}")s
         #u_0 = self.kp_l*av_error[0]   
 
-        u_0 = self.kp_l*av_error[0] - self.kp_a*av_error[1] + self.ki_l*self.ac_error[0]*self.dt - self.ki_a*self.ac_error[1]*self.dt + self.kd_l*(av_error[0]-self.past_error[0])/self.dt - self.kd_a*(av_error[1]-self.past_error[1])/self.dt
-        u_1 = self.kp_l*av_error[0] + self.kp_a*av_error[1] + self.ki_l*self.ac_error[0]*self.dt + self.ki_a*self.ac_error[1]*self.dt + self.kd_l*(av_error[0]-self.past_error[0])/self.dt + self.kd_a*(av_error[1]-self.past_error[1])/self.dt
+        self.u_0 = self.kp_l*av_error[0] - self.kp_a*av_error[1] + self.ki_l*self.ac_error[0]*self.dt - self.ki_a*self.ac_error[1]*self.dt + self.kd_l*(av_error[0]-self.past_error[0])/self.dt - self.kd_a*(av_error[1]-self.past_error[1])/self.dt
+        self.u_1 = self.kp_l*av_error[0] + self.kp_a*av_error[1] + self.ki_l*self.ac_error[0]*self.dt + self.ki_a*self.ac_error[1]*self.dt + self.kd_l*(av_error[0]-self.past_error[0])/self.dt + self.kd_a*(av_error[1]-self.past_error[1])/self.dt
         #u_1 = 0.0
         # print(f"acumulado 0: {self.ac_error[0]}")
         # print(f"pasado 0: {self.past_error[0]}")
-        return (-u_0,u_1) 
+        return (-self.u_0,self.u_1) 
     
     def average_error(self):
         res = list()

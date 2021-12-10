@@ -133,7 +133,7 @@ void loop()
 {
   float motorout0;
   float motorout1;
-
+  
   
   if ((micros() - time_ant) >= Period)
   {
@@ -193,7 +193,8 @@ void loop()
       ref_1 = instruccion.substring(j+1,l).toFloat(); 
     }
   }
-  
+
+  int maxu = 250;
   float delta_t = newtime - time_ant;
 
   //-----------------------------------
@@ -211,28 +212,45 @@ void loop()
     
     error_acumulado0  = error_acumulado0 + newerror0;
     error_acumulado1  = error_acumulado1 + newerror1;
+
+    error_acumulado0 =  min(max(error_acumulado0,-maxu/(Ki_angular*delta_t)), maxu/(Ki_angular*delta_t));
+    error_acumulado1 =  min(max(error_acumulado1,-maxu/(Ki_angular*delta_t)), maxu/(Ki_angular*delta_t));
+    
     oldposition0 = newposition0;
     oldposition1 = newposition1;
     
     
     int k = (400/350);
 
+    
+    
+    Serial.print("ref0  ");
+    Serial.print(ref_0);
+    Serial.print("   error0  ");
+    Serial.print(newerror0);
     motorout0 = k*(Kp_angular*(newerror0) + Ki_angular*error_acumulado0*(delta_t) + Kd_angular*((newerror0 - olderror0)/(delta_t)));
     motorout1 = k*(Kp_angular*(newerror1) + Ki_angular*error_acumulado1*(delta_t) + Kd_angular*((newerror1 - olderror1)/(delta_t)));
     //Serial.println(Kp_angular);
-    Serial.print("motorout0  ");
+    Serial.print("  motorout0  ");
     Serial.print(motorout0);
     //Serial.println("Estoy en el loop");
     Serial.print("  motorout1  ");
     Serial.print(motorout1);
-    Serial.print("vel0  ");
+    Serial.print("  vel0  ");
     Serial.print(vel0);
     //Serial.println("Estoy en el loop");
     Serial.print("  vel1  ");
-    Serial.println(vel1);
+    Serial.print(vel1);
+    motorout0 = min(max(motorout0,-maxu), maxu);
+    motorout1 = min(max(motorout1,-maxu), maxu);
     md.setM2Speed(motorout1);
     md.setM1Speed(motorout0);
     //Serial.println(md.getM1CurrentMilliamps());
+    Serial.print("  motorout0  ");
+    Serial.print(motorout0);
+    //Serial.println("Estoy en el loop");
+    Serial.print("  motorout1  ");
+    Serial.println(motorout1);
  
   time_ant = newtime;
   olderror0 = newerror0;

@@ -24,7 +24,6 @@ MQTT_CAM = "DSR5/CAM"
 MQTT_DATA = "DSR5/DATA"
 idx_img = 0
 
-
 def show_camera():
     global frame
     while True:
@@ -44,45 +43,20 @@ def cam_on_connect(client, userdata, flags, rc):
 # The callback for when a PUBLISH message is received from the server.
 def cam_on_message(client, userdata, msg):
     global frame
-    global idx_img
     if msg.topic == MQTT_CAM:
-        # idx = int(msg.payload[:6].decode('utf8','strict'))
-        idx = int.from_bytes(msg.payload[:2],"little")
-        # print(f"idx: {idx}")
-        if idx > idx_img:
-            # Decoding the message
-            img = base64.b64decode(msg.payload[2:])
-            # converting into numpy array from buffer
-            npimg = np.frombuffer(img, dtype=np.uint8)
-            # Decode to Original Frame
-            frame = cv.imdecode(npimg, 1)
-            idx_img = idx
-        if idx > 290:
-        # if idx > 290:
-            idx_img = 0
-            print("Me di la vuelta")
+        # idx = int.from_bytes(msg.payload[:2],"little")
+    
+        # Decoding the message
+        img = base64.b64decode(msg.payload[2:])
+        # converting into numpy array from buffer
+        npimg = np.frombuffer(img, dtype=np.uint8)
+        # Decode to Original Frame
+        frame = cv.imdecode(npimg, 1)
+
 
     else:
         data = json.loads(msg.payload)
         #  print(data)
-
-
-    # raw_text = base64.b64decode(msg.payload)
-    # npimg = np.frombuffer(raw_text, dtype=np.uint8)
-    # data = json.loads(raw_text)
-    # print(msg.payload)
-    # data = json.loads(msg.payload)
-    # print(data)
-    # img = base64.b64decode(data['img'])
-    # img_text = msg
-    
-
-    # # Decoding the message
-    # img = base64.b64decode(data['img'])
-    # # converting into numpy array from buffer
-    # npimg = np.frombuffer(img, dtype=np.uint8)
-    # # Decode to Original Frame
-    # frame = cv.imdecode(npimg, 1)
 
 def generate():
     # grab global references to the output frame and lock variables
@@ -147,8 +121,8 @@ def get_changes(user, form):
     return new
        
 def send_message(message):
-    client.connect('broker.mqttdashboard.com', 1883, 60)
-    client.publish('DSR5/1', message)
+    publisher.connect('broker.mqttdashboard.com', 1883, 60)
+    publisher.publish('DSR5/1', message)
 
 app = Flask(__name__)
 #CORS(app)
@@ -162,15 +136,22 @@ Payload.max_decode_packets = 500
 socketio = SocketIO(app, cors_allowed_origins='*', logger = True)
 simulation_list = []
 
-
 ref = np.array([0.0, 0.0])
 
-client = mqtt.Client()
+publisher = mqtt.Client()
 try:
-    client.connect('broker.mqttdashboard.com', 1883, 60)
+    publisher.connect('broker.mqttdashboard.com', 1883, 60)
 except:
     print("No se pudo conectar al MQTT")
 
+cam_client = mqtt.Client()
+cam_client.on_connect = cam_on_connect
+cam_client.on_message = cam_on_message
+
+cam_client.connect(MQTT_BROKER)
+
+# Starting thread which will receive the frames
+cam_client.loop_start()
 
 kp_l = 0.0 # 0.01
 ki_l = 0.0
@@ -356,6 +337,72 @@ def experiencia_base_movil():
     send_message(f"SPD{m1_speed}${m2_speed}$")
     return render_template('experiencia_base_movil/index.html')
 
+@app.route('/experiencia_base_movil/set_arduino_k', methods=['POST', 'GET'])
+def constantes_arduino():
+    if request.method == "POST":
+        kp = request.args.get('kp')
+        ki = request.args.get('ki')
+        kd = request.args.get('kd')
+        print(f"contantes recibidas: {kp}, {ki}, {kd}")
+        send_message(f"KAR{kp}${kd}${ki}")
+        return render_template('experiencia_base_movil/index.html')
+
+# RECEPCION DE INFORMACION DE VARIABLES DE LA EXPERIENCIA
+@app.route('/experiencia_base_movil/arduino_constants', methods=['POST', 'GET'])
+def arduino_constants():
+    if request.method == 'POST':
+        print(request.get_json())
+        data = request.get_json()
+        kp = data['kp']
+        ki = data['ki']
+        kd = data['kd']
+        send_message(f"KAR{kp}${kd}${ki}")
+
+        return 'OK', 200
+
+@app.route('/experiencia_base_movil/main_control_constants', methods=['POST', 'GET'])
+def main_control_constants():
+    if request.method == 'POST':
+        print(request.get_json())
+        data = request.get_json()
+
+        kpl = data['kpl']
+        kil = data['kil']
+        kdl = data['kdl']
+        
+        kpa = data['kpa']
+        kia = data['kia']
+        kda = data['kda']
+        # send_message(f"K{kpl}${kdl}${kil}${kpa}${kda}${kia}$")
+        send_message(f"KSL{kpl}${kil}${kdl}")
+        print("KSL enviado")
+        time.sleep(1)
+        send_message(f"KSA{kpa}${kia}${kda}")
+        print("KSA enviado")
+        print()
+
+        return 'OK', 200
+
+@app.route('/experiencia_base_movil/motor_speeds', methods=['POST', 'GET'])
+def motor_speeds():
+    if request.method == 'POST':
+        print(request.get_json())
+        data = request.get_json()
+        m1_speed = data['m1']
+        m2_speed = data['m2']
+        send_message(f"SPD{m1_speed}${m2_speed}$")
+        
+        return 'OK', 200
+
+@app.route('/experiencia_base_movil/open_camera', methods=['POST', 'GET'])
+def open_camera():
+    if request.method == 'POST':
+        print(request.get_data)
+
+        send_message('CAM')
+        
+        return 'OK', 200
+
 @app.route('/experiencia_base_movil/set_constants', methods=['post', 'get'])
 def set_exp_constants():
     kpl = request.args.get('kpl')
@@ -389,19 +436,7 @@ def set_ref(x,y):
 
 @app.route('/camera', methods=['post', 'get'])
 def camera():
-    # Abrir pantalla de stream
     send_message('CAM')
-
-    client = mqtt.Client()
-    client.on_connect = cam_on_connect
-    client.on_message = cam_on_message
-
-    client.connect(MQTT_BROKER)
-
-    # Starting thread which will receive the frames
-    client.loop_start()
-    # t = threading.Thread(target=show_camera)
-    # t.start()
     return render_template('experiencia_base_movil/index.html')
 
 @app.route("/cuenta/exp")

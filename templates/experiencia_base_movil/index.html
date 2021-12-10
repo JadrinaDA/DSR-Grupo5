@@ -25,7 +25,7 @@
           <h2>Camara Laboratorio</h2>
           <img id = "labcam" src="{{ url_for('video_feed') }}">
           
-          <form action="/camera">
+          <form action="/camera" id = "open_camera">
             <input type="submit" value="Open camera">
           </form>
           
@@ -36,7 +36,7 @@
 		<h2>Constantes PID</h2>
 		<p>Ingrese los valores deseados para las constantes del control PID del robot. A continuación, presione el botón "Enviar".</p>
 
-		<form action="/experiencia_base_movil/set_constants">
+		<form action="/experiencia_base_movil/set_constants" id="main_control_constants">
 
 			<div>
 				<h3>Control Distancia</h3>
@@ -74,17 +74,42 @@
       <h2>Velocidad Motores</h2>
 	  <p>Ingrese los valores deseados para la velocidad de cada motor del robot. A continuación, presione el botón "Enviar".</p>
 
-      <form action="/experiencia_base_movil/set_speed">
+      <form action="/experiencia_base_movil/set_speed" id = "motor_speeds">
         <label for="fname">M1 Speed:</label><br>
-        <input type="text" id="m1" name="m1"><br>
+        <input type="number" id="m1" name="m1" step = "any" value = 0><br>
         <label for="lname">M2 Speed:</label><br>
-        <input type="text" id="m2" name="m2"><br><br>
-        <input type="submit" value="Enviar">
+        <input type="text" id="m2" name="m2" step = "any" value = 0><br><br>
+        <input type="number" value="Enviar">
       </form> 
 
-
-	  <script src ="{{ url_for('static', filename = 'js/script_exp.js') }}"></script>
+	  <br>
 	
+	  <hr>
+		<h2>Constantes PID velocidad</h2>
+		<p>Ingrese las constantes para el control de velocidad realizado por el Arduino. A continuación, presione el botón "Enviar".</p>
+  
+		<form action="/experiencia_base_movil/set_arduino_k" id ="arduino_constants" method = "post">
+		<label for="kp">K<sub>p</sub>:</label>
+		<input type="number" id="kpar" name="kp" step = "any" value = 0><br>
+		
+		<label for="kp">K<sub>i</sub>:</label>
+		<input type="number" id="kiar" name="ki" step = "any" value = 0><br>
+		
+		<label for="kp">K<sub>d</sub>:</label>
+		<input type="number" id="kdar" name="kd" step = "any" value = 0><br>
+		<input type="submit" value="Enviar">
+		</form> 
+
+	
+		
+		<!--Jquery Cdn -->
+		<script src="https://code.jquery.com/jquery-3.5.1.js"
+		integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+		crossorigin="anonymous"></script>
+		
+		<script src ="{{ url_for('static', filename = 'js/script_exp.js') }}"></script>
+		<script src ="{{ url_for('static', filename = 'js/exp_forms.js') }}"></script>
+
 	</div>
 </body>
 </html>

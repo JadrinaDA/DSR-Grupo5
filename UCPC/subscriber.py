@@ -10,9 +10,11 @@ import json
 import base64
 import sys
 import parameters as p
+import random
 
 class Subscriber():
     def __init__(self, store_coor, port = None, fps = 10):
+        self.video_id = 0
         self.auto = False
         self.mqtt_dict = dict()
         self.fps = fps
@@ -102,6 +104,8 @@ class Subscriber():
         self.ser.close()
 
     def video(self):
+        this_video_id = random.randint(0, 100000)
+        self.video_id = this_video_id
         # IP address
         MQTT_BROKER = 'broker.mqttdashboard.com'
         # Topic on which frame will be published
@@ -117,7 +121,7 @@ class Subscriber():
         # counter = 0
         try:
             i = 0
-            while True:
+            while (this_video_id == self.video_id):
                 if i > 300:
                 # if i > 300: 
 
@@ -127,10 +131,12 @@ class Subscriber():
                 # Read Frame
                 # _, frame = cap.read()
                 frame = self.current_frame
+                
                 # Resize Frame
                 # frame = cv.resize(frame, [80, 120] )
                 # frame = cv.resize(frame, [160, 120] )
                 frame = cv.resize(frame, [320, 240] )
+                
                 # Encoding the Frame
                 _, buffer = cv.imencode('.jpg', frame)
                 # Converting into encoded bytes
@@ -150,6 +156,7 @@ class Subscriber():
                 msg = idx_bytes + jpg_as_text
                 # print(f"idx: { int.from_bytes(msg[:2], 'little') }")
                 client.publish(MQTT_CAM, msg)
+                print(i)
 
 
                 # MQTT_SEND = "DSR5/DATA"
