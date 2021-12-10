@@ -15,13 +15,6 @@ function updateConstants(k, index, array) {
     }
 }
 
-// if (urlParams.has('kpa'))
-// {
-//     document.getElementById("kpa").value = urlParams.get('kpa');
-// }
-
-
-
 let elem = document.getElementById("labcam");
 elem.onclick = function clickEvent(e){
     setRef(e);
@@ -52,3 +45,25 @@ function SetConstants(){
     let kda = document.getElementById("kd_a").value;
     fetch ('/experiencia_base_movil/set_constants'+'?kpl='+kpl+'&kil='+kil+'&kdl='+kdl+'&kpa='+kpa+'&kia='+kia+'&kda='+kda);
 }
+
+function getExpData(){
+    fetch('/experiencia_base_movil/exp_data')
+    .then(function (response) {
+        return response.json();
+    }).then(function (data) {
+        console.log('GET response text:');
+        console.log(data); // Print the greeting as text
+        if ('error_lineal' in data)
+        {
+            document.getElementById('error_dist').value = data['error_lineal']/ppm;  
+            document.getElementById('error_ang').value = data['error_angular']*180/Math.PI;  
+        }
+        if ('ref' in data)
+        {
+            document.getElementById('ref_x').value = data['ref'][0];
+            document.getElementById('ref_y').value = data['ref'][1];
+        } 
+    });
+}
+
+setInterval(getExpData, 1000);

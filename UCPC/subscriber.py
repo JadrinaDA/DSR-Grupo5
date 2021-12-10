@@ -68,10 +68,10 @@ class Subscriber():
             list_msg = decoded_msg[3:].split('$')
             list_msg = list(map(lambda x: float(x), list_msg))
             self.angular_constants = list_msg
-            # kpa = list_msg[0]
-            # kda = list_msg[1]
-            # kia = list_msg[2]
-            # self.bt_send(f"KSA{kpa}${kda}${kia}")
+            kpa = list_msg[0]
+            kda = list_msg[1]
+            kia = list_msg[2]
+            self.bt_send(f"KSA{kpa}${kda}${kia}")
             
         elif decoded_msg[:3] == "KSL":
             self.auto = True
@@ -82,6 +82,17 @@ class Subscriber():
             except: 
                 print("Favor ingrese valores numéricos")
                 print(f"Ingresado: {list_msg}")
+
+    def bt_receive(self):
+        if not self.port:
+            return
+        try:
+            encoded_msg = self.ser.readline()
+            msg = encoded_msg.decode('utf8', 'strict')
+            print(f"Mensaje recibido por BT: {msg}")
+        except Exception as e:
+            print("\nError de Recepcion BT")
+            print(e)
 
     def bt_send(self, msg):
         if not self.port:

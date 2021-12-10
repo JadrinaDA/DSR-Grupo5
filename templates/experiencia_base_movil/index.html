@@ -79,7 +79,7 @@
         <input type="number" id="m1" name="m1" step = "any" value = 0><br>
         <label for="lname">M2 Speed:</label><br>
         <input type="text" id="m2" name="m2" step = "any" value = 0><br><br>
-        <input type="number" value="Enviar">
+        <input type="submit" value="Enviar">
       </form> 
 
 	  <br>
@@ -110,6 +110,28 @@
 		<script src ="{{ url_for('static', filename = 'js/script_exp.js') }}"></script>
 		<script src ="{{ url_for('static', filename = 'js/exp_forms.js') }}"></script>
 
+		
+		</div>
+	<div class = "right-sidenav">
+		<h2>Datos</h2>
+		<p>A continuación se muestran datos relevantes de la experiencia.</p>
+		
+		<h3>Errores</h3>
+		<label for="error_distancia">Error distancia:</label>
+		<input type="number" id="error_dist" disabled><br>
+
+		<label for="error_angulo">Error ángulo:</label>
+		<input type="number" id="error_ang" disabled><br>
+
+		<h3>Referencia</h3>
+		<label for="ref">x:</label>
+		<input type="number" id="ref_x" disabled><br>
+		<label for="ref">y:</label>
+		<input type="number" id="ref_y" disabled><br>
+
+
+
+	</div>
 	</div>
 </body>
 </html>

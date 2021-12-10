@@ -55,9 +55,9 @@ class Controler():
         return res
 
     def calculate_error(self, state):
-        d = np.linalg.norm(self.ref-state[0:2])
-        # a = state[2]-np.pi/2+np.arctan2(ref[0]-state[0],ref[1]-state[1])
         a = np.arctan2(self.ref[0]-state[0], self.ref[1]-state[1]) + np.pi - state[2]
+        d = np.linalg.norm(self.ref-state[0:2]) * np.cos(a)
+        # a = state[2]-np.pi/2+np.arctan2(ref[0]-state[0],ref[1]-state[1])
         '''
         if (a<-np.pi)and(a>-3*np.pi/2):
             a+= 2*np.pi

@@ -2,6 +2,7 @@ char msgEnd = '\r\n';
 String instruccion;
 bool newMsg = false;
 #include "DualVNH5019MotorShield.h"
+#include "ArduinoJson.h"
 DualVNH5019MotorShield md;
 // Definición de PINs
 #define encoder0PinA  19
@@ -48,6 +49,14 @@ float Kd_angular = 0;
 float Kp_lineal = 0;
 float Ki_lineal = 0;
 float Kd_lineal = 0;
+
+// Diccionario a enviar por BT
+DynamicJsonDocument dict(1024);
+char json_dict[1024]; 
+
+unsigned long previousMillis = millis();
+int sending_inverval = 100; // ms
+
 //-----------------------------------
 // CONFIGURANDO INTERRUPCIONES
 void doEncoder0A()
@@ -133,6 +142,8 @@ void loop()
 {
   float motorout0;
   float motorout1;
+
+  unsigned long currentMillis = millis();
   
   
   if ((micros() - time_ant) >= Period)
@@ -251,7 +262,20 @@ void loop()
     //Serial.println("Estoy en el loop");
     Serial.print("  motorout1  ");
     Serial.println(motorout1);
- 
+
+    dict["M1"] = motorout0;
+    dict["M2"] = motorout1;
+
+    serializeJson(dict, json_dict);
+
+    //Serial3.println(json_dict);
+    //Serial3.println("Que ondax");
+    Serial.println(json_dict);
+    if(millis() - previousMillis > sending_inverval) {
+     previousMillis = millis();
+    Serial3.print(json_dict);
+    }
+  
   time_ant = newtime;
   olderror0 = newerror0;
   olderror1 = newerror1;

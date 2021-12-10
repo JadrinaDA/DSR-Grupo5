@@ -124,9 +124,7 @@ $(document).on('submit','#main_control_constants',function(e)
 
 		// Should be 'OK' if everything was successful
 		console.log(text);
-		});
-		
-		
+		});	
 	  });
 
 

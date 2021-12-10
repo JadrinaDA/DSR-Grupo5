@@ -1,4 +1,5 @@
 import threading
+from time import sleep
 import cv2
 import numpy as np
 from numpy.lib.function_base import average
@@ -17,8 +18,8 @@ hsv_green = cv.cvtColor(green,cv.COLOR_BGR2HSV)
 print( hsv_green )
 '''
 
-bt = False
-cam = 0
+bt = True
+cam = 1
 
 def mask_hsv(X,color):
     lb = np.array([0, 0, 0])
@@ -51,6 +52,13 @@ def manage_bt(sub):
         if sub.bt_signal:
             sub.bt_send(sub.bt_msg)
             sub.bt_signal = False
+        
+
+def bt_receive(sub):
+    while True:
+        sub.bt_receive()
+        sleep(0.2)
+
 
 fps = 10
 cont = Controler(1/fps)  
@@ -73,6 +81,9 @@ clase.bt_send(f"KSA{10}${0.0001}${0}$")
 
 bt_thread = threading.Thread(target = manage_bt, args = [clase], daemon = True)
 bt_thread.start()
+
+bt_rec_thread = threading.Thread(target = bt_receive, args = [clase], daemon = True)
+bt_rec_thread.start()
 
 i=90
 while(1):
@@ -98,8 +109,6 @@ while(1):
     # Brown mask
     brown_mask = mask_hsv(hsv, "brown")
     # brown_mask = gaussian_filter(brown_mask, 2)
-
-
     x2, y2 = center_of_mass(brown_mask)
     if np.isnan(x2) or np.isnan(y2):
         x2, y2 = (0,0)
@@ -151,8 +160,9 @@ while(1):
 
     # Mostramos segmentaciones
     # cv2.imshow('brown', brown_mask)
-    cv2.imshow('frame', frame)
-    cv2.imshow('green', green_mask)
+
+    # cv2.imshow('frame', frame)
+    # cv2.imshow('green', green_mask)
 
     # Actualizamos frame actual y diccionario
     error = cont.error
