@@ -19,7 +19,7 @@ print( hsv_green )
 '''
 
 bt = True
-cam = 1
+cam = 0
 
 def mask_hsv(X,color):
     lb = np.array([0, 0, 0])
@@ -34,8 +34,8 @@ def mask_hsv(X,color):
         lb = np.array([110, 50, 70])
         ub = np.array([130, 255, 255])
     elif (color=="brown")or(color=="cafe"):
-        lb = np.array([11, 150, 30])
-        ub = np.array([21, 255, 100])
+        lb = np.array([3, 150, 30])
+        ub = np.array([20, 255, 120])
     return cv2.inRange(X,lb,ub)
 
 def angulo(p1, p2):
@@ -104,7 +104,7 @@ while(1):
     x1, y1 = center_of_mass(green_mask)
     if np.isnan(x1) or np.isnan(y1):
         x1, y1 = (0,0)
-    green_mask[int(x1)-l:int(x1)+l,int(y1)-l:int(y1)+l] = 0
+    # green_mask[int(x1)-l:int(x1)+l,int(y1)-l:int(y1)+l] = 0
     
     # Brown mask
     brown_mask = mask_hsv(hsv, "brown")
@@ -112,7 +112,7 @@ while(1):
     x2, y2 = center_of_mass(brown_mask)
     if np.isnan(x2) or np.isnan(y2):
         x2, y2 = (0,0)
-    brown_mask[int(x2)-l:int(x2)+l,int(y2)-l:int(y2)+l] = 0
+    # brown_mask[int(x2)-l:int(x2)+l,int(y2)-l:int(y2)+l] = 0
 
     a = angulo((x1,y1), (x2,y2))
     # print(f"Angulo: {a*180/ np.pi}")
