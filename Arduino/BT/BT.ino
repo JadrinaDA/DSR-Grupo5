@@ -55,7 +55,7 @@ DynamicJsonDocument dict(1024);
 char json_dict[1024]; 
 
 unsigned long previousMillis = millis();
-int sending_inverval = 100; // ms
+int sending_inverval = 1000; // ms
 
 //-----------------------------------
 // CONFIGURANDO INTERRUPCIONES
@@ -230,17 +230,17 @@ void loop()
     oldposition0 = newposition0;
     oldposition1 = newposition1;
     
-    
     int k = (400/350);
 
-    
-    
+    /*
     Serial.print("ref0  ");
     Serial.print(ref_0);
     Serial.print("   error0  ");
     Serial.print(newerror0);
+    */
     motorout0 = k*(Kp_angular*(newerror0) + Ki_angular*error_acumulado0*(delta_t) + Kd_angular*((newerror0 - olderror0)/(delta_t)));
     motorout1 = k*(Kp_angular*(newerror1) + Ki_angular*error_acumulado1*(delta_t) + Kd_angular*((newerror1 - olderror1)/(delta_t)));
+    /*
     //Serial.println(Kp_angular);
     Serial.print("  motorout0  ");
     Serial.print(motorout0);
@@ -252,28 +252,37 @@ void loop()
     //Serial.println("Estoy en el loop");
     Serial.print("  vel1  ");
     Serial.print(vel1);
+    */
+ 
     motorout0 = min(max(motorout0,-maxu), maxu);
     motorout1 = min(max(motorout1,-maxu), maxu);
     md.setM2Speed(motorout1);
     md.setM1Speed(motorout0);
+    
     //Serial.println(md.getM1CurrentMilliamps());
+
+    /*
     Serial.print("  motorout0  ");
     Serial.print(motorout0);
     //Serial.println("Estoy en el loop");
     Serial.print("  motorout1  ");
     Serial.println(motorout1);
+    */
 
     dict["M1"] = motorout0;
     dict["M2"] = motorout1;
-
+    dict["vel1"] = vel0;
+    dict["vel2"] = vel1;
+    
     serializeJson(dict, json_dict);
 
     //Serial3.println(json_dict);
     //Serial3.println("Que ondax");
-    Serial.println(json_dict);
+    //Serial.println(json_dict);
     if(millis() - previousMillis > sending_inverval) {
      previousMillis = millis();
-    Serial3.print(json_dict);
+    Serial3.println(json_dict);
+    Serial.println(json_dict);
     }
   
   time_ant = newtime;

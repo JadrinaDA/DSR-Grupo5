@@ -23,6 +23,7 @@ MQTT_BROKER = 'broker.mqttdashboard.com'
 MQTT_RECEIVE = "DSR5/CAM"
 MQTT_CAM = "DSR5/CAM"
 MQTT_DATA = "DSR5/DATA"
+MQTT_ARD = "DSR5/ARD"
 idx_img = 0
 
 def show_camera():
@@ -39,7 +40,7 @@ def cam_on_connect(client, userdata, flags, rc):
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe([(MQTT_CAM,1) , (MQTT_DATA,1)])
+    client.subscribe([(MQTT_CAM,1) , (MQTT_DATA,1) , (MQTT_ARD, 1)])
 
 # The callback for when a PUBLISH message is received from the server.
 def cam_on_message(client, userdata, msg):
@@ -54,9 +55,13 @@ def cam_on_message(client, userdata, msg):
         # Decode to Original Frame
         frame = cv.imdecode(npimg, 1)
 
-    else:
+    elif msg.topic == MQTT_DATA:
         exp_data = json.loads(msg.payload)
-        print(exp_data)
+        # print(exp_data)
+
+    elif msg.topic == MQTT_ARD:
+        ard_data = json.loads(msg.payload)
+        print(ard_data)
 
 def generate():
     # grab global references to the output frame and lock variables

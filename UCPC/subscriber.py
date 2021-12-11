@@ -83,16 +83,6 @@ class Subscriber():
                 print("Favor ingrese valores numéricos")
                 print(f"Ingresado: {list_msg}")
 
-    def bt_receive(self):
-        if not self.port:
-            return
-        try:
-            encoded_msg = self.ser.readline()
-            msg = encoded_msg.decode('utf8', 'strict')
-            print(f"Mensaje recibido por BT: {msg}")
-        except Exception as e:
-            print("\nError de Recepcion BT")
-            print(e)
 
     def bt_send(self, msg):
         if not self.port:
@@ -103,6 +93,27 @@ class Subscriber():
         self.ser.write(msgOnEncode)
         time.sleep(1)
         print(f"Mensaje enviado {msg}")
+
+    def bt_receive(self):
+        if not self.port:
+            return
+        try:
+            MQTT_BROKER = 'broker.mqttdashboard.com'
+            MQTT_DATA = p.MQTT_ARD
+
+            client = mqtt.Client()
+            # Establishing Connection with the Broker
+            client.connect(MQTT_BROKER)
+            encoded_msg = self.ser.readline()
+            msg = encoded_msg.decode('utf8', 'strict')
+            print(f"Mensaje recibido por BT: {msg}")
+            client.publish(MQTT_DATA, msg)
+            # data = json.loads(msg)
+            # print(f"keys: {data.keys()}")
+
+        except Exception as e:
+            print("\nError de Recepcion BT")
+            print(e)
 
     def bt_connect(self, port):
         # seria.Serial nos permite abrir el puerto COM deseado	
@@ -167,7 +178,7 @@ class Subscriber():
                 msg = idx_bytes + jpg_as_text
                 # print(f"idx: { int.from_bytes(msg[:2], 'little') }")
                 client.publish(MQTT_CAM, msg)
-                print(i)
+                # print(i)
 
 
                 # MQTT_SEND = "DSR5/DATA"
