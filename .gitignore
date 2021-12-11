@@ -4,4 +4,4 @@ Web/requirements.txt
 *.DS_Store
 flask_session/
 UCPC/__pycache__/
-*pyc
+*.pyc

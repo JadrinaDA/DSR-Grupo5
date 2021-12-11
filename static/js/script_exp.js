@@ -58,10 +58,30 @@ function getExpData(){
             document.getElementById('error_dist').value = data['error_lineal']/ppm;  
             document.getElementById('error_ang').value = data['error_angular']*180/Math.PI;  
         }
-        if ('ref' in data)
+        // if ('ref' in data)
+        // {
+        //     document.getElementById('ref_x').value = data['ref'][0];
+        //     document.getElementById('ref_y').value = data['ref'][1];
+        // } 
+    });
+}
+
+function getArdData(){
+    fetch('/experiencia_base_movil/ard_data')
+    .then(function (response) {
+        return response.json();
+    }).then(function (data) {
+        console.log('GET response text:');
+        console.log(data); // Print the greeting as text
+        if ('M1' in data)
         {
-            document.getElementById('ref_x').value = data['ref'][0];
-            document.getElementById('ref_y').value = data['ref'][1];
+            document.getElementById('M1').value = data['M1']/ppm;  
+            document.getElementById('M2').value = data['M2']*180/Math.PI;  
+        }
+        if ('vel1' in data)
+        {
+            document.getElementById('vel1').value = data['vel1'][0];
+            document.getElementById('vel2').value = data['vel2'][1];
         } 
     });
 }

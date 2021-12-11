@@ -18,7 +18,7 @@ hsv_green = cv.cvtColor(green,cv.COLOR_BGR2HSV)
 print( hsv_green )
 '''
 
-bt = True
+bt = False
 cam = 0
 
 def mask_hsv(X,color):
@@ -37,6 +37,18 @@ def mask_hsv(X,color):
         lb = np.array([3, 150, 30])
         ub = np.array([20, 255, 120])
     return cv2.inRange(X,lb,ub)
+
+def center_of_mass_area(mask):
+    kernel = np.ones((5,5), np.uint8)  
+    img_dilation = cv2.dilate(mask, kernel, iterations=1)  
+    img_erosion = cv2.erode(img_dilation, kernel, iterations=1)  
+    contours, hierarchy = cv2.findContours(img_erosion, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    sorted_contours= sorted(contours, key=cv2.contourArea, reverse= True)
+    largest_item= sorted_contours[0]
+    M = cv2.moments(largest_item)
+    cX = int(M["m10"] / M["m00"])
+    cY = int(M["m01"] / M["m00"])
+    return (cX, cY)
 
 def angulo(p1, p2):
     # a = np.arctan2(p2[1]-p1[1], p2[0]-p1[0]) + np.pi/2
@@ -109,7 +121,7 @@ while(1):
     # Brown mask
     brown_mask = mask_hsv(hsv, "brown")
     # brown_mask = gaussian_filter(brown_mask, 2)
-    x2, y2 = center_of_mass(brown_mask)
+    x2, y2 = center_of_mass_area(brown_mask)
     if np.isnan(x2) or np.isnan(y2):
         x2, y2 = (0,0)
     # brown_mask[int(x2)-l:int(x2)+l,int(y2)-l:int(y2)+l] = 0

@@ -18,6 +18,7 @@ import parameters as p
 lock = threading.Lock()
 frame = np.ones((160, 120, 3), np.uint8)
 exp_data = dict()
+ard_data = dict()
 
 MQTT_BROKER = 'broker.mqttdashboard.com'
 MQTT_RECEIVE = "DSR5/CAM"
@@ -46,6 +47,7 @@ def cam_on_connect(client, userdata, flags, rc):
 def cam_on_message(client, userdata, msg):
     global frame
     global exp_data
+    global ard_data
     if msg.topic == MQTT_CAM:
         # idx = int.from_bytes(msg.payload[:2],"little")
         # Decoding the message
@@ -61,7 +63,7 @@ def cam_on_message(client, userdata, msg):
 
     elif msg.topic == MQTT_ARD:
         ard_data = json.loads(msg.payload)
-        print(ard_data)
+        # print(ard_data)
 
 def generate():
     # grab global references to the output frame and lock variables
@@ -413,6 +415,12 @@ def send_exp_data():
     global exp_data
     print(f"DATOS ENVIADOS: \n {exp_data}\n")
     return jsonify(exp_data)
+
+@app.route('/experiencia_base_movil/ard_data', methods = ['GET'] )
+def send_ard_data():
+    global ard_data
+    print(f"DATOS ENVIADOS: \n {ard_data}\n")
+    return jsonify(ard_data)
 
 @app.route('/experiencia_base_movil/set_constants', methods=['post', 'get'])
 def set_exp_constants():
