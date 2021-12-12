@@ -1,6 +1,7 @@
 document.getElementById("institucion").onchange = changeListenerCar;
 document.getElementById("cargo").onchange = changeListenerCar;
 document.getElementById("carrera").onchange = changeListenerMaj;
+
   
   function changeListenerCar(){
     var ins = document.getElementById("institucion").value;
