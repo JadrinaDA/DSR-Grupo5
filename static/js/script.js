@@ -12,6 +12,12 @@ document.getElementById("carrera").onchange = changeListenerMaj;
     }else{
         document.getElementById("carrera_div").style.display="none";
     }
+    if (ins == "UC" && cargo == "profesor"){
+      document.getElementById("es_robotica_div").style.display="block";
+  }else{
+      document.getElementById("es_robotica_div").style.display="none";
+  }
+    
   }
 
   function changeListenerMaj(){

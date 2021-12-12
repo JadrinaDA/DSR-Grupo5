@@ -172,7 +172,6 @@ while(1):
     cv2.circle(frame, (int(y2),int(x2)), 10,(0,50, 100), -1)  # Brown Circle
     # cv2.imshow('frame', frame)
 
-
     # Mostramos segmentaciones
     # cv2.imshow('brown', brown_mask)
 
