@@ -1,31 +1,32 @@
 from flask import Flask, render_template, request, jsonify, session
 from flask_session import Session
-
 import numpy as np
 from flask_socketio import SocketIO, send
 from engineio.payload import Payload
-
 from werkzeug.exceptions import abort
-
-
 import threading
-
 import sqlite3
 from flask import Flask, render_template, url_for, flash, redirect, Response
-
 import paho.mqtt.client as mqtt
-
 import base64
 import cv2 as cv
-
 import threading
+import time
+import json
+import parameters as p
 
 lock = threading.Lock()
-frame = np.ones((80, 120, 3), np.uint8)
 whos_there = "N"
+frame = np.ones((160, 120, 3), np.uint8)
+exp_data = dict()
+ard_data = dict()
 
 MQTT_BROKER = 'broker.mqttdashboard.com'
 MQTT_RECEIVE = "DSR5/CAM"
+MQTT_CAM = "DSR5/CAM"
+MQTT_DATA = "DSR5/DATA"
+MQTT_ARD = "DSR5/ARD"
+idx_img = 0
 
 def show_camera():
     global frame
@@ -41,18 +42,29 @@ def cam_on_connect(client, userdata, flags, rc):
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe(MQTT_RECEIVE)
-
+    client.subscribe([(MQTT_CAM,1) , (MQTT_DATA,1) , (MQTT_ARD, 1)])
 
 # The callback for when a PUBLISH message is received from the server.
 def cam_on_message(client, userdata, msg):
     global frame
-    # Decoding the message
-    img = base64.b64decode(msg.payload)
-    # converting into numpy array from buffer
-    npimg = np.frombuffer(img, dtype=np.uint8)
-    # Decode to Original Frame
-    frame = cv.imdecode(npimg, 1)
+    global exp_data
+    global ard_data
+    if msg.topic == MQTT_CAM:
+        # idx = int.from_bytes(msg.payload[:2],"little")
+        # Decoding the message
+        img = base64.b64decode(msg.payload[2:])
+        # converting into numpy array from buffer
+        npimg = np.frombuffer(img, dtype=np.uint8)
+        # Decode to Original Frame
+        frame = cv.imdecode(npimg, 1)
+
+    elif msg.topic == MQTT_DATA:
+        exp_data = json.loads(msg.payload)
+        # print(exp_data)
+
+    elif msg.topic == MQTT_ARD:
+        ard_data = json.loads(msg.payload)
+        # print(ard_data)
 
 def generate():
     # grab global references to the output frame and lock variables
@@ -126,8 +138,8 @@ def get_changes(user, form):
     return new
        
 def send_message(message):
-    client.connect('broker.mqttdashboard.com', 1883, 60)
-    client.publish('DSR5/1', message)
+    publisher.connect('broker.mqttdashboard.com', 1883, 60)
+    publisher.publish('DSR5/1', message)
 
 
 app = Flask(__name__)
@@ -142,12 +154,22 @@ Payload.max_decode_packets = 500
 socketio = SocketIO(app, cors_allowed_origins='*', logger = True)
 simulation_list = []
 
-
 ref = np.array([0.0, 0.0])
 
-client = mqtt.Client()
-client.connect('broker.mqttdashboard.com', 1883, 60)
+publisher = mqtt.Client()
+try:
+    publisher.connect('broker.mqttdashboard.com', 1883, 60)
+except:
+    print("No se pudo conectar al MQTT")
 
+cam_client = mqtt.Client()
+cam_client.on_connect = cam_on_connect
+cam_client.on_message = cam_on_message
+
+cam_client.connect(MQTT_BROKER)
+
+# Starting thread which will receive the frames
+cam_client.loop_start()
 
 kp_l = 0.0 # 0.01
 ki_l = 0.0
@@ -377,7 +399,6 @@ def res():
 
     return render_template("reserva_horas/reserva.html", ava = available, taken = coming_up_dic, is_teach = is_teach)
 
-
 @app.route("/cuenta", methods=('GET', 'POST'))
 def perfil():
     if not session:
@@ -408,7 +429,7 @@ def speed_index():
         return redirect(url_for('index'))
     return render_template('experiencia_base_movil/index.html')
 
-@app.route('/experiencia_base_movil', methods=['post', 'get'])
+@app.route('/experiencia_base_movil/set_speed', methods=['post', 'get'])
 def experiencia_base_movil():
     if not session:
         return redirect(url_for('index'))
@@ -419,14 +440,111 @@ def experiencia_base_movil():
     if session['time_con'] == -1:
         print("beep")
         session['time_con'] = datetime.now().strftime("%H:%M:%S");
+    send_message(f"SPD{m1_speed}${m2_speed}$")
     return render_template('experiencia_base_movil/index.html', time_con = session['time_con'], wt = whos_there)
+
+@app.route('/experiencia_base_movil/set_arduino_k', methods=['POST', 'GET'])
+def constantes_arduino():
+    if request.method == "POST":
+        kp = request.args.get('kp')
+        ki = request.args.get('ki')
+        kd = request.args.get('kd')
+        print(f"contantes recibidas: {kp}, {ki}, {kd}")
+        send_message(f"KAR{kp}${kd}${ki}")
+        return render_template('experiencia_base_movil/index.html')
+
+# RECEPCION DE INFORMACION DE VARIABLES DE LA EXPERIENCIA
+@app.route('/experiencia_base_movil/arduino_constants', methods=['POST', 'GET'])
+def arduino_constants():
+    if request.method == 'POST':
+        print(request.get_json())
+        data = request.get_json()
+        kp = data['kp']
+        ki = data['ki']
+        kd = data['kd']
+        send_message(f"KAR{kp}${kd}${ki}")
+
+        return 'OK', 200
+
+@app.route('/experiencia_base_movil/main_control_constants', methods=['POST', 'GET'])
+def main_control_constants():
+    if request.method == 'POST':
+        print(request.get_json())
+        data = request.get_json()
+
+        kpl = data['kpl']
+        kil = data['kil']
+        kdl = data['kdl']
+        
+        kpa = data['kpa']
+        kia = data['kia']
+        kda = data['kda']
+        # send_message(f"K{kpl}${kdl}${kil}${kpa}${kda}${kia}$")
+        send_message(f"KSL{kpl}${kil}${kdl}")
+        print("KSL enviado")
+        time.sleep(1)
+        send_message(f"KSA{kpa}${kia}${kda}")
+        print("KSA enviado")
+        print()
+
+        return 'OK', 200
+
+@app.route('/experiencia_base_movil/motor_speeds', methods=['POST', 'GET'])
+def motor_speeds():
+    if request.method == 'POST':
+        print(request.get_json())
+        data = request.get_json()
+        m1_speed = data['m1']
+        m2_speed = data['m2']
+        send_message(f"SPD{m1_speed}${m2_speed}$")
+        
+        return 'OK', 200
+
+@app.route('/experiencia_base_movil/open_camera', methods=['POST', 'GET'])
+def open_camera():
+    if request.method == 'POST':
+        print(request.get_data)
+
+        send_message('CAM')
+        
+        return 'OK', 200
+
+@app.route('/experiencia_base_movil/exp_data', methods = ['GET'] )
+def send_exp_data():
+    global exp_data
+    print(f"DATOS ENVIADOS: \n {exp_data}\n")
+    return jsonify(exp_data)
+
+@app.route('/experiencia_base_movil/ard_data', methods = ['GET'] )
+def send_ard_data():
+    global ard_data
+    print(f"DATOS ENVIADOS: \n {ard_data}\n")
+    return jsonify(ard_data)
+
+@app.route('/experiencia_base_movil/set_constants', methods=['post', 'get'])
+def set_exp_constants():
+    kpl = request.args.get('kpl')
+    kil = request.args.get('kil')
+    kdl = request.args.get('kdl')
+    
+    kpa = request.args.get('kpa')
+    kia = request.args.get('kia')
+    kda = request.args.get('kda')
+    # send_message(f"K{kpl}${kdl}${kil}${kpa}${kda}${kia}$")
+    send_message(f"KSL{kpl}${kil}${kdl}")
+    print("KSL enviado")
+    time.sleep(1)
+    send_message(f"KSA{kpa}${kia}${kda}")
+    print("KSA enviado")
+    print()
+    return render_template('experiencia_base_movil/index.html')
 
 @app.route("/setRef/<x>/<y>")
 def set_ref(x,y):
     if request.method == 'GET':
         x = float(x)
         y = float(y)
-        send_message(f'ref:{x},{y}')
+        send_message(f'REF{x},{y}')
         message = f'Ref set in ({x},{y})'
         return jsonify(message)  # serialize and use JSON headers
     # POST request
@@ -436,21 +554,8 @@ def set_ref(x,y):
 
 @app.route('/camera', methods=['post', 'get'])
 def camera():
-    # Abrir pantalla de stream
     send_message('CAM')
-
-    client = mqtt.Client()
-    client.on_connect = cam_on_connect
-    client.on_message = cam_on_message
-
-    client.connect(MQTT_BROKER)
-
-    # Starting thread which will receive the frames
-    client.loop_start()
-    # t = threading.Thread(target=show_camera)
-    # t.start()
     return render_template('experiencia_base_movil/index.html')
-
 
 @app.route("/cuenta/exp")
 def exps():
@@ -575,12 +680,10 @@ def get_wt():
     print(f"DATOS ENVIADOS: \n {whos_there}\n")
     return whos_there
 
-
 @app.route("/salir", methods =('POST',))
 def salir():
     session['user_id'] = None
     return redirect(url_for('index'))
-
 
 @app.route("/video_feed")
 def video_feed():
@@ -589,7 +692,6 @@ def video_feed():
 	return Response(generate(),
 		mimetype = "multipart/x-mixed-replace; boundary=frame")
         
-
 if __name__ == '__main__':
     socketio.run(app)
 

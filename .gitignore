@@ -2,3 +2,6 @@ Web/env
 Web/pyvenv.cfg
 Web/requirements.txt
 *.DS_Store
+flask_session/
+UCPC/__pycache__/
+*.pyc

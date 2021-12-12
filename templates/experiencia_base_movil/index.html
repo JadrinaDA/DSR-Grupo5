@@ -1,24 +1,141 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+	<html>
+	<head>
+		<title>
+		ERobotLab UC / Experiencia 
+		</title>
+		<meta charset="uft-8">
+		<link rel="stylesheet" href="{{ url_for('static', filename = 'css/estilo_experiencia.css') }}">
+	</head>
+	<body>
+		<div class="header">
+			<nav>
+			<h1> ERobotLab UC</h1>
+			<div class="nav-links">
+				<a class='link' href="{{ url_for('perfil') }}">Mi Cuenta</a>	
+				<a class='link' href="{{ url_for('res') }}">Reservar Hora</a>
+			</div>
+			</nav>
+		</div>
 
-<body>
+	<div id="wrapper">
+      <div class="container"> 
+		<div class="square">
 
-<h2>Set speeds</h2>
+          <h2>Camara Laboratorio</h2>
+          <img id = "labcam" src="{{ url_for('video_feed') }}">
+          
+          <form action="/camera" id = "open_camera">
+            <input type="submit" value="Open camera">
+          </form>
+          
+		</div>
 
-<form action="/speed">
-  <label for="fname">M1 Speed:</label><br>
-  <input type="text" id="m1" name="m1"><br>
-  <label for="lname">M2 Speed:</label><br>
-  <input type="text" id="m2" name="m2"><br><br>
-  <input type="submit" value="Set speed">
-</form> 
+		<div class="sidenav">
+		
+		<h2>Constantes PID</h2>
+		<p>Ingrese los valores deseados para las constantes del control PID del robot. A continuación, presione el botón "Enviar".</p>
 
-<h2>Camara Laboratorio</h2>
-<img src="{{ url_for('video_feed') }}" id = 'feed'>
+		<form action="/experiencia_base_movil/set_constants" id="main_control_constants">
 
-<form action="/camera">
-  <input type="submit" value="Open camera">
-</form> 
+<div>
+        <h3>Control Distancia</h3>
+        <label for="kp">K<sub>p</sub>:</label>
+        <input type="number" id="kpl" name="kpl"  step = "any" value = 0><br>
+        
+        <label for="kp">K<sub>i</sub>:</label>
+        <input type="number" id="kil" name="kil" step = "any" value = 0><br>
+        
+        <label for="kp">K<sub>d</sub>:</label>
+        <input type="number" id="kdl" name="kdl" step = "any" value = 0><br>
+      </div>
+
+      <div>
+        <h3>Control Ángulo</h3>
+        <label for="kp">K<sub>p</sub>:</label>
+        <input type="number" id="kpa" name="kpa" step = "any" value = 0><br>
+        
+        <label for="kp">K<sub>i</sub>:</label>
+        <input type="number" id="kia" name="kia" step = "any" value = 0><br>
+        
+        <label for="kp">K<sub>d</sub>:</label>
+        <input type="number" id="kda" name="kda" step = "any" value = 0><br>
+      </div>
+
+      <input type="submit" value="Enviar">
+    </form>   
+      
+    <form action = "/experiencia_base_movil/set_constants?kpl=0&kil=0&kdl=0&kpa=0&kia=0&kda=0">
+      <input type = "submit" value = "Detener">
+    </form>
+  <br>
+  
+  <hr>
+      <h2>Velocidad Motores</h2>
+    <p>Ingrese los valores deseados para la velocidad de cada motor del robot. A continuación, presione el botón "Enviar".</p>
+
+      <form action="/experiencia_base_movil/set_speed" id = "motor_speeds">
+        <label for="fname">M1 Speed:</label><br>
+        <input type="number" id="m1" name="m1" step = "any" value = 0><br>
+        <label for="lname">M2 Speed:</label><br>
+        <input type="text" id="m2" name="m2" step = "any" value = 0><br><br>
+        <input type="submit" value="Enviar">
+      </form> 
+
+    <br>
+  
+    <hr>
+    <h2>Constantes PID velocidad</h2>
+    <p>Ingrese las constantes para el control de velocidad realizado por el Arduino. A continuación, presione el botón "Enviar".</p>
+  
+    <form action="/experiencia_base_movil/set_arduino_k" id ="arduino_constants" method = "post">
+    <label for="kp">K<sub>p</sub>:</label>
+    <input type="number" id="kpar" name="kp" step = "any" value = 0><br>
+    
+    <label for="kp">K<sub>i</sub>:</label>
+    <input type="number" id="kiar" name="ki" step = "any" value = 0><br>
+    
+    <label for="kp">K<sub>d</sub>:</label>
+    <input type="number" id="kdar" name="kd" step = "any" value = 0><br>
+    <input type="submit" value="Enviar">
+    </form> 
+
+    <!--Jquery Cdn -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"
+    integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+    crossorigin="anonymous"></script>
+    
+    <script src ="{{ url_for('static', filename = 'js/exp_forms.js') }}"></script>
+    <script src ="{{ url_for('static', filename = 'js/script_exp.js') }}"></script>
+
+    
+    </div>
+  <div class = "right-sidenav">
+    <h2>Datos</h2>
+    <p>A continuación se muestran datos relevantes de la experiencia.</p>
+    
+    <h3>Errores</h3>
+    <label for="error_distancia">Error distancia:</label>
+    <input type="number" id="error_dist" disabled><br>
+
+    <label for="error_angulo">Error ángulo:</label>
+    <input type="number" id="error_ang" disabled><br>
+
+    <h3>Datos Arduino</h3>
+    <h4>Velocidad Motores</h4>
+    <label for="vel1">Motor 1:</label>
+    <input type="number" id="vel1" disabled><br>
+    <label for="vel2">Motor 2:</label>
+    <input type="number" id="vel2" disabled><br>
+
+    <h4>Output Control</h4>
+    <label for="M1">Motor 1:</label>
+    <input type="number" id="M1" disabled><br>
+    <label for="M2">Motor 2:</label>
+    <input type="number" id="M2" disabled><br>
+
+  </div>
+  </div>
 
 <script src ="{{ url_for('static', filename = 'js/script_exp.js') }}"></script>
 <script>
@@ -49,5 +166,6 @@
 setInterval(getWT, 1000);
   
 </script>
+
 </body>
 </html>
