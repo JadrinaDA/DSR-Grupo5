@@ -1,5 +1,7 @@
 const date = new Date();
-document.getElementById('btn').onclick = changeSet;
+if (document.getElementById('btn') != null){
+	document.getElementById('btn').onclick = changeSet;
+}
 
 function changeSet() {
 	var button_set = document.getElementById('btn');
@@ -34,8 +36,9 @@ function changeSel(day) {
 	day.innerHTML = `<li onclick = "changeSel(this)"><span id ="sel" class="selected">${val}</span></li>`;
 	let taken = document.getElementsByName('taken')[0].content;
 	taken = taken.split("*");
+	let val_enc = document.getElementById("is_enc").value;
 	let toods = [];
-	let times = `<input type="hidden" name="dia" id = "dia" value="${day_f}"><input type="hidden" name="id_exp" id = "id_exp" value=1>`;
+	let times = `<input type="hidden" name="dia" id = "dia" value="${day_f}"><input type="hidden" name="id_exp" id = "id_exp" value=1><input type="hidden" name="is_enc" id = "is_enc" value=${val_enc}>`;
 	for (let t = 0; t < taken.length; t++){
 		let taken_t = taken[t].split(",")
 		if (taken_t[0] == day_f){

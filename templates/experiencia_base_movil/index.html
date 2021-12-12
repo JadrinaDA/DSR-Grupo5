@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <body>
 
 <h2>Set speeds</h2>
@@ -23,6 +24,7 @@
 <script>
   var today = new Date();
   var time_con = '{{time_con}}';
+  var wt = '{{wt}}';
   console.log(today);
   var con_array = time_con.split(':').map(function(x) { return parseInt(x);});
   var exit = new Date(today.getFullYear(), today.getMonth(), today.getDate(),con_array[0] + 1, con_array[1], con_array[2]);
@@ -31,6 +33,21 @@
   console.log(time_left);
   setTimeout(function(){
   window.location.href = "{{ url_for('exper')}}"},  time_left);
+  function getWT(){
+    fetch('/getwt')
+    .then(function (response) {
+        return response.text();
+    })
+    .then(function (data) {
+      console.log(data)
+      if (data != wt){
+        window.location.href = "{{ url_for('exper')}}";
+      }
+    });
+}
+
+setInterval(getWT, 1000);
+  
 </script>
 </body>
 </html>
