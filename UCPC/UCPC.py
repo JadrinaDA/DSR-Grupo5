@@ -39,16 +39,19 @@ def mask_hsv(X,color):
     return cv2.inRange(X,lb,ub)
 
 def center_of_mass_area(mask):
-    kernel = np.ones((5,5), np.uint8)  
-    img_dilation = cv2.dilate(mask, kernel, iterations=1)  
-    img_erosion = cv2.erode(img_dilation, kernel, iterations=1)  
-    contours, hierarchy = cv2.findContours(img_erosion, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    sorted_contours= sorted(contours, key=cv2.contourArea, reverse= True)
-    largest_item= sorted_contours[0]
-    M = cv2.moments(largest_item)
-    cX = int(M["m10"] / M["m00"])
-    cY = int(M["m01"] / M["m00"])
-    return (cX, cY)
+    try:
+        kernel = np.ones((5,5), np.uint8)  
+        img_dilation = cv2.dilate(mask, kernel, iterations=1)  
+        img_erosion = cv2.erode(img_dilation, kernel, iterations=1)  
+        contours, hierarchy = cv2.findContours(img_erosion, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        sorted_contours= sorted(contours, key=cv2.contourArea, reverse= True)
+        largest_item= sorted_contours[0]
+        M = cv2.moments(largest_item)
+        cX = int(M["m10"] / M["m00"])
+        cY = int(M["m01"] / M["m00"])
+        return (cY, cX)
+    except:
+        return (0,0)
 
 def angulo(p1, p2):
     # a = np.arctan2(p2[1]-p1[1], p2[0]-p1[0]) + np.pi/2
@@ -156,17 +159,17 @@ while(1):
         clase.bt_signal = True
         # print(clase.bt_msg)
 
-
     #dist = int(((store_coor.ref[0] -y1)**2 + (store_coor.ref[1] -x1)**2)**(0.5) * screen_to_real)
     # font = cv2.FONT_HERSHEY_SIMPLEX
     #cv2.putText(frame,'Dist:' + str(dist),(10,450), font, 2,(255,255,255),2,cv2.LINE_AA)
 
     # Dibujamos 
     circle_pos = 2*store_coor.ref_d[0], 2*store_coor.ref_d[1]
-    cv2.circle(frame, circle_pos, 10,(0,0, 255), -1)
-    cv2.line(frame, circle_pos, (int(y1),int(x1)), (255, 0, 0),5)
-    cv2.circle(frame, (int(y1),int(x1)), 10,(0,255, 0), -1)
-    cv2.circle(frame, (int(y2),int(x2)), 10,(0,50, 100), -1)
+    cv2.line(frame, circle_pos, (int(y1),int(x1)), (255, 255, 255),3) # Linea al goal
+    cv2.line(frame, (int(y2),int(x2)), (int(y1),int(x1)), (0, 0, 0),8) # Linea Robot
+    cv2.circle(frame, circle_pos, 10,(135,229, 255), -1) # Goal
+    cv2.circle(frame, (int(y1),int(x1)), 10,(0,150, 20), -1) # Green Circle
+    cv2.circle(frame, (int(y2),int(x2)), 10,(0,50, 100), -1)  # Brown Circle
     # cv2.imshow('frame', frame)
 
 

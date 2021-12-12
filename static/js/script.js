@@ -12,7 +12,6 @@ document.getElementById("carrera").onchange = changeListenerMaj;
     }else{
         document.getElementById("carrera_div").style.display="none";
     }
-    
   }
 
   function changeListenerMaj(){

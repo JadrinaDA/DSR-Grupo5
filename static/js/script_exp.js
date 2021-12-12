@@ -101,3 +101,4 @@ function getArdData(){
 
 reset();
 setInterval(getExpData, 1000);
+setInterval(getArdData, 1000);
