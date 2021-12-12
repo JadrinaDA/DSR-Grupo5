@@ -63,11 +63,10 @@ class Subscriber():
             x,y = decoded_msg[3:].split(",")
             self.store_coor.click_event(int(float(x)),int(float(y)))
         
-        elif decoded_msg[:3] == "KSA":
+        elif decoded_msg[:3] == "KAR":
             self.auto = True
             list_msg = decoded_msg[3:].split('$')
             list_msg = list(map(lambda x: float(x), list_msg))
-            self.angular_constants = list_msg
             kpa = list_msg[0]
             kda = list_msg[1]
             kia = list_msg[2]
@@ -79,6 +78,16 @@ class Subscriber():
             try: 
                 list_msg = list(map(lambda x: float(x), list_msg))
                 self.linear_constants = list_msg
+            except: 
+                print("Favor ingrese valores numéricos")
+                print(f"Ingresado: {list_msg}")
+
+        elif decoded_msg[:3] == "KSA":
+            self.auto = True
+            list_msg = decoded_msg[3:].split('$')
+            try: 
+                list_msg = list(map(lambda x: float(x), list_msg))
+                self.angular_constants = list_msg
             except: 
                 print("Favor ingrese valores numéricos")
                 print(f"Ingresado: {list_msg}")

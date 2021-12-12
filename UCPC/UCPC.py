@@ -89,7 +89,7 @@ error_actual = np.array([0.0, 0.0])
 cap = cv2.VideoCapture(cam)
 cap.set(cv2.CAP_PROP_FPS, fps)
 screen_to_real = 0.42
-clase.bt_send(f"KSA{10}${0.0001}${0}$")
+clase.bt_send(f"KAR{10}${0.0001}${0}$")
 
 bt_thread = threading.Thread(target = manage_bt, args = [clase], daemon = True)
 bt_thread.start()

@@ -1,5 +1,4 @@
-// Constantes Arduino
-$(document).on('submit','#arduino_constants',function(e)
+function ArduinoConstants()
 					 {
 		console.log('hello');
 		form = document.getElementById("arduino_constants");
@@ -14,8 +13,6 @@ $(document).on('submit','#arduino_constants',function(e)
 			kd:form['kd'].value
 		};
 		let json_data = JSON.stringify(data);
-				
-		e.preventDefault();
 		
 		fetch('/experiencia_base_movil/arduino_constants', {
 
@@ -40,12 +37,9 @@ $(document).on('submit','#arduino_constants',function(e)
 		});
 		
 		
-	  });
+	  }
 
-
-
-// Velocidades Motores
-$(document).on('submit','#motor_speeds',function(e)
+function MotorSpeeds()
 					 {
 		console.log('hello');
 		form = document.getElementById("motor_speeds");
@@ -55,8 +49,6 @@ $(document).on('submit','#motor_speeds',function(e)
 			m2:form['m2'].value,
 		};
 		let json_data = JSON.stringify(data);
-				
-		e.preventDefault();
 		
 		fetch('/experiencia_base_movil/motor_speeds', {
 
@@ -81,12 +73,9 @@ $(document).on('submit','#motor_speeds',function(e)
 		});
 		
 		
-	  });
+	  }
 
-
-
-// Constantes Control Python
-$(document).on('submit','#main_control_constants',function(e)
+function mainControlConstants()
 					 {
 		console.log('hello');
 		form = document.getElementById("main_control_constants");
@@ -101,8 +90,6 @@ $(document).on('submit','#main_control_constants',function(e)
 			kda:form['kda'].value
 		};
 		let json_data = JSON.stringify(data);
-				
-		e.preventDefault();
 		
 		fetch('/experiencia_base_movil/main_control_constants', {
 
@@ -125,19 +112,14 @@ $(document).on('submit','#main_control_constants',function(e)
 		// Should be 'OK' if everything was successful
 		console.log(text);
 		});	
-	  });
+	  }
 
-
-// Abrir camara
-// Constantes Arduino
-$(document).on('submit','#open_camera',function(e)
+function OpenCamera()
 					 {
 		console.log('hello');
 		form = document.getElementById("open_camera");
 
 		let data = '8';
-				
-		e.preventDefault();
 		
 		fetch('/experiencia_base_movil/open_camera', {
 
@@ -162,4 +144,32 @@ $(document).on('submit','#open_camera',function(e)
 		});
 		
 		
-	  });
+	  }
+
+// Constantes Arduino
+$(document).on('submit','#arduino_constants',
+function(e){
+	e.preventDefault();
+	ArduinoConstants();
+});
+
+// Velocidades Motores
+$(document).on('submit','#motor_speeds', 
+function(e){
+	e.preventDefault();
+	MotorSpeeds();
+});
+
+// Constantes Control Python
+$(document).on('submit','#main_control_constants',
+function(e){
+	e.preventDefault();
+	mainControlConstants();
+});
+
+// Abrir camara
+$(document).on('submit','#open_camera',
+function(e){
+	e.preventDefault();
+	OpenCamera();
+});

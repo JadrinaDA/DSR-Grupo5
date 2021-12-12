@@ -8,6 +8,19 @@ const urlParams = new URLSearchParams(queryString);
 const constants = ["kpl", "kil", "kdl", "kpa", "kia", "kda" ];
 constants.forEach(updateConstants);
 
+function reset(){
+    var inputs = document.getElementsByTagName("input");
+    for (var i=0 ,max=inputs.length; i<max; i++){
+            if (inputs[i].type == "number")
+            {
+                inputs[i].value = 0;
+            }
+    }
+    ArduinoConstants();
+    setTimeout(() => { MotorSpeeds(); }, 500);
+    setTimeout(() => { mainControlConstants(); }, 1000);
+}
+
 function updateConstants(k, index, array) {
     if (urlParams.has(k))
     {
@@ -86,4 +99,5 @@ function getArdData(){
     });
 }
 
+reset();
 setInterval(getExpData, 1000);

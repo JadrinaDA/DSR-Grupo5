@@ -363,7 +363,7 @@ def arduino_constants():
         kp = data['kp']
         ki = data['ki']
         kd = data['kd']
-        send_message(f"KSA{kp}${kd}${ki}")
+        send_message(f"KAR{kp}${kd}${ki}")
 
         return 'OK', 200
 
