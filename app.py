@@ -271,9 +271,15 @@ def reg():
                   errors.append('Seleccione un major.')  
         if len(request.form['psw']) < 6:
             errors.append('Contraseña debe ser mínimo 6 caracteres.')
-        if (('@' not in request.form['email']) & ('.cl' not in request.form['email']) & ('.com' not in request.form['email'])) :
+        conn = get_db_connection()
+        user_old = conn.execute('SELECT * FROM usuarios WHERE mail = ?',
+                        (request.form['email'],)).fetchone()
+        if (('@' not in request.form['email']) or ('.cl' not in request.form['email']) & ('.com' not in request.form['email'])) :
+            errors.append('Correo no es valido.')
+        elif user_old != None:
             errors.append('Correo no es valido.')
         if len(errors) > 0:
+            conn.close()
             return render_template("registro/main.html", errors = errors) 
         if (request.form['cargo'] == "profesor"):
             carrera = "profe"
@@ -284,9 +290,10 @@ def reg():
         uni = request.form['inst']
         if (uni == "UC" and carrera == "ing"):
             is_robot = int((request.form['major'] == 'robotica'))
+        elif (carrera == "profe" and 'es_robotica' in request.form.keys()):
+            is_robot = 1
         else:
             is_robot = 0
-        conn = get_db_connection()
         conn.execute("INSERT INTO usuarios (name, lastname, mail, password, tipo, inst, carrera, robotica) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             (request.form['name'], request.form['lastname'], request.form['email'],
              request.form['psw'], request.form['cargo'], uni, carrera, is_robot))
