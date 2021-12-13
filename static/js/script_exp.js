@@ -96,19 +96,19 @@ let trace1 = {
     width:750,
     heigth:300,
     title: {
-      text:'Error angular en el tiempo',
+      text:'<b>Error angular en el tiempo</b>',
       font: {
-        family: 'Courier New, monospace',
-        size: 18
+        family: "'Montserrat', sans-serif",
+        size: 22
       },
       xref: 'paper',
-      x: 0.05,
+      x: 0.50,
     },
     xaxis: {
       title: {
         text: 'Segundos',
         font: {
-          family: 'Courier New, monospace',
+          family: "'Montserrat', sans-serif",
           size: 12,
           color: '#7f7f7f'
         }
@@ -118,7 +118,7 @@ let trace1 = {
       title: {
         text: 'Error angular',
         font: {
-          family: 'Courier New, monospace',
+          family: "'Montserrat', sans-serif",
           size: 12,
           color: '#7f7f7f'
         }
