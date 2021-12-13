@@ -302,6 +302,7 @@ def reg():
                         (request.form['email'],)).fetchone()
         conn.close()
         session['user_id'] = user["id"]
+        session['time_con'] = -1
         return redirect(url_for('main'))
 
     return render_template("registro/main.html")
