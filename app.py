@@ -167,10 +167,10 @@ cam_client = mqtt.Client()
 cam_client.on_connect = cam_on_connect
 cam_client.on_message = cam_on_message
 
-cam_client.connect(MQTT_BROKER)
+#cam_client.connect(MQTT_BROKER)
 
 # Starting thread which will receive the frames
-cam_client.loop_start()
+#cam_client.loop_start()
 
 kp_l = 0.0 # 0.01
 ki_l = 0.0
@@ -216,7 +216,10 @@ def main():
     dia_h, mes_h, año_h = hoy.split("/")
     for res in week:
         dia_r, mes_r, año_r = res['fecha'].split("/")
+        hora_r = int(res['hora'].split(":")[0])
         if ((dia_r >= dia_h) & (mes_r >= mes_h) & (año_r >= año_h)):
+            if ((dia_r == dia_h) and (hora_r < int(full_date[1]))):
+                continue
             coming_up.append(res)
     conn.close()
     return render_template("pagina_principal/info_lab.html", now = tiene_hora, week = coming_up)
@@ -330,8 +333,8 @@ def res():
     conn.close()
 
     user = get_user(user_id)
-    print(user['blacklist'])
     if user['blacklist']:
+        flash("Estas en lista negra, habla con tu profesor.")
         return redirect(url_for('main'))
     if user['tipo'] == 'profesor':
         is_teach = 1
@@ -599,7 +602,10 @@ def exps():
         else:
             new_res['enc'] = "Libre"
         dia_r, mes_r, año_r = res['fecha'].split("/")
+        hora_r = int(res['hora'].split(":")[0])
         if ((dia_r >= dia_h) & (mes_r >= mes_h) & (año_r >= año_h)):
+            if ((dia_r == dia_h) and (hora_r < int(full_date[1]))):
+                continue
             coming_up.append(new_res)
         else:
             reservas_new.append(new_res)
@@ -651,6 +657,9 @@ def exp_con():
         return redirect(url_for('index'))
     id_user = session.get("user_id")
     usuario = get_user(id_user)
+    if usuario['blacklist']:
+        flash("Estas en lista negra, habla con tu profesor.")
+        return redirect(url_for('main'))
     full_date = datetime.now().strftime("%d/%m/%Y %H").split(" ")
     hoy = full_date[0]
     if hoy[0] == "0":
