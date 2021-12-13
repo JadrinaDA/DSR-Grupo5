@@ -130,3 +130,6 @@ function color() {
 }
 
 update = setInterval(updateState, 10);
+log_error = setInterval(function(){
+    console.log("Error acumulado:" + controler.ac_error)
+}, 1000);
