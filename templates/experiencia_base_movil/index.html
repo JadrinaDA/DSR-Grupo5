@@ -137,14 +137,18 @@
   </div>
   </div>
 
-<script src ="{{ url_for('static', filename = 'js/script_exp.js') }}"></script>
 <script>
   var today = new Date();
   var time_con = '{{time_con}}';
   var wt = '{{wt}}';
+  var d_e_a = '{{d_e}}';
+  d_e_a = d_e_a.split(',')
+  var d_e_1 = parseInt(d_e_a[0]);
+  var d_e_2 = parseInt(d_e_a[1]);
+  console.log('{{d_e}}[0]');
   console.log(today);
   var con_array = time_con.split(':').map(function(x) { return parseInt(x);});
-  var exit = new Date(today.getFullYear(), today.getMonth(), today.getDate(),con_array[0] + 1, con_array[1], con_array[2]);
+  var exit = new Date(today.getFullYear(), today.getMonth(), today.getDate(),con_array[0] + d_e_1, con_array[1] + d_e_2, con_array[2]);
   console.log(exit);
   var time_left = exit - today; 
   console.log(time_left);

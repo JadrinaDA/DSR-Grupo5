@@ -167,10 +167,10 @@ cam_client = mqtt.Client()
 cam_client.on_connect = cam_on_connect
 cam_client.on_message = cam_on_message
 
-#cam_client.connect(MQTT_BROKER)
+cam_client.connect(MQTT_BROKER)
 
 # Starting thread which will receive the frames
-#cam_client.loop_start()
+cam_client.loop_start()
 
 kp_l = 0.0 # 0.01
 ki_l = 0.0
@@ -248,10 +248,15 @@ def login():
 def exper():
     if not session:
         return redirect(url_for('index'))
+    print(session['time_con'])
     if session['time_con'] != -1:
         hour_n, min_n, sec_n = datetime.now().strftime("%H:%M:%S").split(':')
         hour_c, min_c, sec_c = session['time_con'].split(':')
-        if int(hour_n) > int(hour_c):
+        hrs, mins = p.DURACION_EXP.split(",")
+        hrs = int(hrs)
+        mins = int(mins)
+        print(hour_n, hour_c, min_n, min_c)
+        if ((int(hour_n) >= (int(hour_c) + hrs)) or (int(min_n) >= (int(min_c) + mins))):
             session['time_con'] = -1
     global whos_there
     if whos_there != "N":
@@ -460,7 +465,7 @@ def experiencia_base_movil():
         print("beep")
         session['time_con'] = datetime.now().strftime("%H:%M:%S");
     send_message(f"SPD{m1_speed}${m2_speed}$")
-    return render_template('experiencia_base_movil/index.html', time_con = session['time_con'], wt = whos_there)
+    return render_template('experiencia_base_movil/index.html', time_con = session['time_con'], wt = whos_there, d_e = p.DURACION_EXP)
 
 @app.route('/experiencia_base_movil/set_arduino_k', methods=['POST', 'GET'])
 def constantes_arduino():
