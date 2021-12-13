@@ -395,7 +395,7 @@ def res():
             conn.close()
             return redirect(url_for('exps'))
 
-    available = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00","17:00","18:00"]
+    available = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00","17:00","18:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"]
     coming_up = []
     for res in taken:
         dia_r, mes_r, año_r = res['fecha'].split("/")
@@ -411,6 +411,7 @@ def res():
                 if (res['taken'] or not my_teach(res['id_enc'], user_id)): 
                     coming_up.append(res)
         if ((dia_r == dia_h) & (mes_r == mes_h) & (año_r == año_h)):
+            print(res['hora'])
             available.remove(res["hora"])
     coming_up_dic = ""
     for ress in coming_up:
@@ -618,8 +619,8 @@ def exps():
 
 @app.route("/cuenta/est", methods = ('POST', 'GET'))
 def estuds():
-    #if not session:
-    #   return redirect(url_for('index'))
+    if not session:
+       return redirect(url_for('index'))
     user_id = session["user_id"]
     conn = get_db_connection()
     if request.method == 'POST':
