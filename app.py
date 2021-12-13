@@ -20,6 +20,7 @@ whos_there = "N"
 frame = np.ones((160, 120, 3), np.uint8)
 exp_data = dict()
 ard_data = dict()
+was_redic = False
 
 MQTT_BROKER = 'broker.mqttdashboard.com'
 MQTT_RECEIVE = "DSR5/CAM"
@@ -209,6 +210,9 @@ def main():
     week = conn.execute('SELECT * FROM reservas WHERE id_user = ?',
                         (id_user,)).fetchall()
     coming_up = []
+    if tiene_hora:
+        global was_redic
+        was_redic = True
     dia_h, mes_h, año_h = hoy.split("/")
     for res in week:
         dia_r, mes_r, año_r = res['fecha'].split("/")
@@ -439,8 +443,12 @@ def speed_index():
 
 @app.route('/experiencia_base_movil/set_speed', methods=['post', 'get'])
 def experiencia_base_movil():
+    global was_redic
     if not session:
         return redirect(url_for('index'))
+    if not was_redic:
+        return redirect(url_for('main'))
+    was_redic = True
     m1_speed = request.args.get('m1')
     m2_speed = request.args.get('m2')
     #send_message(f"{m1_speed}{m2_speed}000")
@@ -647,6 +655,7 @@ def exp_con():
     hoy = full_date[0]
     if hoy[0] == "0":
         hoy = hoy[1:]
+    global was_redic
     ahora = full_date[1] +":00"
     conn = get_db_connection()
     hora_res  = conn.execute('SELECT * FROM reservas WHERE fecha = ? AND hora = ?', (hoy, ahora,)).fetchone()
@@ -657,6 +666,7 @@ def exp_con():
             tiene_hora = 0
         conn.close()
         if tiene_hora:
+            was_redic = True
             return redirect(url_for('experiencia_base_movil'))
         else: 
             flash("No tienes reservada esta hora, reserva una aquí.")
@@ -677,6 +687,7 @@ def exp_con():
                 whos_there  = "U"
             else:
                 whos_there = "E"
+            was_redic = True
             return redirect(url_for('experiencia_base_movil'))
         else:
             flash("No tienes reservada esta hora, reserva una aquí.")
