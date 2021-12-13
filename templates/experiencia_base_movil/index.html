@@ -6,6 +6,7 @@
 		</title>
 		<meta charset="uft-8">
 		<link rel="stylesheet" href="{{ url_for('static', filename = 'css/estilo_experiencia.css') }}">
+    <script src='https://cdn.plot.ly/plotly-2.6.3.min.js'></script>
 	</head>
 	<body>
 		<div class="header">
@@ -30,6 +31,7 @@
           </form>
           
 		</div>
+    <div id='myDiv'></div>
 
 		<div class="sidenav">
 		
@@ -106,7 +108,7 @@
     crossorigin="anonymous"></script>
     
     <script src ="{{ url_for('static', filename = 'js/exp_forms.js') }}"></script>
-    <script src ="{{ url_for('static', filename = 'js/script_exp.js') }}"></script>
+    
 
     
     </div>
@@ -163,9 +165,10 @@
     });
 }
 
+
 setInterval(getWT, 1000);
   
 </script>
-
+<script src ="{{ url_for('static', filename = 'js/script_exp.js') }}"></script>
 </body>
 </html>

@@ -167,10 +167,10 @@ cam_client = mqtt.Client()
 cam_client.on_connect = cam_on_connect
 cam_client.on_message = cam_on_message
 
-#cam_client.connect(MQTT_BROKER)
+cam_client.connect(MQTT_BROKER)
 
 # Starting thread which will receive the frames
-#cam_client.loop_start()
+cam_client.loop_start()
 
 kp_l = 0.0 # 0.01
 ki_l = 0.0
