@@ -11,6 +11,7 @@ class BaseMovil
         this._step_size = this._Ts;
         this._t0 = 0;
         this._tf = this.t_0 + this._step_size;
+        this._mu = 0.5; // roce
         this._Nsamples = 10+1;
         this._tX = linspace(this._t0, this._tf, this._Nsamples);
         // this._Ts = 0.001;
@@ -59,12 +60,27 @@ class BaseMovil
 
     Model()
     {
+        // x[0] = x
+        // x[1] = y
+        // x[2] = theta
+        // x[3] = v
+        // x[4] = alfa
+        let u0 = Math.max(Math.abs(this._u[0]) - this._mu , 0) * Math.sign(this._u[0]) 
+        let u1 = Math.max(Math.abs(this._u[1]) - this._mu , 0) * Math.sign(this._u[1]) 
+        
+        // var xdot = [
+        //     this._x[3]*Math.cos(this._x[2]), 
+        //     this._x[3]*Math.sin(this._x[2]), 
+        //     this._x[4], 
+        //     ((this._u[0]+this._u[1])/this._r-this._c*this._x[3])/this._m, 
+        //     (this._w*(this._u[0]-this._u[1])/(2*this._r)-this._b*this._x[4])/this._j];
+
         var xdot = [
             this._x[3]*Math.cos(this._x[2]), 
             this._x[3]*Math.sin(this._x[2]), 
             this._x[4], 
-            ((this._u[0]+this._u[1])/this._r-this._c*this._x[3])/this._m, 
-            (this._w*(this._u[0]-this._u[1])/(2*this._r)-this._b*this._x[4])/this._j];
+            ((u0+u1)/this._r-this._c*this._x[3])/this._m, 
+            (this._w*(u0-u1)/(2*this._r)-this._b*this._x[4])/this._j];
 
             // console.log(`u: ${this._u}`);
             // console.log(`r: ${this._r}`);

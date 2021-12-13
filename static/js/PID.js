@@ -13,7 +13,7 @@ class MobileBasePID
         this.mobile_base = mobile_base;
         this.reference = reference;
 
-        this.max_ac_error = [2.0 , 4.0];
+        this.max_ac_error = [3.0 , 4.0];
     }
 
     SetLinearConstants(kp, kd, ki){
@@ -61,13 +61,14 @@ class MobileBasePID
 
         this.ac_error = VpV(this.ac_error, SxV(this.mobile_base._Ts, this.error));
 
+        let ki = [this.ki_l, this.ki_a];
+
         for (let k = 0; k<2; k++){
-            if (Math.abs(this.ac_error[k]) > this.max_ac_error[k])
+            if (Math.abs(this.ac_error[k]) > this.max_ac_error[k]/ki[k])
             {
-                this.ac_error[k] = this.max_ac_error[k] * Math.sign(this.ac_error[k]);
+                this.ac_error[k] = this.max_ac_error[k]/ki[k] * Math.sign(this.ac_error[k]);
             }
         }
-        // console.log("Error:" + this.error);
         return this.error;
     }
 
@@ -78,9 +79,10 @@ class MobileBasePID
         // console.log(`Error anterior: ${this.past_error}`);
         // console.log(`Ts: ${this.mobile_base._Ts}`);
         // console.log(`Error acumulado: ${this.ac_error}`);
-        var u_0 = this.kp_l*this.error[0] - this.kp_a*this.error[1] + this.ki_l*this.ac_error[0]*this.mobile_base._Ts - this.ki_a*this.ac_error[1]*this.mobile_base._Ts + this.kd_l*(this.error[0]-this.past_error[0])/this.mobile_base._Ts - this.kd_a*(this.error[1]-this.past_error[1])/this.mobile_base._Ts;
-        var u_1 = this.kp_l*this.error[0] + this.kp_a*this.error[1] + this.ki_l*this.ac_error[0]*this.mobile_base._Ts + this.ki_a*this.ac_error[1]*this.mobile_base._Ts + this.kd_l*(this.error[0]-this.past_error[0])/this.mobile_base._Ts + this.kd_a*(this.error[1]-this.past_error[1])/this.mobile_base._Ts;
+        var u_0 = this.kp_l*this.error[0] - this.kp_a*this.error[1] + this.ki_l*this.ac_error[0] - this.ki_a*this.ac_error[1]+ this.kd_l*(this.error[0]-this.past_error[0])/this.mobile_base._Ts - this.kd_a*(this.error[1]-this.past_error[1])/this.mobile_base._Ts;
+        var u_1 = this.kp_l*this.error[0] + this.kp_a*this.error[1] + this.ki_l*this.ac_error[0] + this.ki_a*this.ac_error[1] + this.kd_l*(this.error[0]-this.past_error[0])/this.mobile_base._Ts + this.kd_a*(this.error[1]-this.past_error[1])/this.mobile_base._Ts;
         this.mobile_base.SetActuator([u_0,u_1]);
+        // El error acumulado no se pnderó por dT porque se hizo al acumularlo
     }
 
     SetReference(x, y){
