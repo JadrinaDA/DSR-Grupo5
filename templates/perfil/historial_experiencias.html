@@ -27,6 +27,9 @@
     <div class="sidenav">
     <a class ="not_current" href="{{ url_for('perfil') }}">Datos personales</a>
     <a class="current" href="#">Experiencias</a>
+    {% if user['tipo'] == 'profesor' %}
+    <a class="not_current" href="{{ url_for('estuds') }}">Estudiantes</a>
+    {% endif %}
     </div>
 
     <div class="content">
@@ -37,6 +40,7 @@
       <tr>
         <th> Experiencia</th>
         <th>Fecha</th>
+        <th>Hora</th>
         <th>Encargado</th> 
       </tr>
 
@@ -46,7 +50,7 @@
           <td>{{nombres_exp[res['id_exp'] - 1]}}</td>
           <td>{{res['fecha']}}</td>
           <td>{{res['hora']}}</td>
-          <td>Daniel Calabi</td>
+          <td>{{res['enc']}}</td>
         </tr>
 
         {% endfor %}
@@ -69,7 +73,7 @@
           <td>{{nombres_exp[res['id_exp'] - 1]}}</td>
           <td>{{res['fecha']}}</td>
           <td>{{res['hora']}}</td>
-          <td>Daniel Calabi</td>
+          <td>{{res['enc']}}</td>
         </tr>
 
         {% endfor %}

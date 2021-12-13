@@ -29,6 +29,9 @@
     <div class="sidenav">
     <a class ="current" href="#">Datos personales</a>
     <a class="not_current" href="{{ url_for('exps') }}">Experiencias</a>
+    {% if user['tipo'] == 'profesor' %}
+    <a class="not_current" href="{{ url_for('estuds') }}">Estudiantes</a>
+    {% endif %}
     </div>
 
     <div class="content">

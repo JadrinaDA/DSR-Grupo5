@@ -38,41 +38,41 @@
 
 		<form action="/experiencia_base_movil/set_constants" id="main_control_constants">
 
-			<div>
-				<h3>Control Distancia</h3>
-				<label for="kp">K<sub>p</sub>:</label>
-				<input type="number" id="kpl" name="kpl"  step = "any" value = 0><br>
-				
-				<label for="kp">K<sub>i</sub>:</label>
-				<input type="number" id="kil" name="kil" step = "any" value = 0><br>
-				
-				<label for="kp">K<sub>d</sub>:</label>
-				<input type="number" id="kdl" name="kdl" step = "any" value = 0><br>
-			</div>
+<div>
+        <h3>Control Distancia</h3>
+        <label for="kp">K<sub>p</sub>:</label>
+        <input type="number" id="kpl" name="kpl"  step = "any" value = 0><br>
+        
+        <label for="kp">K<sub>i</sub>:</label>
+        <input type="number" id="kil" name="kil" step = "any" value = 0><br>
+        
+        <label for="kp">K<sub>d</sub>:</label>
+        <input type="number" id="kdl" name="kdl" step = "any" value = 0><br>
+      </div>
 
-			<div>
-				<h3>Control Ángulo</h3>
-				<label for="kp">K<sub>p</sub>:</label>
-				<input type="number" id="kpa" name="kpa" step = "any" value = 0><br>
-				
-				<label for="kp">K<sub>i</sub>:</label>
-				<input type="number" id="kia" name="kia" step = "any" value = 0><br>
-				
-				<label for="kp">K<sub>d</sub>:</label>
-				<input type="number" id="kda" name="kda" step = "any" value = 0><br>
-			</div>
+      <div>
+        <h3>Control Ángulo</h3>
+        <label for="kp">K<sub>p</sub>:</label>
+        <input type="number" id="kpa" name="kpa" step = "any" value = 0><br>
+        
+        <label for="kp">K<sub>i</sub>:</label>
+        <input type="number" id="kia" name="kia" step = "any" value = 0><br>
+        
+        <label for="kp">K<sub>d</sub>:</label>
+        <input type="number" id="kda" name="kda" step = "any" value = 0><br>
+      </div>
 
-			<input type="submit" value="Enviar">
-		</form> 	
-		  
-		<form action = "/experiencia_base_movil/set_constants?kpl=0&kil=0&kdl=0&kpa=0&kia=0&kda=0">
-			<input type = "submit" value = "Detener">
-		</form>
-	<br>
-	
-	<hr>
+      <input type="submit" value="Enviar">
+    </form>   
+      
+    <form action = "/experiencia_base_movil/set_constants?kpl=0&kil=0&kdl=0&kpa=0&kia=0&kda=0">
+      <input type = "submit" value = "Detener">
+    </form>
+  <br>
+  
+  <hr>
       <h2>Velocidad Motores</h2>
-	  <p>Ingrese los valores deseados para la velocidad de cada motor del robot. A continuación, presione el botón "Enviar".</p>
+    <p>Ingrese los valores deseados para la velocidad de cada motor del robot. A continuación, presione el botón "Enviar".</p>
 
       <form action="/experiencia_base_movil/set_speed" id = "motor_speeds">
         <label for="fname">M1 Speed:</label><br>
@@ -82,59 +82,90 @@
         <input type="submit" value="Enviar">
       </form> 
 
-	  <br>
-	
-	  <hr>
-		<h2>Constantes PID velocidad</h2>
-		<p>Ingrese las constantes para el control de velocidad realizado por el Arduino. A continuación, presione el botón "Enviar".</p>
+    <br>
   
-		<form action="/experiencia_base_movil/set_arduino_k" id ="arduino_constants" method = "post">
-		<label for="kp">K<sub>p</sub>:</label>
-		<input type="number" id="kpar" name="kp" step = "any" value = 0><br>
-		
-		<label for="kp">K<sub>i</sub>:</label>
-		<input type="number" id="kiar" name="ki" step = "any" value = 0><br>
-		
-		<label for="kp">K<sub>d</sub>:</label>
-		<input type="number" id="kdar" name="kd" step = "any" value = 0><br>
-		<input type="submit" value="Enviar">
-		</form> 
+    <hr>
+    <h2>Constantes PID velocidad</h2>
+    <p>Ingrese las constantes para el control de velocidad realizado por el Arduino. A continuación, presione el botón "Enviar".</p>
+  
+    <form action="/experiencia_base_movil/set_arduino_k" id ="arduino_constants" method = "post">
+    <label for="kp">K<sub>p</sub>:</label>
+    <input type="number" id="kpar" name="kp" step = "any" value = 0><br>
+    
+    <label for="kp">K<sub>i</sub>:</label>
+    <input type="number" id="kiar" name="ki" step = "any" value = 0><br>
+    
+    <label for="kp">K<sub>d</sub>:</label>
+    <input type="number" id="kdar" name="kd" step = "any" value = 0><br>
+    <input type="submit" value="Enviar">
+    </form> 
 
-		<!--Jquery Cdn -->
-		<script src="https://code.jquery.com/jquery-3.5.1.js"
-		integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
-		crossorigin="anonymous"></script>
-		
-		<script src ="{{ url_for('static', filename = 'js/exp_forms.js') }}"></script>
-		<script src ="{{ url_for('static', filename = 'js/script_exp.js') }}"></script>
+    <!--Jquery Cdn -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"
+    integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+    crossorigin="anonymous"></script>
+    
+    <script src ="{{ url_for('static', filename = 'js/exp_forms.js') }}"></script>
+    <script src ="{{ url_for('static', filename = 'js/script_exp.js') }}"></script>
 
-		
-		</div>
-	<div class = "right-sidenav">
-		<h2>Datos</h2>
-		<p>A continuación se muestran datos relevantes de la experiencia.</p>
-		
-		<h3>Errores</h3>
-		<label for="error_distancia">Error distancia:</label>
-		<input type="number" id="error_dist" disabled><br>
+    
+    </div>
+  <div class = "right-sidenav">
+    <h2>Datos</h2>
+    <p>A continuación se muestran datos relevantes de la experiencia.</p>
+    
+    <h3>Errores</h3>
+    <label for="error_distancia">Error distancia:</label>
+    <input type="number" id="error_dist" disabled><br>
 
-		<label for="error_angulo">Error ángulo:</label>
-		<input type="number" id="error_ang" disabled><br>
+    <label for="error_angulo">Error ángulo:</label>
+    <input type="number" id="error_ang" disabled><br>
 
-		<h3>Datos Arduino</h3>
-		<h4>Velocidad Motores</h4>
-		<label for="vel1">Motor 1:</label>
-		<input type="number" id="vel1" disabled><br>
-		<label for="vel2">Motor 2:</label>
-		<input type="number" id="vel2" disabled><br>
+    <h3>Datos Arduino</h3>
+    <h4>Velocidad Motores</h4>
+    <label for="vel1">Motor 1:</label>
+    <input type="number" id="vel1" disabled><br>
+    <label for="vel2">Motor 2:</label>
+    <input type="number" id="vel2" disabled><br>
 
-		<h4>Output Control</h4>
-		<label for="M1">Motor 1:</label>
-		<input type="number" id="M1" disabled><br>
-		<label for="M2">Motor 2:</label>
-		<input type="number" id="M2" disabled><br>
+    <h4>Output Control</h4>
+    <label for="M1">Motor 1:</label>
+    <input type="number" id="M1" disabled><br>
+    <label for="M2">Motor 2:</label>
+    <input type="number" id="M2" disabled><br>
 
-	</div>
-	</div>
+  </div>
+  </div>
+
+<script src ="{{ url_for('static', filename = 'js/script_exp.js') }}"></script>
+<script>
+  var today = new Date();
+  var time_con = '{{time_con}}';
+  var wt = '{{wt}}';
+  console.log(today);
+  var con_array = time_con.split(':').map(function(x) { return parseInt(x);});
+  var exit = new Date(today.getFullYear(), today.getMonth(), today.getDate(),con_array[0] + 1, con_array[1], con_array[2]);
+  console.log(exit);
+  var time_left = exit - today; 
+  console.log(time_left);
+  setTimeout(function(){
+  window.location.href = "{{ url_for('exper')}}"},  time_left);
+  function getWT(){
+    fetch('/getwt')
+    .then(function (response) {
+        return response.text();
+    })
+    .then(function (data) {
+      console.log(data)
+      if (data != wt){
+        window.location.href = "{{ url_for('exper')}}";
+      }
+    });
+}
+
+setInterval(getWT, 1000);
+  
+</script>
+
 </body>
 </html>

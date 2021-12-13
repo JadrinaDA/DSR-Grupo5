@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Estudiantes</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="{{ url_for('static', filename = 'css/estilo_perfil.css') }}">
+
+</head>
+<body>
+
+<div class="header">
+
+  <nav>
+    <a class="inlink" href= "{{ url_for('main') }}"><h1> ERobotLab UC</h1></a>
+    <div class="nav-links">
+        <a class='link' href="">Mi Cuenta</a>		
+        <a class='link' href="{{ url_for('res') }}">Reservar Hora</a>
+    </div>
+    
+  </nav>
+ 
+
+</div>
+
+<div id="wrapper">
+    <div class="sidenav">
+    <a class ="not_current" href="{{ url_for('perfil') }}">Datos personales</a>
+    <a class ="not_current" href="{{ url_for('exps') }}">Experiencias</a>
+    <a class="current" href="#">Estudiantes</a>
+    </div>
+
+    <div class="content">
+    <h2>Estudiantes</h2>
+    
+    <table>
+      <form method = "POST">
+
+      <tr>
+        <th> Nombre</th>
+        <th>Apellido</th>
+        <th>Asignar estudiante</th> 
+      </tr>
+
+       {% for estud in not_mine %}
+  
+        <tr>
+          <td>{{estud['name']}}</td>
+          <td>{{estud['lastname']}}</td>
+          <td><button class='boton' type="submit" name="sid" value="A{{estud['id']}}">Es mi estudiante</button></td>
+        </tr>
+
+        {% endfor %}
+      </table>
+
+      <h2 style="margin-top: 40px">Tus Estudiantes</h2>
+    
+      <table>
+  
+        <tr>
+          <th> Nombre</th>
+          <th>Apellido</th>
+          <th>Desasignar estudiante</th>
+          <th>Lista negra</th> 
+        </tr>
+
+        {% for estud in mine %}
+  
+        <tr>
+          <td>{{estud['name']}}</td>
+          <td>{{estud['lastname']}}</td>
+          <td><button class='boton' type="submit" name="sid" value="D{{estud['id']}}">No es mi estudiante</button></td>
+          {% if estud['blacklist'] %}
+           <td><button class='boton' type="submit" name="sid" value="U{{estud['id']}}">Sacar de lista negra</button></td>
+          {% else %}
+           <td><button class='boton' type="submit" name="sid" value="B{{estud['id']}}">Lista negra</button></td>
+          {% endif%} 
+        </tr>
+
+        {% endfor %}
+      
+      </form>
+      </table>
+      
+    </div>
+</div>
+
+</body>
+</html>
+
+
+</body>
+</html>

@@ -16,9 +16,11 @@ import json
 import parameters as p
 
 lock = threading.Lock()
+whos_there = "N"
 frame = np.ones((160, 120, 3), np.uint8)
 exp_data = dict()
 ard_data = dict()
+was_redic = False
 
 MQTT_BROKER = 'broker.mqttdashboard.com'
 MQTT_RECEIVE = "DSR5/CAM"
@@ -112,6 +114,15 @@ def get_user(id_user):
         abort(404)
     return user
 
+def my_teach(id_prof, id_est):
+    conn = get_db_connection()
+    is_stud = conn.execute('SELECT * FROM estudiante_de WHERE id_est = ? AND id_prof = ?',
+                        (id_est, id_prof)).fetchone()
+    conn.close()
+    if is_stud is None:
+        return False
+    return True
+
 def get_changes(user, form):
     new = {}
     for x in form.keys():
@@ -130,6 +141,7 @@ def get_changes(user, form):
 def send_message(message):
     publisher.connect('broker.mqttdashboard.com', 1883, 60)
     publisher.publish('DSR5/1', message)
+
 
 app = Flask(__name__)
 #CORS(app)
@@ -169,11 +181,13 @@ kd_a = 0.0
 
 horas = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00","17:00","18:00"]
 
+
 @app.route("/")
 def index():
     conn = get_db_connection()
-    users = conn.execute('SELECT * FROM usuarios').fetchall()
+    users = conn.execute('SELECT * FROM estudiante_de').fetchall()
     conn.close()
+    print(my_teach(2,3))
     return render_template("inicio/pagina_inicio.html", users = None)
 
 @app.route("/capture")
@@ -196,6 +210,9 @@ def main():
     week = conn.execute('SELECT * FROM reservas WHERE id_user = ?',
                         (id_user,)).fetchall()
     coming_up = []
+    if tiene_hora:
+        global was_redic
+        was_redic = True
     dia_h, mes_h, año_h = hoy.split("/")
     for res in week:
         dia_r, mes_r, año_r = res['fecha'].split("/")
@@ -218,6 +235,7 @@ def login():
         else:
             if user['password'] == request.form["password"]:
                 session['user_id'] = user["id"]
+                session['time_con'] = -1
                 return redirect("/main")
             else:
                 error = 'Contraseña incorrecta'
@@ -225,6 +243,16 @@ def login():
 
 @app.route("/exp")
 def exper():
+    if not session:
+        return redirect(url_for('index'))
+    if session['time_con'] != -1:
+        hour_n, min_n, sec_n = datetime.now().strftime("%H:%M:%S").split(':')
+        hour_c, min_c, sec_c = session['time_con'].split(':')
+        if int(hour_n) > int(hour_c):
+            session['time_con'] = -1
+    global whos_there
+    if whos_there != "N":
+        whos_there = "N"
     conn = get_db_connection()
     exp = conn.execute('SELECT * FROM experiencias WHERE id = ?',
                         (1,)).fetchone()
@@ -246,10 +274,16 @@ def reg():
                 if 'major' not in request.form.keys() and request.form['inst'] == "UC" and request.form['carrera'] == "ing":
                   errors.append('Seleccione un major.')  
         if len(request.form['psw']) < 6:
-            errors.append('Contraseña debe ser mínmo 6 caracteres.')
-        if (('@' not in request.form['email']) & ('.cl' not in request.form['email']) & ('.com' not in request.form['email'])) :
+            errors.append('Contraseña debe ser mínimo 6 caracteres.')
+        conn = get_db_connection()
+        user_old = conn.execute('SELECT * FROM usuarios WHERE mail = ?',
+                        (request.form['email'],)).fetchone()
+        if (('@' not in request.form['email']) or ('.cl' not in request.form['email']) & ('.com' not in request.form['email'])) :
+            errors.append('Correo no es valido.')
+        elif user_old != None:
             errors.append('Correo no es valido.')
         if len(errors) > 0:
+            conn.close()
             return render_template("registro/main.html", errors = errors) 
         if (request.form['cargo'] == "profesor"):
             carrera = "profe"
@@ -260,9 +294,10 @@ def reg():
         uni = request.form['inst']
         if (uni == "UC" and carrera == "ing"):
             is_robot = int((request.form['major'] == 'robotica'))
+        elif (carrera == "profe" and 'es_robotica' in request.form.keys()):
+            is_robot = 1
         else:
             is_robot = 0
-        conn = get_db_connection()
         conn.execute("INSERT INTO usuarios (name, lastname, mail, password, tipo, inst, carrera, robotica) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             (request.form['name'], request.form['lastname'], request.form['email'],
              request.form['psw'], request.form['cargo'], uni, carrera, is_robot))
@@ -271,6 +306,7 @@ def reg():
                         (request.form['email'],)).fetchone()
         conn.close()
         session['user_id'] = user["id"]
+        session['time_con'] = -1
         return redirect(url_for('main'))
 
     return render_template("registro/main.html")
@@ -284,32 +320,96 @@ def res():
     hoy = full_date[0]
     if hoy[0] == "0":
         hoy = hoy[1:]
-        
-    if request.method == 'POST':
-        conn = get_db_connection()
-        conn.execute('INSERT INTO reservas (id_user, id_exp, fecha, hora) VALUES (?, ?, ?, ?)',
-         (user_id, request.form['id_exp'], request.form['dia'], request.form['hora']))
-        conn.commit()
-        conn.close()
-        return redirect(url_for('exps'))
+    dia_h, mes_h, año_h = hoy.split("/")
 
     conn = get_db_connection()
-    taken = conn.execute('SELECT fecha, hora FROM reservas').fetchall()
+    taken = conn.execute('SELECT * FROM reservas').fetchall()
+    users_res = conn.execute('SELECT * FROM reservas WHERE id_user = ?',
+                        (user_id,)).fetchall()
+    
     conn.close()
+
+    user = get_user(user_id)
+    print(user['blacklist'])
+    if user['blacklist']:
+        return redirect(url_for('main'))
+    if user['tipo'] == 'profesor':
+        is_teach = 1
+    else:
+        is_teach = 0
+        
+    if request.method == 'POST':
+
+        this_week = 0
+        this_month = 0
+        
+        dia_c, mes_c, año_c = request.form['dia'].split("/")
+        for res in users_res:
+            dia_r, mes_r, año_r = res['fecha'].split("/")
+            if abs(int(dia_r) - int(dia_c)) < 7:
+                this_week += 1
+            if mes_r == mes_c:
+                this_month += 1
+        # Check limit 
+        can_res = 1
+        if user['tipo'] == "alumno":
+            if user['robotica']:
+                if this_week >= 3:
+                    flash("Ya reservaste 3 horas esta semana.")
+                    can_res = 0
+            elif user['inst'] == "UC":
+                if this_week >= 1:
+                    flash("Ya reservaste una hora esta semana.")
+                    can_res = 0
+            else:
+                if this_month >= 1:
+                    flash("Ya reservaste una hora este mes.")
+                    can_res = 0 
+        if can_res:
+            conn = get_db_connection()
+            #Check if its reserved by teach
+            update = conn.execute('SELECT * FROM reservas WHERE fecha = ? AND hora = ?',
+                        (request.form['dia'], request.form['hora'])).fetchone()
+            if update:
+                if is_teach and request.form['is_enc']:
+                    conn.execute('UPDATE reservas SET id_user = ?, taken = ?, id_enc = ? WHERE fecha = ? AND hora = ?', (user_id, 0, user_id, request.form['dia'], request.form['hora']))
+                elif is_teach:
+                    conn.execute('UPDATE reservas SET id_user = ?, taken = ?, id_enc = ? WHERE fecha = ? AND hora = ?', (user_id, 1, user_id, request.form['dia'], request.form['hora']))
+                else:
+                    conn.execute('UPDATE reservas SET id_user = ?, taken = ? WHERE fecha = ? AND hora = ?', (user_id, 1, request.form['dia'], request.form['hora']))
+            elif request.form['is_enc']:
+                conn.execute('INSERT INTO reservas (id_user, id_exp, fecha, hora, id_enc, taken) VALUES (?, ?, ?, ?, ?, ?)',
+                 (user_id, request.form['id_exp'], request.form['dia'], request.form['hora'], user_id, 0))
+            else:
+                conn.execute('INSERT INTO reservas (id_user, id_exp, fecha, hora, id_enc) VALUES (?, ?, ?, ?, ?)',
+                (user_id, request.form['id_exp'], request.form['dia'], request.form['hora'], user_id))
+            conn.commit()
+            conn.close()
+            return redirect(url_for('exps'))
+
     available = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00","17:00","18:00"]
     coming_up = []
-    dia_h, mes_h, año_h = hoy.split("/")
     for res in taken:
         dia_r, mes_r, año_r = res['fecha'].split("/")
         if ((dia_r >= dia_h) & (mes_r >= mes_h) & (año_r >= año_h)):
-            coming_up.append(res)
+            if is_teach and  user['robotica']:
+                la_user = get_user(res['id_enc'])
+                if (la_user['tipo'] == 'profesor' and la_user['robotica']):
+                    coming_up.append(res)
+            elif is_teach:
+                if (my_teach(res['id_enc'], res['id_user']) or get_user(res['id_user'])['tipo'] == 'profesor'):
+                    coming_up.append(res)
+            else:
+                if (res['taken'] or not my_teach(res['id_enc'], user_id)): 
+                    coming_up.append(res)
         if ((dia_r == dia_h) & (mes_r == mes_h) & (año_r == año_h)):
             available.remove(res["hora"])
     coming_up_dic = ""
     for ress in coming_up:
         coming_up_dic += ress["fecha"] + "," + ress["hora"] + "*"
     coming_up_dic = coming_up_dic[:-1]
-    return render_template("reserva_horas/reserva.html", ava = available, taken = coming_up_dic)
+
+    return render_template("reserva_horas/reserva.html", ava = available, taken = coming_up_dic, is_teach = is_teach)
 
 @app.route("/cuenta", methods=('GET', 'POST'))
 def perfil():
@@ -331,18 +431,33 @@ def perfil():
 
 @app.route("/sim", methods = ('GET', 'POST'))
 def sim():
+    if not session:
+        return redirect(url_for('index'))
     return render_template("Simulacion/simulacion_base_movil.html")
 
-@app.route('/experiencia_base_movil')
+@app.route('/experiencia_base_movil/s')
 def speed_index():
+    if not session:
+        return redirect(url_for('index'))
     return render_template('experiencia_base_movil/index.html')
 
 @app.route('/experiencia_base_movil/set_speed', methods=['post', 'get'])
 def experiencia_base_movil():
+    global was_redic
+    if not session:
+        return redirect(url_for('index'))
+    if not was_redic:
+        return redirect(url_for('main'))
+    was_redic = True
     m1_speed = request.args.get('m1')
     m2_speed = request.args.get('m2')
+    #send_message(f"{m1_speed}{m2_speed}000")
+    print(session['time_con'])
+    if session['time_con'] == -1:
+        print("beep")
+        session['time_con'] = datetime.now().strftime("%H:%M:%S");
     send_message(f"SPD{m1_speed}${m2_speed}$")
-    return render_template('experiencia_base_movil/index.html')
+    return render_template('experiencia_base_movil/index.html', time_con = session['time_con'], wt = whos_there)
 
 @app.route('/experiencia_base_movil/set_arduino_k', methods=['POST', 'GET'])
 def constantes_arduino():
@@ -451,7 +566,7 @@ def set_ref(x,y):
     # POST request
     if request.method == 'POST':
         print(request.get_json())  # parse as JSON
-        return 'Sucesss', 200
+        return 'Success', 200
 
 @app.route('/camera', methods=['post', 'get'])
 def camera():
@@ -463,6 +578,7 @@ def exps():
     if not session:
         return redirect(url_for('index'))
     user_id = session["user_id"]
+    user = get_user(user_id)
     conn = get_db_connection()
     reservas = conn.execute('SELECT * FROM reservas WHERE id_user = ?',
                         (user_id,)).fetchall()
@@ -476,12 +592,47 @@ def exps():
     reservas_new = []
     dia_h, mes_h, año_h = hoy.split("/")
     for res in reservas:
+        new_res = {"fecha": res['fecha'], "hora": res['hora'],"id_exp": res['id_exp']}
+        enc = get_user(res['id_enc'])
+        if enc['tipo'] == "profesor":
+            new_res['enc'] = enc['name'] + " " + enc['lastname']
+        else:
+            new_res['enc'] = "Libre"
         dia_r, mes_r, año_r = res['fecha'].split("/")
         if ((dia_r >= dia_h) & (mes_r >= mes_h) & (año_r >= año_h)):
-            coming_up.append(res)
+            coming_up.append(new_res)
         else:
-            reservas_new.append(res)
-    return render_template("perfil/historial_experiencias.html", reservas = reservas_new, nombres_exp = nomexp, reservas_cu = coming_up)
+            reservas_new.append(new_res)
+    return render_template("perfil/historial_experiencias.html", reservas = reservas_new, nombres_exp = nomexp, reservas_cu = coming_up, user = user)
+
+@app.route("/cuenta/est", methods = ('POST', 'GET'))
+def estuds():
+    #if not session:
+    #   return redirect(url_for('index'))
+    user_id = session["user_id"]
+    conn = get_db_connection()
+    if request.method == 'POST':
+        act, id_est = request.form['sid'][0], int(request.form['sid'][1:])
+        if act == "A":
+            conn.execute("INSERT INTO estudiante_de (id_est, id_prof) VALUES (?, ?)", (id_est,user_id))
+        elif act == "D":
+            conn.execute("DELETE FROM estudiante_de WHERE id_est = ? AND id_prof = ?", (id_est,user_id))
+        elif act == "U":
+            conn.execute("UPDATE usuarios SET blacklist = ? WHERE id = ?", (0,id_est))
+        else:
+            conn.execute("UPDATE usuarios SET blacklist = ? WHERE id = ?", (1,id_est))
+        conn.commit()
+    estuds = conn.execute('SELECT * FROM usuarios WHERE tipo = ?',
+                        ('alumno',)).fetchall()
+    conn.close()
+    mine = []
+    not_mine = []
+    for estud in estuds:
+        if my_teach(user_id, estud['id']):
+            mine.append(estud)
+        else:
+            not_mine.append(estud)
+    return render_template("perfil/estudiantes.html", mine = mine, not_mine = not_mine)
 
 @app.route("/cuenta/del", methods =('POST', ))
 def delete():
@@ -504,15 +655,49 @@ def exp_con():
     hoy = full_date[0]
     if hoy[0] == "0":
         hoy = hoy[1:]
+    global was_redic
     ahora = full_date[1] +":00"
     conn = get_db_connection()
-    tiene_hora  = conn.execute('SELECT * FROM reservas WHERE id_user = ? AND fecha = ? AND hora = ?', (id_user, hoy, ahora,)).fetchone()
-    conn.close()
-    if tiene_hora:
-        return redirect(url_for('experiencia_base_movil'))
-    else: 
-        flash("No tienes reservada esta hora, reserva una aquí.")
-        return redirect(url_for('res'))
+    hora_res  = conn.execute('SELECT * FROM reservas WHERE fecha = ? AND hora = ?', (hoy, ahora,)).fetchone()
+    if hora_res != None:
+        if hora_res['id_user'] == id_user:
+            tiene_hora = 1
+        else:
+            tiene_hora = 0
+        conn.close()
+        if tiene_hora:
+            was_redic = True
+            return redirect(url_for('experiencia_base_movil'))
+        else: 
+            flash("No tienes reservada esta hora, reserva una aquí.")
+            return redirect(url_for('res'))
+    else:
+        global whos_there
+        answer = whos_there
+        print(answer)
+        rob = usuario['robotica']
+        uc = (usuario['inst'] == 'UC')
+        #If robotic, external or uc in there
+        #If uc, external in there
+        #If external, first come first serve
+        if (answer == 'N') or ((answer == 'E' or answer == 'U') and rob) or (answer == 'E' and uc):
+            if rob:
+                whos_there = "R"
+            elif uc:
+                whos_there  = "U"
+            else:
+                whos_there = "E"
+            was_redic = True
+            return redirect(url_for('experiencia_base_movil'))
+        else:
+            flash("No tienes reservada esta hora, reserva una aquí.")
+            return redirect(url_for('res'))
+
+@app.route('/getwt', methods = ['GET'] )
+def get_wt():
+    global whos_there
+    print(f"DATOS ENVIADOS: \n {whos_there}\n")
+    return whos_there
 
 @app.route("/salir", methods =('POST',))
 def salir():

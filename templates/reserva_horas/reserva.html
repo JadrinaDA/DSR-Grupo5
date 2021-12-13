@@ -87,11 +87,15 @@
 				<form method = "POST" class = "horform"> 
 					<input type="hidden" name="dia" id = "dia" value="">
 					<input type="hidden" name="id_exp" id = "id_exp" value=1>
+					<input type="hidden" name="is_enc" id = "is_enc" value=1>
 					{% for hora in ava %}
 		        		<button class="hora_bubble" type="submit" name="hora" value={{hora}}>{{hora}}</button>
 		    		{% endfor %}
 				</form>
 			</div>
+			{% if is_teach %}
+			<button value = "enc" id = 'btn'> Asignarse encargado</button>
+			{% endif%} 
 		</div>
 
 		<meta name = "taken"  content="{{taken}}"/>

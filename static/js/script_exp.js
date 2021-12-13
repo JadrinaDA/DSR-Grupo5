@@ -1,5 +1,6 @@
 const ppm = 400; // Pixeles por metro
 
+
 const queryString = window.location.search;
 console.log(queryString);
 
