@@ -73,6 +73,7 @@ function getExpData(){
         {
             document.getElementById('error_dist').value = data['error_lineal']/ppm;  
             document.getElementById('error_ang').value = data['error_angular']*180/Math.PI;  
+            addData(data['error_angular']*180/Math.PI)  
         }
         // if ('ref' in data)
         // {
@@ -81,6 +82,63 @@ function getExpData(){
         // } 
     });
 }
+// Creación de gráficos 
+// Parte creada por Nico
+let trace1 = {
+    x: [0],
+    y: [0],
+    name: 'Error angular',
+    type: 'scatter'
+    
+  };
+
+  var layout = {
+    width:750,
+    heigth:300,
+    title: {
+      text:'Error angular en el tiempo',
+      font: {
+        family: 'Courier New, monospace',
+        size: 18
+      },
+      xref: 'paper',
+      x: 0.05,
+    },
+    xaxis: {
+      title: {
+        text: 'Segundos',
+        font: {
+          family: 'Courier New, monospace',
+          size: 12,
+          color: '#7f7f7f'
+        }
+      },
+    },
+    yaxis: {
+      title: {
+        text: 'Error angular',
+        font: {
+          family: 'Courier New, monospace',
+          size: 12,
+          color: '#7f7f7f'
+        }
+      }
+    }
+  };
+
+data_plot = [trace1];
+TESTER = document.getElementById('myDiv');
+Plotly.newPlot(TESTER, data_plot, layout);
+
+function addData(y_value) 
+{
+  trace1['x'].push(trace1['x'].slice(-1)[0] + 1);
+  trace1['y'].push(y_value);
+  Plotly.newPlot('myDiv', data_plot, layout);
+}
+
+
+
 
 function getArdData(){
     fetch('/experiencia_base_movil/ard_data')
@@ -92,7 +150,8 @@ function getArdData(){
         if ('M1' in data)
         {
             document.getElementById('M1').value = data['M1']/ppm;  
-            document.getElementById('M2').value = data['M2']*180/Math.PI;  
+            document.getElementById('M2').value = data['M2']*180/Math.PI;
+            
         }
         if ('vel1' in data)
         {
