@@ -23,9 +23,6 @@ function ArduinoConstants()
 		body: json_data
 		}).then(function (response) { // At this point, Flask has printed our JSON
 		return response.text();
-		}).then(function (text) {
-
-		// Should be 'OK' if everything was successful
 		});
 		
 		
