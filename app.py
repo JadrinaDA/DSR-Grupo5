@@ -29,17 +29,8 @@ MQTT_DATA = "DSR5/DATA"
 MQTT_ARD = "DSR5/ARD"
 idx_img = 0
 
-def show_camera():
-    global frame
-    while True:
-        print(frame)
-        #cv.imshow("Stream", frame)
-        # if cv.waitKey(1) & 0xFF == ord('q'):
-        #     break
-
 # The callback for when the client receives a CONNACK response from the server.
 def cam_on_connect(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
@@ -96,7 +87,6 @@ def on_message(client, userdata, msg):
     npimg = np.frombuffer(img, dtype=np.uint8)
     # Decode to Original Frame
     frame = cv.imdecode(npimg, 1)
-    print(frame)
 
 from datetime import datetime
 
@@ -126,7 +116,6 @@ def my_teach(id_prof, id_est):
 def get_changes(user, form):
     new = {}
     for x in form.keys():
-        print(x)
         if x == "major":
             if form[x] == "robotica":
                 new['robotica'] = 1
@@ -187,7 +176,6 @@ def index():
     conn = get_db_connection()
     users = conn.execute('SELECT * FROM estudiante_de').fetchall()
     conn.close()
-    print(my_teach(2,3))
     return render_template("inicio/pagina_inicio.html", users = None)
 
 @app.route("/capture")
@@ -248,14 +236,12 @@ def login():
 def exper():
     if not session:
         return redirect(url_for('index'))
-    print(session['time_con'])
     if session['time_con'] != -1:
         hour_n, min_n, sec_n = datetime.now().strftime("%H:%M:%S").split(':')
         hour_c, min_c, sec_c = session['time_con'].split(':')
         hrs, mins = p.DURACION_EXP.split(",")
         hrs = int(hrs)
         mins = int(mins)
-        print(hour_n, hour_c, min_n, min_c)
         if ((int(hour_n) >= (int(hour_c) + hrs)) or (int(min_n) >= (int(min_c) + mins))):
             session['time_con'] = -1
     global whos_there
@@ -411,7 +397,6 @@ def res():
                 if (res['taken'] or not my_teach(res['id_enc'], user_id)): 
                     coming_up.append(res)
         if ((dia_r == dia_h) & (mes_r == mes_h) & (año_r == año_h)):
-            print(res['hora'])
             available.remove(res["hora"])
     coming_up_dic = ""
     for ress in coming_up:
@@ -461,9 +446,7 @@ def experiencia_base_movil():
     m1_speed = request.args.get('m1')
     m2_speed = request.args.get('m2')
     #send_message(f"{m1_speed}{m2_speed}000")
-    print(session['time_con'])
     if session['time_con'] == -1:
-        print("beep")
         session['time_con'] = datetime.now().strftime("%H:%M:%S");
     send_message(f"SPD{m1_speed}${m2_speed}$")
     return render_template('experiencia_base_movil/index.html', time_con = session['time_con'], wt = whos_there, d_e = p.DURACION_EXP)
@@ -474,7 +457,6 @@ def constantes_arduino():
         kp = request.args.get('kp')
         ki = request.args.get('ki')
         kd = request.args.get('kd')
-        print(f"contantes recibidas: {kp}, {ki}, {kd}")
         send_message(f"KAR{kp}${kd}${ki}")
         return render_template('experiencia_base_movil/index.html')
 
@@ -482,7 +464,6 @@ def constantes_arduino():
 @app.route('/experiencia_base_movil/arduino_constants', methods=['POST', 'GET'])
 def arduino_constants():
     if request.method == 'POST':
-        print(request.get_json())
         data = request.get_json()
         kp = data['kp']
         ki = data['ki']
@@ -494,7 +475,6 @@ def arduino_constants():
 @app.route('/experiencia_base_movil/main_control_constants', methods=['POST', 'GET'])
 def main_control_constants():
     if request.method == 'POST':
-        print(request.get_json())
         data = request.get_json()
 
         kpl = data['kpl']
@@ -506,18 +486,14 @@ def main_control_constants():
         kda = data['kda']
         # send_message(f"K{kpl}${kdl}${kil}${kpa}${kda}${kia}$")
         send_message(f"KSL{kpl}${kil}${kdl}")
-        print("KSL enviado")
         time.sleep(1)
         send_message(f"KSA{kpa}${kia}${kda}")
-        print("KSA enviado")
-        print()
 
         return 'OK', 200
 
 @app.route('/experiencia_base_movil/motor_speeds', methods=['POST', 'GET'])
 def motor_speeds():
     if request.method == 'POST':
-        print(request.get_json())
         data = request.get_json()
         m1_speed = data['m1']
         m2_speed = data['m2']
@@ -528,7 +504,6 @@ def motor_speeds():
 @app.route('/experiencia_base_movil/open_camera', methods=['POST', 'GET'])
 def open_camera():
     if request.method == 'POST':
-        print(request.get_data)
 
         send_message('CAM')
         
@@ -537,13 +512,11 @@ def open_camera():
 @app.route('/experiencia_base_movil/exp_data', methods = ['GET'] )
 def send_exp_data():
     global exp_data
-    print(f"DATOS ENVIADOS: \n {exp_data}\n")
     return jsonify(exp_data)
 
 @app.route('/experiencia_base_movil/ard_data', methods = ['GET'] )
 def send_ard_data():
     global ard_data
-    print(f"DATOS ENVIADOS: \n {ard_data}\n")
     return jsonify(ard_data)
 
 @app.route('/experiencia_base_movil/set_constants', methods=['post', 'get'])
@@ -557,11 +530,8 @@ def set_exp_constants():
     kda = request.args.get('kda')
     # send_message(f"K{kpl}${kdl}${kil}${kpa}${kda}${kia}$")
     send_message(f"KSL{kpl}${kil}${kdl}")
-    print("KSL enviado")
     time.sleep(1)
     send_message(f"KSA{kpa}${kia}${kda}")
-    print("KSA enviado")
-    print()
     return render_template('experiencia_base_movil/index.html')
 
 @app.route("/setRef/<x>/<y>")
@@ -574,7 +544,6 @@ def set_ref(x,y):
         return jsonify(message)  # serialize and use JSON headers
     # POST request
     if request.method == 'POST':
-        print(request.get_json())  # parse as JSON
         return 'Success', 200
 
 @app.route('/camera', methods=['post', 'get'])
@@ -689,7 +658,6 @@ def exp_con():
     else:
         global whos_there
         answer = whos_there
-        print(answer)
         rob = usuario['robotica']
         uc = (usuario['inst'] == 'UC')
         #If robotic, external or uc in there
@@ -711,7 +679,6 @@ def exp_con():
 @app.route('/getwt', methods = ['GET'] )
 def get_wt():
     global whos_there
-    print(f"DATOS ENVIADOS: \n {whos_there}\n")
     return whos_there
 
 @app.route("/salir", methods =('POST',))
