@@ -29,14 +29,6 @@ MQTT_DATA = "DSR5/DATA"
 MQTT_ARD = "DSR5/ARD"
 idx_img = 0
 
-def show_camera():
-    global frame
-    while True:
-        pass
-        #cv.imshow("Stream", frame)
-        # if cv.waitKey(1) & 0xFF == ord('q'):
-        #     break
-
 # The callback for when the client receives a CONNACK response from the server.
 def cam_on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
