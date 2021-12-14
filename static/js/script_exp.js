@@ -132,8 +132,21 @@ Plotly.newPlot(TESTER, data_plot, layout);
 
 function addData(y_value) 
 {
-  trace1['x'].push(trace1['x'].slice(-1)[0] + 1);
-  trace1['y'].push(y_value);
+  if (trace1['x'].length >= 30)
+  {
+    trace1['x'].push(trace1['x'].slice(-1)[0] + 1);
+    trace1['y'].push(y_value);
+    trace1['x'].shift();
+    trace1['y'].shift();
+  }
+  else
+  {
+    trace1['x'].push(trace1['x'].slice(-1)[0] + 1);
+    trace1['y'].push(y_value);
+  }
+
+
+  
   Plotly.newPlot('myDiv', data_plot, layout);
 }
 
