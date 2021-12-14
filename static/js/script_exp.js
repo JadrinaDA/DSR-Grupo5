@@ -19,7 +19,7 @@ function reset(){
             }
     }
     ArduinoConstants();
-    setTimeout(() => { MotorSpeeds(); }, 500);
+    /*setTimeout(() => { MotorSpeeds(); }, 500);*/
     setTimeout(() => { mainControlConstants(); }, 1000);
 }
 
