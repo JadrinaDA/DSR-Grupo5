@@ -1,6 +1,11 @@
 function ArduinoConstants()
 					 {
+		console.log('hello');
 		form = document.getElementById("arduino_constants");
+
+		console.log(form['kp'].value);
+		console.log(form['ki'].value);
+		console.log(form['kd'].value);
 		
 		data = {
 			kp:form['kp'].value,
@@ -23,6 +28,12 @@ function ArduinoConstants()
 		body: json_data
 		}).then(function (response) { // At this point, Flask has printed our JSON
 		return response.text();
+		}).then(function (text) {
+
+		console.log('POST response: ');
+
+		// Should be 'OK' if everything was successful
+		console.log(text);
 		});
 		
 		
@@ -30,6 +41,7 @@ function ArduinoConstants()
 
 function MotorSpeeds()
 					 {
+		console.log('hello');
 		form = document.getElementById("motor_speeds");
 
 		data = {
@@ -52,6 +64,12 @@ function MotorSpeeds()
 		body: json_data
 		}).then(function (response) { // At this point, Flask has printed our JSON
 		return response.text();
+		}).then(function (text) {
+
+		console.log('POST response: ');
+
+		// Should be 'OK' if everything was successful
+		console.log(text);
 		});
 		
 		
@@ -59,6 +77,7 @@ function MotorSpeeds()
 
 function mainControlConstants()
 					 {
+		console.log('hello');
 		form = document.getElementById("main_control_constants");
 
 		data = {
@@ -86,11 +105,18 @@ function mainControlConstants()
 		body: json_data
 		}).then(function (response) { // At this point, Flask has printed our JSON
 		return response.text();
+		}).then(function (text) {
+
+		console.log('POST response: ');
+
+		// Should be 'OK' if everything was successful
+		console.log(text);
 		});	
 	  }
 
 function OpenCamera()
 					 {
+		console.log('hello');
 		form = document.getElementById("open_camera");
 
 		let data = '8';
@@ -109,6 +135,12 @@ function OpenCamera()
 		body: data
 		}).then(function (response) { // At this point, Flask has printed our JSON
 		return response.text();
+		}).then(function (text) {
+
+		console.log('POST response: ');
+
+		// Should be 'OK' if everything was successful
+		console.log(text);
 		});
 		
 		
