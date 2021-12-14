@@ -27,7 +27,6 @@ def FiltroTarea(X,p1,p2,p3):
             if np.abs(X[k1,k2])>m:
                 mask[k1-p2:k1+p2,k2-p2:k2+p2] = 0
     mask[int(s[0]/2)-p3:int(s[0]/2)+p3,int(s[1]/2)-p3:int(s[1]/2)+p3] = 1
-    # imshow(mask)
     Y = mask*X
     return Y
 
@@ -51,8 +50,6 @@ def FiltroTarea2(X,p1,p2,p3):
                 mask[k1-p2:k1+p2,k2-p2:k2+p2] = 0
     mask[int(s[0]/2)-p3:int(s[0]/2)+p3,int(s[1]/2)-p3:int(s[1]/2)+p3] = 1
     
-    # imshow(mask)
-
     Y_fft = mask*X_fft
 
     Y = np.abs(ifft2(Y_fft))
@@ -60,12 +57,7 @@ def FiltroTarea2(X,p1,p2,p3):
 
 img = cv2.imread('J1.png',0)
 
-# img_fft = fft2(img)
-
-# img_fft = fftshift(img_fft)
 
 filtrada = FiltroTarea2(img,0.8,20,25)
-
-# filtrada = np.abs(ifft2(filtrada_fft))
 
 imshow(filtrada)

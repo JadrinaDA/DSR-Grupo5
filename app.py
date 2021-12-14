@@ -42,22 +42,25 @@ def cam_on_message(client, userdata, msg):
     global frame
     global exp_data
     global ard_data
-    if msg.topic == MQTT_CAM:
-        # idx = int.from_bytes(msg.payload[:2],"little")
-        # Decoding the message
-        img = base64.b64decode(msg.payload[2:])
-        # converting into numpy array from buffer
-        npimg = np.frombuffer(img, dtype=np.uint8)
-        # Decode to Original Frame
-        frame = cv.imdecode(npimg, 1)
+    try:
+        if msg.topic == MQTT_CAM:
+            # idx = int.from_bytes(msg.payload[:2],"little")
+            # Decoding the message
+            img = base64.b64decode(msg.payload[2:])
+            # converting into numpy array from buffer
+            npimg = np.frombuffer(img, dtype=np.uint8)
+            # Decode to Original Frame
+            frame = cv.imdecode(npimg, 1)
 
-    elif msg.topic == MQTT_DATA:
-        exp_data = json.loads(msg.payload)
-        # print(exp_data)
+        elif msg.topic == MQTT_DATA:
+            exp_data = json.loads(msg.payload)
+            # print(exp_data)
 
-    elif msg.topic == MQTT_ARD:
-        ard_data = json.loads(msg.payload)
-        # print(ard_data)
+        elif msg.topic == MQTT_ARD:
+            ard_data = json.loads(msg.payload)
+            # print(ard_data)
+    except:
+        print('Error de MQTT')
 
 def generate():
     # grab global references to the output frame and lock variables
@@ -441,6 +444,7 @@ def speed_index():
         return redirect(url_for('index'))
     return render_template('experiencia_base_movil/index.html')
 
+
 @app.route('/experiencia_base_movil/set_speed', methods=['post', 'get'])
 def experiencia_base_movil():
     global was_redic
@@ -510,10 +514,13 @@ def motor_speeds():
 @app.route('/experiencia_base_movil/open_camera', methods=['POST', 'GET'])
 def open_camera():
     if request.method == 'POST':
-
-        send_message('CAM')
+        try:
+            send_message('CAM')
+            return 'OK', 200
+        except:
+            print('Error al enviar mensaje CAM')
         
-        return 'OK', 200
+        
 
 @app.route('/experiencia_base_movil/exp_data', methods = ['GET'] )
 def send_exp_data():
