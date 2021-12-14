@@ -29,8 +29,17 @@ MQTT_DATA = "DSR5/DATA"
 MQTT_ARD = "DSR5/ARD"
 idx_img = 0
 
+def show_camera():
+    global frame
+    while True:
+        pass
+        #cv.imshow("Stream", frame)
+        # if cv.waitKey(1) & 0xFF == ord('q'):
+        #     break
+
 # The callback for when the client receives a CONNACK response from the server.
 def cam_on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
@@ -87,6 +96,7 @@ def on_message(client, userdata, msg):
     npimg = np.frombuffer(img, dtype=np.uint8)
     # Decode to Original Frame
     frame = cv.imdecode(npimg, 1)
+    print(frame)
 
 from datetime import datetime
 
@@ -116,6 +126,7 @@ def my_teach(id_prof, id_est):
 def get_changes(user, form):
     new = {}
     for x in form.keys():
+        print(x)
         if x == "major":
             if form[x] == "robotica":
                 new['robotica'] = 1
@@ -176,6 +187,7 @@ def index():
     conn = get_db_connection()
     users = conn.execute('SELECT * FROM estudiante_de').fetchall()
     conn.close()
+    print(my_teach(2,3))
     return render_template("inicio/pagina_inicio.html", users = None)
 
 @app.route("/capture")
@@ -236,12 +248,14 @@ def login():
 def exper():
     if not session:
         return redirect(url_for('index'))
+    print(session['time_con'])
     if session['time_con'] != -1:
         hour_n, min_n, sec_n = datetime.now().strftime("%H:%M:%S").split(':')
         hour_c, min_c, sec_c = session['time_con'].split(':')
         hrs, mins = p.DURACION_EXP.split(",")
         hrs = int(hrs)
         mins = int(mins)
+        print(hour_n, hour_c, min_n, min_c)
         if ((int(hour_n) >= (int(hour_c) + hrs)) or (int(min_n) >= (int(min_c) + mins))):
             session['time_con'] = -1
     global whos_there
