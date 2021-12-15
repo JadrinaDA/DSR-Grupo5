@@ -18,7 +18,7 @@
 			</nav>
 		</div>
 		<div class="container"> 
-			<div class="square">
+			<div class="square top">
 				<h1> Robot PID / Robot Fundamentos </h1>
 				<hr>
 				<br>
@@ -30,6 +30,7 @@
 						<p>El control automático es el proceso de hacer que variables de un sistema se ajusten a un valor determinado.
 							Esto nos permite controlar el estado de un sistema, por ejemplo un robot, para que realice las acciones que queremos
 							de una manera precisa y eficiente.
+						</p>
 							<br> 
 							Un buen sistema de control cuenta con las siguientes características:
 							<ul>
@@ -42,14 +43,35 @@
 							Para un buen sistema de control, es necesario contar con modelos que permitan predecir el comportamiento del objeto. 
 							<br> 
 
-						<h2>Control PID/h2>
+							Un controlador finalmente es una función cuyo input es el error, que corresponde a la diferencia entre el valor esperado 
+							de la variable controlada, o referencia, y el valor actual de la variable. El output del controlador es la llamada señal de control
+							la cual altera, directa o indirectamente la variable controlada para poder regularla.
+						</div>
+
+						<div class="info_square">
+						<h2>Control PID</h2>
 						<hr>
 						<p>
+							Su nombre viene de la sigla Proporcional, Integral, Derivativo. Es un sistema cuya señal de control corresponde a la ponderación
+						de tres variables relacionadas con el error del sistema	según tres constantes que varían en cada caso y que se deben escoger según 
+						las propiedades que se deseen.
+						</p>			
+						<ul>
+							<b><li>K<sub>p</sub>:</b> Regula la ponderación del control proporcional, se pondera directamente con el error. Intuitivamente,
+								a mayor error, más "fuerza" hay que ejercer para que el sistema se acerque a su referencia. </li>
+								<b><li>K<sub>i</sub>:</b> Regula la ponderación del control integral, se pondera por la integral del error. Generalmente se utiliza 
+									para contrarrestar errores constantes producidos por fuerzas externas que el control proporcional no es capaz de manejar. Mientras más
+							tiempo se mantiene un error, más se acumula en la integral y más fuerza aporta el control integral. 
+							</li>
+							<b><li>K<sub>d</sub>:</b> Regula la ponderación del control derivativo, se pondera con la derivada del error. Sirve para disminuír 
+							oscilaciones. Intuitivamente, si la variación del error es muy grande con signo positivo, la derivada va a a ser proptiorcional pero 
+							con signo negativo, lo mismo ocurre con el signo opuesto.</li>
+						</ul>
+					</div>
+						
 
-						</p>
 					</div>
 				</div>
-			</div>
 			<div class="square">
 				<h2> Experiencias</h2>
 				<div class="container_bts">
@@ -66,4 +88,5 @@
 				</div>
 			</div>
 		</div>
+	</div>
 	</body>

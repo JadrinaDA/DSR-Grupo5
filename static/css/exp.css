@@ -20,9 +20,14 @@ body{
 	background-color: rgb(255, 210, 0, 0.2);
 	width: 50%;
 	padding: 2%;
-	margin: 6%;
 	color: #000000;
 	border-radius: 20px;
+	margin: 2%;
+}
+
+.top{
+	margin-top: 8%;
+	
 }
 
 .container_bts {
@@ -62,11 +67,6 @@ h3 {
 	color: white;
 	padding-left: 5px;
 }
-
-h2 {
-	text-align: left !important; 
-}
-
 
 h1 {
 	text-align: center;
