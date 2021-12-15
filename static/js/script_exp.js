@@ -8,10 +8,7 @@ const urlParams = new URLSearchParams(queryString);
 const constants = ["kpl", "kil", "kdl", "kpa", "kia", "kda" ];
 constants.forEach(updateConstants);
 
-<<<<<<< HEAD
 // window.addEventListener('beforeunload', reset);
-=======
-window.addEventListener('beforeunload', reset);
 let data_arduino = {};
 let data_experiencia = {};
 let arduino = false ;
@@ -21,7 +18,6 @@ let names = {
   'error_angular': 'Error angular en el tiempo',
   'error_lineal' : 'Error de distancia en el tiempo'
 }
->>>>>>> 94c2a0ac0e6785462d8f3a6bc873f87a08911a1d
 
 let eje_y =
 {
