@@ -22,8 +22,20 @@
 
 			<div class="container"> 
 				<div class="square">
+<<<<<<< HEAD
 					<h1> Nuestras Experiencias </h1>
 					<br>
+=======
+					<h2> Nuestras Experiencias </h2>
+					{% with messages = get_flashed_messages() %}
+					{% if messages %}
+					{% for message in messages %}
+	      				{{message}}
+	      			{% endfor %}
+	      			{% else %}
+	   				{% endif %}
+	   				{% endwith %}
+>>>>>>> 94c2a0ac0e6785462d8f3a6bc873f87a08911a1d
 					<div class="container_sim">
 						<div class="container_exp">
 							<p class="nombre"> Robot PID </p>

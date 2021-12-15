@@ -6,6 +6,10 @@
 		</title>
 		<meta charset="uft-8">
 		<link rel="stylesheet" href="{{ url_for('static', filename = 'css/estilo_experiencia.css') }}">
+    <script src='https://cdn.plot.ly/plotly-2.6.3.min.js'></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
 	</head>
 	<body>
 		<div class="header">
@@ -30,7 +34,17 @@
           </form>
           
 		</div>
-
+    <button> Next </button>
+    <div id='myDiv'></div>
+    <div> 
+      <select id="mySelect" onchange="addData()">
+        
+        <option value="error_lineal">Error lineal</option>
+        <option value="error_angular">Error angular</option>
+        <option value="vel1">Referencia Motor 1</option>
+        <option value="vel2">Referencia Motor 2</option>
+      </select>
+    </div>
 		<div class="sidenav">
 		
 		<h2>Constantes PID</h2>
@@ -106,7 +120,7 @@
     crossorigin="anonymous"></script>
     
     <script src ="{{ url_for('static', filename = 'js/exp_forms.js') }}"></script>
-    <script src ="{{ url_for('static', filename = 'js/script_exp.js') }}"></script>
+    
 
     
     </div>
@@ -137,17 +151,17 @@
   </div>
   </div>
 
-<script src ="{{ url_for('static', filename = 'js/script_exp.js') }}"></script>
 <script>
   var today = new Date();
   var time_con = '{{time_con}}';
   var wt = '{{wt}}';
-  console.log(today);
+  var d_e_a = '{{d_e}}';
+  d_e_a = d_e_a.split(',')
+  var d_e_1 = parseInt(d_e_a[0]);
+  var d_e_2 = parseInt(d_e_a[1]);
   var con_array = time_con.split(':').map(function(x) { return parseInt(x);});
-  var exit = new Date(today.getFullYear(), today.getMonth(), today.getDate(),con_array[0] + 1, con_array[1], con_array[2]);
-  console.log(exit);
+  var exit = new Date(today.getFullYear(), today.getMonth(), today.getDate(),con_array[0] + d_e_1, con_array[1] + d_e_2, con_array[2]);
   var time_left = exit - today; 
-  console.log(time_left);
   setTimeout(function(){
   window.location.href = "{{ url_for('exper')}}"},  time_left);
   function getWT(){
@@ -156,16 +170,16 @@
         return response.text();
     })
     .then(function (data) {
-      console.log(data)
       if (data != wt){
         window.location.href = "{{ url_for('exper')}}";
       }
     });
 }
 
+
 setInterval(getWT, 1000);
   
 </script>
-
+<script src ="{{ url_for('static', filename = 'js/script_exp.js') }}"></script>
 </body>
 </html>

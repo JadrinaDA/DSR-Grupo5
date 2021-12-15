@@ -8,6 +8,7 @@ from subscriber import Subscriber
 from controler import Controler
 from store_coor import StoreCoor
 
+<<<<<<< HEAD
 # import Filtro as filter
 
 '''
@@ -18,6 +19,8 @@ hsv_green = cv.cvtColor(green,cv.COLOR_BGR2HSV)
 print( hsv_green )
 '''
 
+=======
+>>>>>>> 94c2a0ac0e6785462d8f3a6bc873f87a08911a1d
 bt = True
 cam = 1
 
@@ -54,7 +57,6 @@ def center_of_mass_area(mask):
         return (0,0)
 
 def angulo(p1, p2):
-    # a = np.arctan2(p2[1]-p1[1], p2[0]-p1[0]) + np.pi/2
     a = np.arctan2(p2[1]-p1[1], p2[0]-p1[0])
     while a>np.pi:
         a-= 2*np.pi
@@ -76,6 +78,7 @@ def bt_receive(sub):
 
 
 fps = 10
+fps_cam = 5
 cont = Controler(1/fps)  
 port = "/dev/cu.IRB-G01-SPPDev"
 #port = "/dev/cu.iPhonedeIgnacio-Wireles"
@@ -90,7 +93,7 @@ state = np.array([0.0, 0.0, 0.0])
 error_actual = np.array([0.0, 0.0])
 
 cap = cv2.VideoCapture(cam)
-cap.set(cv2.CAP_PROP_FPS, fps)
+cap.set(cv2.CAP_PROP_FPS, fps_cam) 
 screen_to_real = 0.42
 clase.bt_send(f"KAR{10}${0.0001}${0}$")
 
@@ -108,10 +111,6 @@ while(1):
     s = np.shape(frame)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    # if (100<i) and (i<200):
-    #     cv2.imwrite(f"imor_{i}.jpg",frame) 
-    #     print("guardando imagen")
-
     l = 5
     
     # Green mask
@@ -127,41 +126,21 @@ while(1):
     x2, y2 = center_of_mass_area(brown_mask)
     if np.isnan(x2) or np.isnan(y2):
         x2, y2 = (0,0)
-    # brown_mask[int(x2)-l:int(x2)+l,int(y2)-l:int(y2)+l] = 0
 
     a = angulo((x1,y1), (x2,y2))
-    # print(f"Angulo: {a*180/ np.pi}")
-    
-    # dist = int(((store_coor.ref[0] -y1)*2 + (store_coor.ref[1] -x1)2)*(0.5) * screen_to_real)
-    # font = cv2.FONT_HERSHEY_SIMPLEX
-    # cv2.putText(frame,'Dist:' + str(dist),(10,450), font, 2,(255,255,255),2,cv2.LINE_AA)
-
-    # state[:] = np.array([y1-640/2, 480/2-x1, a])
     state[:] = np.array([y1/2, x1/2, a])
-    # print(f"Angulo: {a*180/np.pi}")
-    # print(f"({state[0]}, {state[1]}), angulo: {state[2]*180/np.pi} Ref: {store_coor.ref_d}")
-    # error_actual[:] = error(store_coor.ref_d, state)
-    # clase.bt_msg = f"ERA{error_actual[1]}$"
-    # cont.UpdateError(error_actual)
-    # print(f"Error actual: {error_actual[1] * 180/np.pi}")
-    # print(f"Referencia: {store_coor.ref_d}")
 
     # Actualizamos constantes
     cont.kp_a, cont.ki_a, cont.kd_a = clase.angular_constants
     cont.kp_l, cont.ki_l, cont.kd_l = clase.linear_constants
 
     # Mandamos señal de control
-    # print(clase.auto)
     if clase.auto:
         cont.ref = np.array(store_coor.ref_d)
         u0, u1 = cont.control(state)
         clase.bt_msg = f"REF{u0}${u1}$"
         clase.bt_signal = True
-        # print(clase.bt_msg)
 
-    #dist = int(((store_coor.ref[0] -y1)**2 + (store_coor.ref[1] -x1)**2)**(0.5) * screen_to_real)
-    # font = cv2.FONT_HERSHEY_SIMPLEX
-    #cv2.putText(frame,'Dist:' + str(dist),(10,450), font, 2,(255,255,255),2,cv2.LINE_AA)
 
     # Dibujamos 
     circle_pos = 2*store_coor.ref_d[0], 2*store_coor.ref_d[1]
@@ -170,23 +149,12 @@ while(1):
     cv2.circle(frame, circle_pos, 10,(135,229, 255), -1) # Goal
     cv2.circle(frame, (int(y1),int(x1)), 10,(0,150, 20), -1) # Green Circle
     cv2.circle(frame, (int(y2),int(x2)), 10,(0,50, 100), -1)  # Brown Circle
-    # cv2.imshow('frame', frame)
-
-    # Mostramos segmentaciones
-    # cv2.imshow('brown', brown_mask)
-
-    # cv2.imshow('frame', frame)
-    # cv2.imshow('green', green_mask)
 
     # Actualizamos frame actual y diccionario
     error = cont.error
     clase.current_frame = frame
     clase.mqtt_dict['error_lineal']=cont.error[0]
     clase.mqtt_dict['error_angular']=cont.error[1]
-    #print(cont.error[1]*180/np.pi)
-    #print(cont.error[1]*180/np.pi)
-    # clase.mqtt_dict['u0']=u0
-    # clase.mqtt_dict['u1']=u1
     clase.mqtt_dict['ref']=store_coor.ref_d
     clase.mqtt_dict['x']=state[0]
     clase.mqtt_dict['y']=state[1]

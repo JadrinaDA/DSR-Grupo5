@@ -45,7 +45,7 @@ class Subscriber():
         t.start()
 
     def on_connect(self, client, userdata, flags, rc):
-        print('Se conectó con MQTT ' + str(rc))
+        print('Se conectó con MQTT')
         client.subscribe('DSR5/1')
 
     def on_message(self, client, userdata, msg):
@@ -116,8 +116,6 @@ class Subscriber():
             msg = encoded_msg.decode('utf8', 'strict')
             print(f"Mensaje recibido por BT: {msg}")
             client.publish(MQTT_DATA, msg)
-            # data = json.loads(msg)
-            # print(f"keys: {data.keys()}")
 
         except Exception as e:
             print("\nError de Recepcion BT")
@@ -141,10 +139,6 @@ class Subscriber():
         # Topic on which frame will be published
         MQTT_CAM = p.MQTT_CAM
         MQTT_DATA = p.MQTT_DATA
-        # MQTT_CAM = "DSR5/CAM"
-        # Object to capture the frames
-        # cap = cv.VideoCapture(1)
-        # Phao-MQTT Clinet
         client = mqtt.Client()
         # Establishing Connection with the Broker
         client.connect(MQTT_BROKER)
@@ -153,60 +147,29 @@ class Subscriber():
             i = 0
             while (this_video_id == self.video_id):
                 if i > 300:
-                # if i > 300: 
-
                     i = 0
                 i += 1
-                # start = time.time()
-                # Read Frame
-                # _, frame = cap.read()
                 frame = self.current_frame
                 
                 # Resize Frame
-                # frame = cv.resize(frame, [80, 120] )
-                # frame = cv.resize(frame, [160, 120] )
                 frame = cv.resize(frame, [320, 240] )
                 
                 # Encoding the Frame
                 _, buffer = cv.imencode('.jpg', frame)
                 # Converting into encoded bytes
                 jpg_as_text = base64.b64encode(buffer)
-                # Publishig the Frame on the Topic home/server
-                # self.mqtt_dict['image'] = jpg_as_text
                 self.mqtt_dict['indx'] = i
-
-                # new_dict = {'x': 10, 'y': 20}
-                # json_data = json.dumps(new_dict)
-                # json_data = base64.b64encode(json_data)
-                # print(f"Json: {json_data}")
-
-                # MQTT_SEND = "DSR5/CAM"
-                # idx = str(i).zfill(5)[-5:]
                 idx_bytes = int(i).to_bytes(2,'little')
                 msg = idx_bytes + jpg_as_text
-                # print(f"idx: { int.from_bytes(msg[:2], 'little') }")
                 client.publish(MQTT_CAM, msg)
-                # print(i)
-
-
-                # MQTT_SEND = "DSR5/DATA"
 
                 json_data = json.dumps(self.mqtt_dict)
                 client.publish(MQTT_DATA, json_data)
 
-                # end = time.time()
-                # t = end - start
-                # fps = 1/t
-                # print(fps)
-                # print(counter)
-                # counter += 1
-                # time.sleep(0.5)
                 time.sleep(1/self.fps)
         except Exception as e:
-            # cap.release()
             print(f"Excepción ocurrida: {e.__class__}")
             client.disconnect()
             print("\nNow you can restart fresh")
 
-# run_cv(store_coor, clase=sub)
 
