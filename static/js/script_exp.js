@@ -108,6 +108,7 @@ let trace1 = {
   };
 
   var layout = {
+    showlegend : true,
     width:750,
     heigth:300,
     title: {
@@ -247,6 +248,11 @@ function getArdData(){
     .then(function (response) {
         return response.json();
     }).then(function (data) {
+      if ('vel1' in data)
+      {
+          document.getElementById('vel1').value = data['vel1'];
+          document.getElementById('vel2').value = data['vel2'];
+      } 
         if ('M1' in data)
         {
             document.getElementById('M1').value = data['M1']/ppm;  
@@ -255,11 +261,6 @@ function getArdData(){
             console.log(data);
             addData();
         }
-        if ('vel1' in data)
-        {
-            document.getElementById('vel1').value = data['vel1'][0];
-            document.getElementById('vel2').value = data['vel2'][1];
-        } 
     });
 }
 

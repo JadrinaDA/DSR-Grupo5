@@ -245,6 +245,9 @@ font-weight: bold;}
 
   .fila{
     padding: 0 8px;
+    display: flex;
+    flex-direction: row;
+    margin-right: 10px;
   }
 
   .col{
@@ -266,3 +269,4 @@ font-weight: bold;}
     box-sizing: inherit;
     border-radius: 10px;
   }
+
