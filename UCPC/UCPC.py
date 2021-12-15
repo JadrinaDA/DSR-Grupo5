@@ -8,21 +8,8 @@ from subscriber import Subscriber
 from controler import Controler
 from store_coor import StoreCoor
 
-<<<<<<< HEAD
-# import Filtro as filter
-
-'''
-conversion de colores
-
-green = np.uint8([[[0,255,0 ]]])
-hsv_green = cv.cvtColor(green,cv.COLOR_BGR2HSV)
-print( hsv_green )
-'''
-
-=======
->>>>>>> 94c2a0ac0e6785462d8f3a6bc873f87a08911a1d
-bt = True
-cam = 1
+bt = True  
+cam = 0
 
 def mask_hsv(X,color):
     lb = np.array([0, 0, 0])
