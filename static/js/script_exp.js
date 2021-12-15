@@ -226,7 +226,7 @@ function addData()
         trace2['y'].push(data_arduino['ref_vel1']);
       }
       else{
-        trace2['y'].push(data_arduino['ref_vel1']);
+        trace2['y'].push(data_arduino['ref_vel2']);
       }
     trace2['x'].push(trace2['x'].slice(-1)[0] + 1);
     
