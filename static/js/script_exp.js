@@ -191,7 +191,7 @@ function addData()
       trace2['y'] = [0];
       trace1['id'] = id.value;
       layout.title = names[id.value];
-      trace1.name = names[id.value];
+      trace1.name = eje_y[id.value];
       layout.yaxis['title']['text']= eje_y[id.value];
   }
   if (trace1['x'].length >= 30)
