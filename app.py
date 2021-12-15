@@ -177,12 +177,18 @@ kd_a = 0.0
 horas = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00","17:00","18:00"]
 
 
-@app.route("/")
+@app.route("/", methods = ['POST', 'GET'])
 def index():
-    conn = get_db_connection()
-    users = conn.execute('SELECT * FROM estudiante_de').fetchall()
-    conn.close()
-    print(my_teach(2,3))
+    if request.method == "POST":
+        if (('@' not in request.form['Email']) or ('.cl' not in request.form['Email']) & ('.com' not in request.form['Email'])):
+            flash("Correo no es válido.")
+        else:
+            conn = get_db_connection()
+            conn.execute("INSERT INTO mensajes (nombre, email, asunto, comentario) VALUES (?, ?, ?, ?)",
+            (request.form['Name'], request.form['Email'], request.form['Subject'],
+             request.form['Comment']))
+            conn.commit()
+            conn.close()
     return render_template("inicio/pagina_inicio.html", users = None)
 
 @app.route("/capture")
@@ -216,8 +222,12 @@ def main():
             if ((dia_r == dia_h) and (hora_r < int(full_date[1]))):
                 continue
             coming_up.append(res)
+    if usuario['tipo'] == "admin":
+        msgs = conn.execute('SELECT * FROM mensajes').fetchall()
+    else:
+        msgs = None 
     conn.close()
-    return render_template("pagina_principal/info_lab.html", now = tiene_hora, week = coming_up)
+    return render_template("pagina_principal/info_lab.html", now = tiene_hora, week = coming_up, msgs = msgs)
 
 @app.route("/login", methods = ['POST', 'GET'])
 def login():
@@ -282,9 +292,9 @@ def reg():
         user_old = conn.execute('SELECT * FROM usuarios WHERE mail = ?',
                         (request.form['email'],)).fetchone()
         if (('@' not in request.form['email']) or ('.cl' not in request.form['email']) & ('.com' not in request.form['email'])) :
-            errors.append('Correo no es valido.')
+            errors.append('Correo no es válido.')
         elif user_old != None:
-            errors.append('Correo no es valido.')
+            errors.append('Correo no es válido.')
         if len(errors) > 0:
             conn.close()
             return render_template("registro/main.html", errors = errors) 

@@ -39,19 +39,14 @@
 
     <!-- Page Content -->
     <div class="content_inicio" style="max-width:1564px">
-      {% if users%}
-      {% for user in users %}
-        <a href="#">
-            <h2>{{ user['name'] }}</h2>
-        </a>
-        <span class="badge badge-primary">{{ user['password'] }}</span>
-        <span class="badge badge-primary">{{ user['inst'] }}</span>
-        <span class="badge badge-primary">{{ user['robotica'] }}</span>
-        <hr>
-      }
-      {% endfor %}
-      {% else %}
-      {% endif %}
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      {% for message in messages %}
+            Oops: {{message}}
+          {% endfor %}
+          {% else %}
+        {% endif %}
+      {% endwith %}
 
       <!-- About Section -->
       <div id="about">
@@ -88,7 +83,7 @@
        <!-- Contact Section -->
   <div id="contact">
     <h3 class="subtitle">Contacto</h3>
-    <form action="#" target="_blank">
+    <form method = "post">
       <input style="margin-left: 10px; width: 100%;" type="text" placeholder="Nombre" required="" name="Name">
       <input style="margin-left: 10px; width: 100%;" type="text" placeholder="Email" required="" name="Email">
       <input style="margin-left: 10px; width: 100%;" type="text" placeholder="Asunto" required="" name="Subject">
