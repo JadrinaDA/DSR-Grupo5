@@ -18,8 +18,8 @@ hsv_green = cv.cvtColor(green,cv.COLOR_BGR2HSV)
 print( hsv_green )
 '''
 
-bt = False
-cam = 0
+bt = True
+cam = 1
 
 def mask_hsv(X,color):
     lb = np.array([0, 0, 0])

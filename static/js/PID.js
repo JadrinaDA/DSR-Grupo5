@@ -41,13 +41,13 @@ class MobileBasePID
         // console.log(`Referencia: ${ref}`);
 
         // console.log("d:" + d_vec); //
+        var a = state[2] - Math.PI / 2 + Math.atan2(ref[0]-state[0],ref[1]-state[1]);
 
-        var d = Math.sqrt(Math.pow(d_vec[0],2) + Math.pow(d_vec[1],2));
+        var d = Math.sqrt(Math.pow(d_vec[0],2) + Math.pow(d_vec[1],2)) * Math.cos(a);
 
         // console.log(ref[0]-state[0]); //
         // console.log(ref[1]-state[1]); //
 
-        var a = state[2] - Math.PI / 2 + Math.atan2(ref[0]-state[0],ref[1]-state[1]);
         // console.log("a:" + a); //
 
         while (a>Math.PI){

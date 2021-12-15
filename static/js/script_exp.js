@@ -9,7 +9,7 @@ const urlParams = new URLSearchParams(queryString);
 const constants = ["kpl", "kil", "kdl", "kpa", "kia", "kda" ];
 constants.forEach(updateConstants);
 
-window.addEventListener('beforeunload', reset);
+// window.addEventListener('beforeunload', reset);
 
 function reset(){
     var inputs = document.getElementsByTagName("input");

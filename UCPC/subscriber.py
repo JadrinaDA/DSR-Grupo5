@@ -64,13 +64,12 @@ class Subscriber():
             self.store_coor.click_event(int(float(x)),int(float(y)))
         
         elif decoded_msg[:3] == "KAR":
-            self.auto = True
             list_msg = decoded_msg[3:].split('$')
             list_msg = list(map(lambda x: float(x), list_msg))
             kpa = list_msg[0]
             kda = list_msg[1]
             kia = list_msg[2]
-            self.bt_send(f"KSA{kpa}${kda}${kia}")
+            self.bt_send(f"KSA{kpa}${kia}${kda}")
             
         elif decoded_msg[:3] == "KSL":
             self.auto = True
@@ -101,7 +100,7 @@ class Subscriber():
         time.sleep(1)
         self.ser.write(msgOnEncode)
         time.sleep(1)
-        print(f"Mensaje enviado {msg}")
+        # print(f"Mensaje enviado {msg}")
 
     def bt_receive(self):
         if not self.port:

@@ -188,6 +188,12 @@ void loop()
 
       n = return_pos(l+1, instruccion.length(), instruccion);
       Kd_angular = instruccion.substring(l+1,n).toFloat();
+      Serial.print("kp: ");
+      Serial.print(Kp_angular);
+      Serial.print(" | ki: ");
+      Serial.print(Ki_angular);
+      Serial.print(" | kd: ");
+      Serial.print(Kd_angular);
     }
 
 // ---- Término seteo constantes ---------------
@@ -273,6 +279,8 @@ void loop()
     dict["M2"] = motorout1;
     dict["vel1"] = vel0;
     dict["vel2"] = vel1;
+    dict["ref_vel1"] = ref_0;
+    dict["ref_vel2"] = ref_1;
     
     serializeJson(dict, json_dict);
 
