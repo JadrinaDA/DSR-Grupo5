@@ -203,7 +203,7 @@ function addData()
       {
         trace2['y'].push(data_arduino['ref_vel1']);
       }
-      else(id.value == 'vel2')
+      else if (id.value == 'vel2')
       {
         trace2['y'].push(data_arduino['ref_vel2']);
       }
