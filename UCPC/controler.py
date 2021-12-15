@@ -13,7 +13,8 @@ class Controler():
         self.ki_a = ki_a
         self.u_0 = 0
         self.u_1 = 0
-
+        self.constante_tuning_angular = 6.6
+        self.constante_tuning_lineal = 10 
         self.error = [0.0, 0.0]
         self.past_error = [0.0, 0.0]
         self.ac_error = [0.0, 0.0]
@@ -37,7 +38,14 @@ class Controler():
         # print(f"kpa: {self.kp_a}")
         #print(f"av_error_0: {av_error[0]}")s
         #u_0 = self.kp_l*av_error[0]   
-
+        self.kp_l = self.constante_tuning_lineal*self.kp_l
+        self.kd_l = self.constante_tuning_lineal*self.kd_l
+        self.ki_l = self.constante_tuning_lineal*self.ki_l
+        
+        self.kp_a = self.constante_tuning_angular*self.kp_a
+        self.kd_a = self.constante_tuning_angular*self.kd_a
+        self.ki_a = self.constante_tuning_angular*self.ki_a
+        
         self.u_0 = self.kp_l*av_error[0] - self.kp_a*av_error[1] + self.ki_l*self.ac_error[0]*self.dt - self.ki_a*self.ac_error[1]*self.dt + self.kd_l*(av_error[0]-self.past_error[0])/self.dt - self.kd_a*(av_error[1]-self.past_error[1])/self.dt
         self.u_1 = self.kp_l*av_error[0] + self.kp_a*av_error[1] + self.ki_l*self.ac_error[0]*self.dt + self.ki_a*self.ac_error[1]*self.dt + self.kd_l*(av_error[0]-self.past_error[0])/self.dt + self.kd_a*(av_error[1]-self.past_error[1])/self.dt
         #u_1 = 0.0

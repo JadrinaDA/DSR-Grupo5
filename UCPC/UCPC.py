@@ -9,7 +9,7 @@ from controler import Controler
 from store_coor import StoreCoor
 
 bt = True  
-cam = 0
+cam = 1
 
 def mask_hsv(X,color):
     lb = np.array([0, 0, 0])
