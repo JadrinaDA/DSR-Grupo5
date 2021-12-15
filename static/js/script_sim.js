@@ -115,7 +115,7 @@ load();
 var id = null;
 function color() {
   var elem = document.getElementById("botin");  
-  console.log(getComputedStyle(elem).backgroundColor);
+  //console.log(getComputedStyle(elem).backgroundColor);
   switch(getComputedStyle(elem).backgroundColor){
       case 'rgb(255, 0, 0)':
         elem.style.background = 'green'; 
@@ -130,6 +130,6 @@ function color() {
 }
 
 update = setInterval(updateState, 10);
-log_error = setInterval(function(){
-    console.log("Error acumulado:" + controler.ac_error)
-}, 1000);
+// log_error = setInterval(function(){
+//     console.log("Error acumulado:" + controler.ac_error)
+// }, 1000);

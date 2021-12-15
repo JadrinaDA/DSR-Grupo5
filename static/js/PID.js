@@ -74,15 +74,12 @@ class MobileBasePID
 
     Update(){
         this.UpdateError();
-        // console.log(`Error: ${this.error}`);
-        // console.log(`Error acumulado: ${this.ac_error}`);
-        // console.log(`Error anterior: ${this.past_error}`);
-        // console.log(`Ts: ${this.mobile_base._Ts}`);
-        // console.log(`Error acumulado: ${this.ac_error}`);
         var u_0 = this.kp_l*this.error[0] - this.kp_a*this.error[1] + this.ki_l*this.ac_error[0] - this.ki_a*this.ac_error[1]+ this.kd_l*(this.error[0]-this.past_error[0])/this.mobile_base._Ts - this.kd_a*(this.error[1]-this.past_error[1])/this.mobile_base._Ts;
+        console.log('Entrada u0: '+ u_0);
+        console.log('Errores '+ this.error);
         var u_1 = this.kp_l*this.error[0] + this.kp_a*this.error[1] + this.ki_l*this.ac_error[0] + this.ki_a*this.ac_error[1] + this.kd_l*(this.error[0]-this.past_error[0])/this.mobile_base._Ts + this.kd_a*(this.error[1]-this.past_error[1])/this.mobile_base._Ts;
+        console.log('Entrada u1: '+ u_1);
         this.mobile_base.SetActuator([u_0,u_1]);
-        // El error acumulado no se pnderó por dT porque se hizo al acumularlo
     }
 
     SetReference(x, y){

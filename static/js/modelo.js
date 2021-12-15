@@ -11,7 +11,7 @@ class BaseMovil
         this._step_size = this._Ts;
         this._t0 = 0;
         this._tf = this.t_0 + this._step_size;
-        this._mu = 0.5; // roce
+        this._mu = 0.25; // roce
         this._Nsamples = 10+1;
         this._tX = linspace(this._t0, this._tf, this._Nsamples);
         // this._Ts = 0.001;
@@ -50,12 +50,12 @@ class BaseMovil
     SetActuator(u){
         // console.log(`Actuador seteado: ${u}`);
         for (let k = 0; k<2; k++){
-            if (Math.abs(u[k]) > this._u_max[k])
-            {
-                u[k] = this._u_max[k] * Math.sign(u[k]);
-            }
+                if (Math.abs(u[k]) > this._u_max[k])
+                {
+                        u[k] = this._u_max[k] * Math.sign(u[k]);
+                    }
         this._u = u;
-        }
+    }
     }
 
     Model()
@@ -104,26 +104,34 @@ class BaseMovil
         this._x = x;
         this._t = this._t + this._Ts;
         // this.ode.solve(1, this._Ts);
+        while (x[2]>Math.PI){
+            x[2] = x[2] - 2*Math.PI;
+        }
+        while (x[2]<-Math.PI){
+            x[2] = x[2] + 2*Math.PI;
+        }
 
         // Check state bounds
+        console.log('Velocidad pasada: '+this._x[3]);
         if (this._x[0] > this.x_max){
             this._x[0] = this.x_max;
-            this._x[3] = -this._x[3]*Math.cos(this._x[2])*this._ce;
+            this._x[3] = -this._x[3]*Math.sin(this._x[2])*this._ce;
         }
         if (this._x[0] < this.x_min){
             this._x[0] = this.x_min;
-            this._x[3] = -this._x[3]*Math.cos(this._x[2])*this._ce;
+            this._x[3] = -this._x[3]*Math.sin(this._x[2])*this._ce;
         }
 
         if (this._x[1] > this.y_max){
             this._x[1] = this.y_max;
-            this._x[3] = -this._x[3]*Math.sin(this._x[2])*this._ce;
+            this._x[3] = -this._x[3]*Math.cos(this._x[2])*this._ce;
         }
         if (this._x[1] < this.y_min){
             this._x[1] = this.y_min;
-            this._x[3] = -this._x[3]*Math.sin(this._x[2])*this._ce;
+            this._x[3] = -this._x[3]*Math.cos(this._x[2])*this._ce;
         }
-
+        console.log('angulo ' + this._x[2])
+        console.log('Velocidad final '+ this._x[3]);
         for(var i = 0; i<5; i++)
         {
             if (Number.isNaN(this._x[i]))
