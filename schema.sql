@@ -51,3 +51,15 @@ CREATE TABLE estudiante_de (
     FOREIGN KEY (id_prof) REFERENCES usuarios(id),
     PRIMARY KEY (id_est, id_prof)
 );
+
+
+DROP TABLE IF EXISTS mensajes;
+
+CREATE TABLE mensajes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL,
+    email TEXT NOT NULL,
+    asunto TEXT NOT NULL,
+    comentario TEXT NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
